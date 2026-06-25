@@ -2347,10 +2347,12 @@ function init() {
     if (isOwner) {
       showOwnerPanel();
     } else {
-      // loginTime is set inside showApp() from the attendance record (first login of day)
+        // _realLogin flag is set only when user actually typed email+password
+      // If not set, this is a session restore (refresh/reopen) — don't record new login
       state.user = { name: displayName };
       await loadAllData();
-      showApp();
+      showApp(!!window._realLogin);
+      window._realLogin = false; // reset after use
     }
     scheduleMidnightLogout();
   };
@@ -2370,11 +2372,10 @@ function init() {
   }
 }
 
-async function showApp() {
+async function showApp(isRealLogin = false) {
   document.getElementById('login-screen').style.display = 'none';
   const app = document.getElementById('app');
   app.classList.add('visible');
-  document.getElementById('topbar-name').textContent = state.user.name;
   attMonthOffset = 0;
   seedAIEngineerSubject();
   seedAgenticAISubject();
@@ -2388,16 +2389,16 @@ async function showApp() {
   renderPosts();
   renderNotes();
   navTo('dashboard');
-  // ── Attendance & Login History ──────────────────────────────────────────
-  const now       = new Date();
-  const dateKey   = toDateKey(now);
-  const timeStr   = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  const isLeave   = state.leaves.some(l => dateKey >= l.startDate && dateKey <= l.endDate);
-  let attEntry    = state.attendance.find(a => a.date === dateKey);
 
-  if (!isLeave) {
+  const now     = new Date();
+  const dateKey = toDateKey(now);
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const isLeave = state.leaves.some(l => dateKey >= l.startDate && dateKey <= l.endDate);
+  let attEntry  = state.attendance.find(a => a.date === dateKey);
+
+  if (isRealLogin && !isLeave) {
+    // ── Real login (email+password typed) — record attendance + history ──
     if (!attEntry) {
-      // First login of the day — create the record
       attEntry = {
         date: dateKey,
         loginTime: timeStr,
@@ -2407,20 +2408,23 @@ async function showApp() {
       };
       state.attendance.push(attEntry);
     } else {
-      // Returning to site same day — update loginTime to current and append history
-      attEntry.loginTime = timeStr;
+      // Already logged in today before — just add to history, keep first loginTime
       if (!attEntry.history) attEntry.history = [];
-      attEntry.history.push({ type: 'login', time: timeStr, ts: now.toISOString() });
+      // Only add if last entry wasn't already a login (avoid duplicate on fast refresh)
+      const lastHist = attEntry.history[attEntry.history.length - 1];
+      if (!lastHist || lastHist.type !== 'login') {
+        attEntry.history.push({ type: 'login', time: timeStr, ts: now.toISOString() });
+      }
     }
     saveData('attendance');
+    state.user.loginTime = attEntry.loginTime; // always show first login of day
+    fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
+  } else {
+    // ── Session restore (refresh/reopen) — just restore loginTime from record ──
+    state.user.loginTime = attEntry ? attEntry.loginTime : '—';
   }
 
-  // Show current session login time
-  state.user.loginTime = timeStr;
   document.getElementById('topbar-name').textContent = state.user.name;
-
-  // Save last-login meta (fire and forget)
-  fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
 }
 
 async function loadAllData() {
@@ -2508,7 +2512,7 @@ function scheduleMidnightLogout() {
   const midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
   const msToMidnight = midnight - now;
-  // Show warning 1 minute before
+  // Show 60-second warning banner before midnight
   setTimeout(() => {
     const banner = document.getElementById('logout-banner');
     if (!state.user) return;
@@ -2517,12 +2521,39 @@ function scheduleMidnightLogout() {
     const interval = setInterval(() => {
       cnt--;
       document.getElementById('logout-countdown').textContent = cnt;
-      if (cnt <= 0) { clearInterval(interval); doLogout(true); }
+      if (cnt <= 0) { clearInterval(interval); doMidnightLogout(); }
     }, 1000);
   }, Math.max(0, msToMidnight - 60000));
   setTimeout(() => {
-    if (state.user) doLogout(true);
+    if (state.user) doMidnightLogout();
   }, msToMidnight);
+}
+
+async function doMidnightLogout() {
+  // Record logout in attendance history
+  if (state.user) {
+    const now = new Date();
+    const dateKey = toDateKey(now);
+    const logoutTime = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+    const attIdx = state.attendance.findIndex(a => a.date === dateKey);
+    if (attIdx >= 0) {
+      state.attendance[attIdx].logoutTime = logoutTime;
+      if (!state.attendance[attIdx].history) state.attendance[attIdx].history = [];
+      state.attendance[attIdx].history.push({ type: 'logout', time: logoutTime, ts: now.toISOString() });
+      saveData('attendance');
+    }
+    // Pause running timers
+    state.activeTimers.forEach(t => {
+      if (t.status === 'running') { t.elapsed += Date.now() - t.startTime; t.status = 'paused'; }
+    });
+    saveData('activeTimers');
+  }
+  document.getElementById('logout-banner').style.display = 'none';
+  showToast('Session ended. Good night! 🌙', 'success');
+  state.user = null;
+  // Sign out of Firebase — this clears the session so user MUST re-enter credentials
+  try { await window._auth.signOut(); } catch(e) {}
+  // _onFirebaseLogout will handle UI cleanup (show login screen)
 }
 
 // ===================== LOGIN / LOGOUT =====================
@@ -2542,20 +2573,23 @@ async function doLogin() {
   btn.disabled = true;
 
   try {
+    // Mark this as a REAL login (user typed credentials)
+    window._realLogin = true;
     // Try sign in first
     await window._auth.signInWithEmailAndPassword(email, pass);
     // onAuthStateChanged fires → _onFirebaseLogin handles the rest
   } catch (e) {
+    window._realLogin = false;
     if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
       // Try to create new account
       try {
+        window._realLogin = true;
         await window._auth.createUserWithEmailAndPassword(email, pass);
         const name = displayName || email.split('@')[0];
         window._fbDisplayName = name;
-        // Save user meta — fire and forget
         fbSaveUserMeta({ displayName: name, email, role: 'student', createdAt: new Date().toISOString() }).catch(()=>{});
-        // onAuthStateChanged fires → _onFirebaseLogin handles the rest
       } catch (ce) {
+        window._realLogin = false;
         errEl.textContent = friendlyAuthError(ce.code);
       }
     } else {
@@ -2589,27 +2623,21 @@ async function doLogout(auto = false) {
   const logoutTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const attIdx = state.attendance.findIndex(a => a.date === dateKey);
   if (attIdx >= 0) {
-    state.attendance[attIdx].logoutTime = logoutTime; // last logout of the day
+    state.attendance[attIdx].logoutTime = logoutTime;
     if (!state.attendance[attIdx].history) state.attendance[attIdx].history = [];
     state.attendance[attIdx].history.push({ type: 'logout', time: logoutTime, ts: now.toISOString() });
     saveData('attendance');
   }
   // Pause any running timers
   state.activeTimers.forEach(t => {
-    if (t.status === 'running') {
-      t.elapsed += Date.now() - t.startTime;
-      t.status = 'paused';
-    }
+    if (t.status === 'running') { t.elapsed += Date.now() - t.startTime; t.status = 'paused'; }
   });
   saveData('activeTimers');
   document.getElementById('logout-banner').style.display = 'none';
   if (auto) showToast('Session ended. Good night! 🌙', 'success');
-  // Sign out of Firebase (triggers onAuthStateChanged → _onFirebaseLogout cleans up UI)
-  try {
-    await window._auth.signOut();
-  } catch(e) {
-    console.warn('Firebase signOut error:', e);
-    state.user = null;
+  state.user = null;
+  // Sign out of Firebase — user must re-enter email+password to get back in
+  try { await window._auth.signOut(); } catch(e) {
     document.getElementById('app').classList.remove('visible');
     document.getElementById('login-screen').style.display = 'flex';
   }
