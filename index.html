@@ -2397,25 +2397,26 @@ async function showApp() {
 
   if (!isLeave) {
     if (!attEntry) {
-      // Very first login of this day — create the record
+      // First login of the day — create the record
       attEntry = {
         date: dateKey,
-        loginTime: timeStr,   // ← locked forever, never overwritten
+        loginTime: timeStr,
         logoutTime: null,
         status: 'present',
         history: [{ type: 'login', time: timeStr, ts: now.toISOString() }]
       };
       state.attendance.push(attEntry);
     } else {
-      // Returning to the site same day — append to history only
-      if (!attEntry.history) attEntry.history = [{ type: 'login', time: attEntry.loginTime, ts: dateKey + 'T00:00:00' }];
+      // Returning to site same day — update loginTime to current and append history
+      attEntry.loginTime = timeStr;
+      if (!attEntry.history) attEntry.history = [];
       attEntry.history.push({ type: 'login', time: timeStr, ts: now.toISOString() });
     }
     saveData('attendance');
   }
 
-  // Always show the FIRST login time of the day in the topbar/dashboard
-  state.user.loginTime = attEntry ? attEntry.loginTime : timeStr;
+  // Show current session login time
+  state.user.loginTime = timeStr;
   document.getElementById('topbar-name').textContent = state.user.name;
 
   // Save last-login meta (fire and forget)
