@@ -1103,6 +1103,22 @@ input, textarea, select { font-family: inherit; outline: none; }
             <div class="att-leg-item"><div class="att-leg-dot" style="background:var(--bg3);border:1px solid var(--border);"></div>Future</div>
           </div>
         </div>
+        <!-- Today's Login/Logout History -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">📋 Today's Login History</div>
+          <div id="att-login-history">
+            <div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No history yet today</div>
+          </div>
+        </div>
+
+        <!-- Monthly Attendance List -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">📅 Monthly Login Records</div>
+          <div id="att-recent-list">
+            <div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No records this month</div>
+          </div>
+        </div>
+
         <!-- Leaves list -->
         <div class="card">
           <div class="card-title" style="margin-bottom:14px;">Leave Records</div>
@@ -2331,7 +2347,8 @@ function init() {
     if (isOwner) {
       showOwnerPanel();
     } else {
-      state.user = { name: displayName, loginTime: new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}) };
+      // loginTime is set inside showApp() from the attendance record (first login of day)
+      state.user = { name: displayName };
       await loadAllData();
       showApp();
     }
@@ -2371,18 +2388,38 @@ async function showApp() {
   renderPosts();
   renderNotes();
   navTo('dashboard');
-  // Mark attendance in Firestore
-  const now = new Date();
-  const dateKey = toDateKey(now);
-  const loginTime = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  const attEntry = state.attendance.find(a => a.date === dateKey);
-  const isLeave = state.leaves.some(l => dateKey >= l.startDate && dateKey <= l.endDate);
-  if (!attEntry && !isLeave) {
-    state.attendance.push({ date: dateKey, loginTime, logoutTime: null, status: 'present' });
+  // ── Attendance & Login History ──────────────────────────────────────────
+  const now       = new Date();
+  const dateKey   = toDateKey(now);
+  const timeStr   = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const isLeave   = state.leaves.some(l => dateKey >= l.startDate && dateKey <= l.endDate);
+  let attEntry    = state.attendance.find(a => a.date === dateKey);
+
+  if (!isLeave) {
+    if (!attEntry) {
+      // Very first login of this day — create the record
+      attEntry = {
+        date: dateKey,
+        loginTime: timeStr,   // ← locked forever, never overwritten
+        logoutTime: null,
+        status: 'present',
+        history: [{ type: 'login', time: timeStr, ts: now.toISOString() }]
+      };
+      state.attendance.push(attEntry);
+    } else {
+      // Returning to the site same day — append to history only
+      if (!attEntry.history) attEntry.history = [{ type: 'login', time: attEntry.loginTime, ts: dateKey + 'T00:00:00' }];
+      attEntry.history.push({ type: 'login', time: timeStr, ts: now.toISOString() });
+    }
     saveData('attendance');
   }
-  // Save last-login meta
-  fbSaveUserMeta({ displayName: state.user.name, lastLogin: new Date().toISOString(), role: 'student' });
+
+  // Always show the FIRST login time of the day in the topbar/dashboard
+  state.user.loginTime = attEntry ? attEntry.loginTime : timeStr;
+  document.getElementById('topbar-name').textContent = state.user.name;
+
+  // Save last-login meta (fire and forget)
+  fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
 }
 
 async function loadAllData() {
@@ -2545,13 +2582,15 @@ function friendlyAuthError(code) {
 
 async function doLogout(auto = false) {
   if (!state.user) return;
-  // Save logout time to attendance
+  // Save logout time to attendance + history
   const now = new Date();
   const dateKey = toDateKey(now);
   const logoutTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   const attIdx = state.attendance.findIndex(a => a.date === dateKey);
   if (attIdx >= 0) {
-    state.attendance[attIdx].logoutTime = logoutTime;
+    state.attendance[attIdx].logoutTime = logoutTime; // last logout of the day
+    if (!state.attendance[attIdx].history) state.attendance[attIdx].history = [];
+    state.attendance[attIdx].history.push({ type: 'logout', time: logoutTime, ts: now.toISOString() });
     saveData('attendance');
   }
   // Pause any running timers
@@ -3269,6 +3308,46 @@ function renderAttendance() {
   document.getElementById('att-rate-text').textContent = rate + '%';
   const statsTitle = document.getElementById('att-stats-title');
   if (statsTitle) statsTitle.textContent = isCurrentMonthView ? 'This Month' : viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // ── Login/Logout History for today ──────────────────────────────────────
+  const historyEl = document.getElementById('att-login-history');
+  if (historyEl) {
+    const todayAtt = state.attendance.find(a => a.date === todayKey);
+    const hist = todayAtt && todayAtt.history ? todayAtt.history : [];
+    if (hist.length === 0) {
+      historyEl.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No history yet today</div>';
+    } else {
+      historyEl.innerHTML = hist.map(h => `
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:1rem;">${h.type === 'login' ? '🟢' : '🔴'}</span>
+          <span style="font-weight:600;font-size:0.82rem;color:${h.type === 'login' ? 'var(--success)' : 'var(--danger)'};">${h.type === 'login' ? 'Login' : 'Logout'}</span>
+          <span style="font-size:0.82rem;color:var(--muted);margin-left:auto;">${h.time}</span>
+        </div>`).join('');
+    }
+  }
+
+  // ── Monthly attendance list (last 10 present days) ───────────────────────
+  const attListEl = document.getElementById('att-recent-list');
+  if (attListEl) {
+    const monthAtts = state.attendance
+      .filter(a => a.date.startsWith(monthStr) && a.status === 'present')
+      .sort((a,b) => b.date.localeCompare(a.date))
+      .slice(0, 15);
+    if (monthAtts.length === 0) {
+      attListEl.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No records this month</div>';
+    } else {
+      attListEl.innerHTML = monthAtts.map(a => {
+        const hist = a.history || [];
+        const histStr = hist.length > 0
+          ? hist.map(h => `<span style="color:${h.type==='login'?'var(--success)':'var(--danger)'};">${h.type==='login'?'↑':'↓'}${h.time}</span>`).join(' ')
+          : `<span style="color:var(--success);">↑${a.loginTime||'—'}</span>${a.logoutTime ? ` <span style="color:var(--danger);">↓${a.logoutTime}</span>` : ''}`;
+        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <span style="font-size:0.82rem;font-weight:600;min-width:90px;">${a.date}</span>
+          <span style="font-size:0.75rem;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;">${histStr}</span>
+        </div>`;
+      }).join('');
+    }
+  }
 
   // Leaves list — filter to leaves that overlap the viewed month, most recent first
   const leaveList = document.getElementById('leave-list');
