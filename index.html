@@ -872,6 +872,10 @@ input, textarea, select { font-family: inherit; outline: none; }
         <div class="nav-label">Social</div>
         <button class="nav-item" data-page="community" onclick="navTo('community')"><span class="icon">🌐</span> Community</button>
       </div>
+      <div class="nav-section">
+        <div class="nav-label">Account</div>
+        <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon">👤</span> Profile</button>
+      </div>
     </nav>
     <!-- Main -->
     <div id="main">
@@ -1222,6 +1226,82 @@ input, textarea, select { font-family: inherit; outline: none; }
             <div class="card-title">Monthly Study Hours</div>
             <div class="chart-wrap"><canvas id="analytics-monthly-chart"></canvas></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Profile Page -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <div class="page-title">Profile</div>
+          <div class="page-sub">Your account details</div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:36px 24px;margin-bottom:18px;">
+          <!-- Big round avatar -->
+          <div id="profile-avatar-circle" style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:800;color:#fff;margin-bottom:20px;box-shadow:0 4px 24px rgba(124,58,237,0.35);letter-spacing:1px;">
+            ?
+          </div>
+          <div id="profile-name-big" style="font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
+          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:20px;">—</div>
+
+          <!-- Stats row -->
+          <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;width:100%;">
+            <div style="text-align:center;">
+              <div id="profile-stat-subjects" style="font-size:1.4rem;font-weight:700;color:var(--accent);">0</div>
+              <div style="font-size:0.75rem;color:var(--muted);">Subjects</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="profile-stat-todos" style="font-size:1.4rem;font-weight:700;color:var(--success);">0</div>
+              <div style="font-size:0.75rem;color:var(--muted);">To-Dos Done</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="profile-stat-sessions" style="font-size:1.4rem;font-weight:700;color:var(--accent2);">0</div>
+              <div style="font-size:0.75rem;color:var(--muted);">Sessions</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="profile-stat-hours" style="font-size:1.4rem;font-weight:700;color:var(--warn);">0h</div>
+              <div style="font-size:0.75rem;color:var(--muted);">Study Hours</div>
+            </div>
+          </div>
+
+          <!-- Logout button -->
+          <button onclick="doLogout()" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:var(--radius);padding:12px 36px;font-size:0.95rem;font-weight:600;cursor:pointer;width:100%;max-width:280px;letter-spacing:0.3px;">
+            🚪 Logout
+          </button>
+        </div>
+
+        <!-- Account Info Card -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title" style="margin-bottom:16px;">Account Info</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.85rem;color:var(--muted);">Display Name</span>
+              <span id="profile-info-name" style="font-size:0.88rem;font-weight:600;color:var(--text);">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.85rem;color:var(--muted);">Email</span>
+              <span id="profile-info-email" style="font-size:0.88rem;font-weight:600;color:var(--text);">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.85rem;color:var(--muted);">Today's Login</span>
+              <span id="profile-info-login" style="font-size:0.88rem;font-weight:600;color:var(--success);">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);">
+              <span style="font-size:0.85rem;color:var(--muted);">Days Present (This Month)</span>
+              <span id="profile-info-present" style="font-size:0.88rem;font-weight:600;color:var(--text);">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.85rem;color:var(--muted);">Overall Progress</span>
+              <span id="profile-info-progress" style="font-size:0.88rem;font-weight:600;color:var(--accent);">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Progress Card -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px;">Subject Progress</div>
+          <div id="profile-subject-list"></div>
         </div>
       </div>
 
@@ -2303,6 +2383,74 @@ function seedMLOpsEngineerSubject() {
   saveData('subjects');
 }
 
+// ===================== PROFILE PAGE =====================
+function renderProfile() {
+  if (!state.user) return;
+
+  const name  = state.user.name || '—';
+  const email = window._fbUser ? window._fbUser.email : '—';
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?';
+
+  // Avatar & name
+  const avatarEl = document.getElementById('profile-avatar-circle');
+  if (avatarEl) avatarEl.textContent = initials;
+  const nameBig = document.getElementById('profile-name-big');
+  if (nameBig) nameBig.textContent = name;
+  const emailBig = document.getElementById('profile-email-big');
+  if (emailBig) emailBig.textContent = email;
+
+  // Account info fields
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('profile-info-name',  name);
+  set('profile-info-email', email);
+  set('profile-info-login', state.user.loginTime || '—');
+
+  // Days present this month
+  const now = new Date();
+  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const daysPresent = state.attendance.filter(a => a.date.startsWith(monthStr) && a.status === 'present').length;
+  set('profile-info-present', daysPresent + ' day' + (daysPresent !== 1 ? 's' : ''));
+
+  // Overall progress
+  const totalTopics = state.subjects.reduce((a,s) => a + s.topics.length, 0);
+  const doneTopics  = state.subjects.reduce((a,s) => a + s.topics.filter(t=>t.done).length, 0);
+  const pct = totalTopics > 0 ? Math.round(doneTopics/totalTopics*100) : 0;
+  set('profile-info-progress', pct + '%');
+
+  // Stats
+  const doneSessions = state.sessions.filter(s => s.status === 'done').length;
+  const totalMs = state.sessions.filter(s=>s.status==='done').reduce((a,s)=>a+(s.duration||0),0);
+  const totalHrs = Math.round(totalMs/3600000 * 10) / 10;
+  set('profile-stat-subjects', state.subjects.length);
+  set('profile-stat-todos',    doneTopics);
+  set('profile-stat-sessions', doneSessions);
+  set('profile-stat-hours',    totalHrs + 'h');
+
+  // Subject progress list
+  const listEl = document.getElementById('profile-subject-list');
+  if (listEl) {
+    if (state.subjects.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0;">No subjects yet</div>';
+    } else {
+      listEl.innerHTML = state.subjects.map(s => {
+        const total = s.topics.length;
+        const done  = s.topics.filter(t=>t.done).length;
+        const p     = total > 0 ? Math.round(done/total*100) : 0;
+        const color = s.color || 'var(--accent)';
+        return `<div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:0.85rem;font-weight:600;color:var(--text);">${escHtml(s.name)}</span>
+            <span style="font-size:0.78rem;color:var(--muted);">${done}/${total} &nbsp;${p}%</span>
+          </div>
+          <div style="height:7px;background:var(--bg3);border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${p}%;background:${color};border-radius:99px;transition:width 0.4s ease;"></div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
 function colorForSubject(s) {
   if (s.color) return s.color;
   const idx = state.subjects.findIndex(x => x.id === s.id);
@@ -2330,9 +2478,17 @@ function init() {
   startClock();
   // Wait for Firebase auth state — _onFirebaseLogin / _onFirebaseLogout are set below
   window._onFirebaseLogin = async (fbUser) => {
-    // Load user meta doc from Firestore
-    const { doc, getDoc } = window._fbApi;
-    // Load user meta with timeout so local file usage never hangs
+    window._fbUid = fbUser.uid;
+
+    // ── Static owner check (email-based, no Firestore needed) ──
+    const OWNER_EMAIL = 'owner@gmail.com';
+    if (fbUser.email === OWNER_EMAIL) {
+      window._fbDisplayName = 'Owner';
+      showOwnerPanel();
+      return; // owner doesn't need scheduleMidnightLogout
+    }
+
+    // ── Regular student ──
     let meta = {};
     try {
       const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
@@ -2340,20 +2496,16 @@ function init() {
       const metaSnap = await Promise.race([metaPromise, timeoutPromise]);
       if (metaSnap && metaSnap.exists) meta = metaSnap.data();
     } catch(e) { console.warn('Meta load failed, continuing:', e); }
-    const isOwner = meta.role === 'owner';
+
     const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
-    window._fbUid = fbUser.uid;
     window._fbDisplayName = displayName;
-    if (isOwner) {
-      showOwnerPanel();
-    } else {
-        // _realLogin flag is set only when user actually typed email+password
-      // If not set, this is a session restore (refresh/reopen) — don't record new login
-      state.user = { name: displayName };
-      await loadAllData();
-      showApp(!!window._realLogin);
-      window._realLogin = false; // reset after use
-    }
+
+    // _realLogin flag is set only when user actually typed email+password
+    // If not set, this is a session restore (refresh/reopen) — don't record new login
+    state.user = { name: displayName };
+    await loadAllData();
+    showApp(!!window._realLogin);
+    window._realLogin = false; // reset after use
     scheduleMidnightLogout();
   };
   window._onFirebaseLogout = () => {
@@ -2572,6 +2724,16 @@ async function doLogin() {
   btn.textContent = 'Signing in…';
   btn.disabled = true;
 
+  // ── Static owner credentials check ──
+  const OWNER_EMAIL = 'owner@gmail.com';
+  const OWNER_PASS  = '1010';
+  if (email === OWNER_EMAIL && pass !== OWNER_PASS) {
+    errEl.textContent = 'Incorrect owner password.';
+    btn.textContent = 'Sign In / Create Account';
+    btn.disabled = false;
+    return;
+  }
+
   try {
     // Mark this as a REAL login (user typed credentials)
     window._realLogin = true;
@@ -2581,16 +2743,28 @@ async function doLogin() {
   } catch (e) {
     window._realLogin = false;
     if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
-      // Try to create new account
-      try {
-        window._realLogin = true;
-        await window._auth.createUserWithEmailAndPassword(email, pass);
-        const name = displayName || email.split('@')[0];
-        window._fbDisplayName = name;
-        fbSaveUserMeta({ displayName: name, email, role: 'student', createdAt: new Date().toISOString() }).catch(()=>{});
-      } catch (ce) {
-        window._realLogin = false;
-        errEl.textContent = friendlyAuthError(ce.code);
+      if (email === 'owner@gmail.com') {
+        // Owner account — create it in Firebase Auth silently (first time only)
+        try {
+          window._realLogin = true;
+          await window._auth.createUserWithEmailAndPassword(email, pass);
+          // onAuthStateChanged fires → _onFirebaseLogin detects owner email → showOwnerPanel
+        } catch (ce) {
+          window._realLogin = false;
+          errEl.textContent = friendlyAuthError(ce.code);
+        }
+      } else {
+        // Regular student — create new account
+        try {
+          window._realLogin = true;
+          await window._auth.createUserWithEmailAndPassword(email, pass);
+          const name = displayName || email.split('@')[0];
+          window._fbDisplayName = name;
+          fbSaveUserMeta({ displayName: name, email, role: 'student', createdAt: new Date().toISOString() }).catch(()=>{});
+        } catch (ce) {
+          window._realLogin = false;
+          errEl.textContent = friendlyAuthError(ce.code);
+        }
       }
     } else {
       errEl.textContent = friendlyAuthError(e.code);
@@ -2655,6 +2829,7 @@ function navTo(page) {
   if (page === 'tasks') { renderTaskSubjectFilter(); renderTasks(); }
   if (page === 'timer') { renderActiveTimers(); renderSessions(); }
   if (page === 'attendance') renderAttendance();
+  if (page === 'profile') renderProfile();
   if (page === 'community') renderPosts();
   if (page === 'analytics') renderAnalytics();
   if (page === 'notes') renderNotes();
@@ -3969,7 +4144,10 @@ async function getAllStudents() {
   // Returns array of { uid, displayName, email, lastLogin, role }
   try {
     const users = await fbGetAllUsers();
-    return users.filter(u => u.role !== 'owner').sort((a,b) => (a.displayName||'').localeCompare(b.displayName||''));
+    // Filter out owner email and role:owner accounts from student list
+    return users
+      .filter(u => u.role !== 'owner' && u.email !== 'owner@gmail.com')
+      .sort((a,b) => (a.displayName||'').localeCompare(b.displayName||''));
   } catch(e) { return []; }
 }
 
