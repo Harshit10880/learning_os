@@ -7,25 +7,63 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase Compat SDK -->
+<!-- Firebase Compat SDK (works with local files, no ES module issues) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// Firebase is initialized here but onAuthStateChanged is set up in initFirebase()
-// which is called at the bottom of the file AFTER all functions are defined.
-const firebaseConfig = {
-  apiKey: "AIzaSyCJZ7RMtnaPr56AMkJRpTneh21iSS6r5z8",
-  authDomain: "learning-os-c8be8.firebaseapp.com",
-  projectId: "learning-os-c8be8",
-  storageBucket: "learning-os-c8be8.firebasestorage.app",
-  messagingSenderId: "177429992332",
-  appId: "1:177429992332:web:7149cb46f6f73f180bfca9"
-};
-const _fbApp  = firebase.initializeApp(firebaseConfig);
-window._auth  = firebase.auth();
-window._db    = firebase.firestore();
-window._db.enablePersistence({ synchronizeTabs: false }).catch(() => {});
+(function() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJZ7RMtnaPr56AMkJRpTneh21iSS6r5z8",
+    authDomain: "learning-os-c8be8.firebaseapp.com",
+    projectId: "learning-os-c8be8",
+    storageBucket: "learning-os-c8be8.firebasestorage.app",
+    messagingSenderId: "177429992332",
+    appId: "1:177429992332:web:7149cb46f6f73f180bfca9"
+  };
+
+  const fbApp  = firebase.initializeApp(firebaseConfig);
+  const auth   = firebase.auth();
+  const db     = firebase.firestore();
+
+  // Enable offline persistence so local file usage works even with bad connectivity
+  db.enablePersistence({ synchronizeTabs: false }).catch(() => {});
+
+  window._db   = db;
+  window._auth = auth;
+
+  // Compat API shims so our helper functions work unchanged
+  window._fbApi = {
+    doc: (db, ...path) => {
+      // path can be ('users', uid) or ('users', uid, 'data', key) etc.
+      let ref = db;
+      for (let i = 0; i < path.length; i++) {
+        ref = (i % 2 === 0) ? ref.collection(path[i]) : ref.doc(path[i]);
+      }
+      return ref;
+    },
+    getDoc: ref => ref.get(),
+    setDoc: (ref, data, opts) => opts && opts.merge ? ref.set(data, { merge: true }) : ref.set(data),
+    collection: (db, name) => db.collection(name),
+    getDocs: ref => ref.get(),
+    serverTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
+    signInWithEmailAndPassword: (auth, email, pass) => auth.signInWithEmailAndPassword(email, pass),
+    createUserWithEmailAndPassword: (auth, email, pass) => auth.createUserWithEmailAndPassword(email, pass),
+    signOut: (auth) => auth.signOut()
+  };
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      window._fbUser = user;
+      window._fbUid  = user.uid;
+      if (window._onFirebaseLogin) window._onFirebaseLogin(user);
+    } else {
+      window._fbUser = null;
+      window._fbUid  = null;
+      if (window._onFirebaseLogout) window._onFirebaseLogout();
+    }
+  });
+})();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -681,25 +719,6 @@ input, textarea, select { font-family: inherit; outline: none; }
   box-shadow: 0 4px 16px rgba(239,68,68,0.4);
 }
 
-
-/* ===================== GAMIFICATION ===================== */
-#page-gamification { padding: 0 0 40px; }
-.xp-bar-wrap { background: var(--bg3); border-radius: 99px; height: 12px; overflow: hidden; margin: 8px 0 4px; }
-.xp-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.6s cubic-bezier(.4,0,.2,1); }
-.level-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-radius: 99px; padding: 4px 14px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; }
-.streak-chip { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#f59e0b,#ef4444); color:#fff; border-radius:99px; padding:4px 12px; font-size:0.82rem; font-weight:700; }
-.trophy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
-.trophy-card { background: var(--bg2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 12px; text-align: center; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-.trophy-card.earned { border-color: var(--accent); box-shadow: 0 0 16px rgba(124,58,237,0.18); }
-.trophy-card.locked { opacity: 0.38; filter: grayscale(1); }
-.trophy-card .t-icon { font-size: 2.2rem; margin-bottom: 8px; }
-.trophy-card .t-name { font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.trophy-card .t-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.4; }
-.trophy-card .t-date { font-size: 0.65rem; color: var(--accent); margin-top: 6px; font-weight: 600; }
-.trophy-card.earned::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); font-weight: 800; }
-.dash-gam-strip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
-.profile-level-section { background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(56,189,248,0.08)); border: 1.5px solid rgba(124,58,237,0.2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -808,7 +827,7 @@ input, textarea, select { font-family: inherit; outline: none; }
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" onclick="doLogin()" id="login-btn" disabled style="opacity:0.6;">⏳ Connecting…</button>
+    <button class="btn-primary" onclick="doLogin()" id="login-btn">Sign In / Create Account</button>
     <div id="login-error"></div>
     <div style="margin-top:14px;font-size:0.75rem;color:var(--muted2);line-height:1.5;">
       New here? Enter your email + name + password to create an account.<br>
@@ -854,10 +873,6 @@ input, textarea, select { font-family: inherit; outline: none; }
         <button class="nav-item" data-page="community" onclick="navTo('community')"><span class="icon">🌐</span> Community</button>
       </div>
       <div class="nav-section">
-        <div class="nav-label">Achievements</div>
-        <button class="nav-item" data-page="gamification" onclick="navTo('gamification')"><span class="icon">🏆</span> Trophies & XP</button>
-      </div>
-      <div class="nav-section">
         <div class="nav-label">Account</div>
         <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon">👤</span> Profile</button>
       </div>
@@ -880,8 +895,6 @@ input, textarea, select { font-family: inherit; outline: none; }
           <div class="meta-divider"></div>
           <div class="meta-item"><div class="meta-val" id="dash-streak" style="color:var(--warn);">🔥 0</div><div class="meta-lbl">Day Streak</div></div>
         </div>
-        <!-- Gamification strip -->
-        <div class="dash-gam-strip" id="dash-gam-strip" style="margin:10px 0 4px;"></div>
         <div class="grid-2" style="margin-bottom:18px;">
           <!-- Overall progress -->
           <div class="card">
@@ -1216,52 +1229,6 @@ input, textarea, select { font-family: inherit; outline: none; }
         </div>
       </div>
 
-      <!-- Gamification / Trophies Page -->
-      <div class="page" id="page-gamification">
-        <div class="page-header">
-          <div class="page-title">🏆 Trophies & XP</div>
-          <div class="page-sub">Your achievements and progress</div>
-        </div>
-
-        <!-- Level & XP Card -->
-        <div class="card" id="gam-level-card" style="margin-bottom:18px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-            <div>
-              <div id="gam-level-badge" class="level-badge" style="margin-bottom:6px;">⭐ Level 1 — Beginner</div>
-              <div id="gam-xp-label" style="font-size:0.78rem;color:var(--muted);">0 / 100 XP</div>
-            </div>
-            <div id="gam-streak-chip" class="streak-chip">🔥 0 day streak</div>
-          </div>
-          <div class="xp-bar-wrap">
-            <div class="xp-bar-fill" id="gam-xp-bar" style="width:0%;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px;">
-            <div style="text-align:center;flex:1;">
-              <div id="gam-stat-xp" style="font-size:1.3rem;font-weight:800;color:var(--accent);">0</div>
-              <div style="font-size:0.72rem;color:var(--muted);">Total XP</div>
-            </div>
-            <div style="text-align:center;flex:1;">
-              <div id="gam-stat-streak" style="font-size:1.3rem;font-weight:800;color:#f59e0b;">0</div>
-              <div style="font-size:0.72rem;color:var(--muted);">Best Streak</div>
-            </div>
-            <div style="text-align:center;flex:1;">
-              <div id="gam-stat-trophies" style="font-size:1.3rem;font-weight:800;color:#22c55e;">0</div>
-              <div style="font-size:0.72rem;color:var(--muted);">Trophies</div>
-            </div>
-            <div style="text-align:center;flex:1;">
-              <div id="gam-stat-level" style="font-size:1.3rem;font-weight:800;color:var(--accent2);">1</div>
-              <div style="font-size:0.72rem;color:var(--muted);">Level</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trophy Cabinet -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:16px;">🏅 Trophy Cabinet</div>
-          <div class="trophy-grid" id="gam-trophy-grid"></div>
-        </div>
-      </div>
-
       <!-- Profile Page -->
       <div class="page" id="page-profile">
         <div class="page-header">
@@ -1276,11 +1243,7 @@ input, textarea, select { font-family: inherit; outline: none; }
             ?
           </div>
           <div id="profile-name-big" style="font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
-          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">—</div>
-          <!-- Level badge + streak -->
-          <div id="profile-level-badge" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;"></div>
-          <!-- Earned trophies mini row -->
-          <div id="profile-trophy-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;padding:10px 12px;background:var(--bg3);border-radius:var(--radius);width:100%;box-sizing:border-box;"></div>
+          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:20px;">—</div>
 
           <!-- Stats row -->
           <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;width:100%;">
@@ -2420,241 +2383,6 @@ function seedMLOpsEngineerSubject() {
   saveData('subjects');
 }
 
-
-// ===================== GAMIFICATION ENGINE =====================
-
-const LEVELS = [
-  { level:1,  xp:0,    title:'Beginner',    badge:'🌱' },
-  { level:2,  xp:100,  title:'Explorer',    badge:'🧭' },
-  { level:3,  xp:300,  title:'Learner',     badge:'📚' },
-  { level:4,  xp:600,  title:'Achiever',    badge:'⚡' },
-  { level:5,  xp:1000, title:'Scholar',     badge:'🎓' },
-  { level:6,  xp:1500, title:'Expert',      badge:'💡' },
-  { level:7,  xp:2200, title:'Master',      badge:'🔮' },
-  { level:8,  xp:3000, title:'Champion',    badge:'🏆' },
-  { level:9,  xp:4000, title:'Legend',      badge:'⚔️' },
-  { level:10, xp:5500, title:'Grandmaster', badge:'👑' },
-];
-
-const TROPHIES_DEF = [
-  { id:'first_step',     icon:'🌱', name:'First Step',      desc:'First login ever' },
-  { id:'on_fire',        icon:'🔥', name:'On Fire',         desc:'Achieve a 7-day streak' },
-  { id:'diamond_mind',   icon:'💎', name:'Diamond Mind',    desc:'Achieve a 30-day streak' },
-  { id:'speed_learner',  icon:'⚡', name:'Speed Learner',   desc:'Complete 10 topics in one day' },
-  { id:'century',        icon:'💯', name:'Century',         desc:'Complete 100 topics total' },
-  { id:'focused',        icon:'🎯', name:'Focused',         desc:'Complete 5 sessions in one week' },
-  { id:'subject_master', icon:'👑', name:'Subject Master',  desc:'Complete all topics in one subject' },
-  { id:'rocket',         icon:'🚀', name:'Rocket',          desc:'Reach level 10' },
-  { id:'early_bird',     icon:'🌅', name:'Early Bird',      desc:'Login before 7 AM' },
-  { id:'night_owl',      icon:'🦉', name:'Night Owl',       desc:'Study session after 10 PM' },
-  { id:'streak_3',       icon:'✨', name:'Ignition',        desc:'Achieve a 3-day streak' },
-  { id:'half_century',   icon:'🥈', name:'Half Century',    desc:'Complete 50 topics total' },
-];
-
-// XP values
-const XP = {
-  login:        10,
-  topic:        15,
-  task:         10,
-  session:      20,
-  streak3:      50,
-  streak7:      150,
-  streak30:     500,
-};
-
-// Get gamification state (stored in Firestore under 'gamification' key)
-function getGamState() {
-  if (!state.gamification) {
-    state.gamification = {
-      xp: 0,
-      level: 1,
-      currentStreak: 0,
-      bestStreak: 0,
-      lastStreakDate: null,
-      trophies: {},   // { trophy_id: { earnedAt: ISO string } }
-      xpLog: [],      // [{ reason, amount, date }]
-    };
-  }
-  return state.gamification;
-}
-
-function getLevelInfo(xp) {
-  let lvl = LEVELS[0];
-  for (const l of LEVELS) { if (xp >= l.xp) lvl = l; else break; }
-  const nextIdx = LEVELS.findIndex(l => l.level === lvl.level);
-  const next = LEVELS[nextIdx + 1] || null;
-  const pct = next ? Math.round(((xp - lvl.xp) / (next.xp - lvl.xp)) * 100) : 100;
-  return { ...lvl, next, pct, xpInLevel: xp - lvl.xp, xpToNext: next ? next.xp - lvl.xp : 0 };
-}
-
-function awardXP(reason, amount, skipSave = false) {
-  const g = getGamState();
-  g.xp += amount;
-  g.xpLog.push({ reason, amount, date: new Date().toISOString() });
-  // Check level up
-  const info = getLevelInfo(g.xp);
-  if (info.level > g.level) {
-    g.level = info.level;
-    showToast(`🎉 Level Up! You are now ${info.badge} ${info.title}`, 'success');
-  }
-  if (!skipSave) saveData('gamification');
-}
-
-function earnTrophy(id) {
-  const g = getGamState();
-  if (g.trophies[id]) return false; // already earned
-  const def = TROPHIES_DEF.find(t => t.id === id);
-  if (!def) return false;
-  g.trophies[id] = { earnedAt: new Date().toISOString() };
-  saveData('gamification');
-  showToast(`🏆 Trophy Unlocked: ${def.icon} ${def.name}!`, 'success');
-  return true;
-}
-
-// Call on every real login
-function gamHandleLogin() {
-  const g = getGamState();
-  const today = toDateKey(new Date());
-  const hour  = new Date().getHours();
-
-  // Streak logic
-  const yesterday = toDateKey(new Date(Date.now() - 86400000));
-  if (g.lastStreakDate === today) {
-    // already counted today
-  } else if (g.lastStreakDate === yesterday) {
-    g.currentStreak += 1;
-  } else {
-    g.currentStreak = 1; // reset or start
-  }
-  g.lastStreakDate = today;
-  if (g.currentStreak > g.bestStreak) g.bestStreak = g.currentStreak;
-
-  // Streak bonus XP
-  if (g.currentStreak === 3)  { awardXP('3-day streak bonus', XP.streak3, true);  earnTrophy('streak_3'); }
-  if (g.currentStreak === 7)  { awardXP('7-day streak bonus', XP.streak7, true);  earnTrophy('on_fire'); }
-  if (g.currentStreak === 30) { awardXP('30-day streak bonus', XP.streak30, true); earnTrophy('diamond_mind'); }
-
-  // Login XP
-  awardXP('Daily login', XP.login, true);
-
-  // Early bird trophy
-  if (hour < 7) earnTrophy('early_bird');
-
-  // First step trophy
-  if (!g.trophies['first_step']) earnTrophy('first_step');
-
-  saveData('gamification');
-  renderDashboardGamStrip();
-}
-
-// Call when topic is toggled to done
-function gamHandleTopicDone() {
-  awardXP('Topic completed', XP.topic, true);
-
-  const g = getGamState();
-  const today = toDateKey(new Date());
-
-  // Count topics done today
-  const todayTopicsDone = (g.xpLog || []).filter(e =>
-    e.reason === 'Topic completed' && e.date.startsWith(today)
-  ).length;
-  if (todayTopicsDone >= 10) earnTrophy('speed_learner');
-
-  // Total topics done
-  const totalDone = state.subjects.reduce((a,s) => a + s.topics.filter(t=>t.done).length, 0);
-  if (totalDone >= 50)  earnTrophy('half_century');
-  if (totalDone >= 100) earnTrophy('century');
-
-  // Subject master — all topics in any subject done
-  for (const s of state.subjects) {
-    if (s.topics.length > 0 && s.topics.every(t => t.done)) {
-      earnTrophy('subject_master');
-      break;
-    }
-  }
-
-  // Level 10 check
-  if (getLevelInfo(g.xp).level >= 10) earnTrophy('rocket');
-
-  saveData('gamification');
-}
-
-function gamHandleTaskDone() {
-  awardXP('Task completed', XP.task);
-}
-
-function gamHandleSessionDone() {
-  awardXP('Session completed', XP.session, true);
-
-  // Night owl trophy (after 10 PM)
-  if (new Date().getHours() >= 22) earnTrophy('night_owl');
-
-  // 5 sessions in one week
-  const g = getGamState();
-  const today = new Date();
-  const weekAgo = new Date(today - 7 * 86400000);
-  const weekSessions = state.sessions.filter(s => {
-    return s.status === 'done' && new Date(s.createdAt || s.date) >= weekAgo;
-  }).length;
-  if (weekSessions >= 5) earnTrophy('focused');
-
-  saveData('gamification');
-}
-
-// Render the XP/streak strip on dashboard
-function renderDashboardGamStrip() {
-  const el = document.getElementById('dash-gam-strip');
-  if (!el) return;
-  const g = getGamState();
-  const info = getLevelInfo(g.xp);
-  const earnedCount = Object.keys(g.trophies).length;
-  el.innerHTML = `
-    <div class="level-badge">${info.badge} Lv.${info.level} ${info.title}</div>
-    <div class="streak-chip">🔥 ${g.currentStreak} day streak</div>
-    <div style="font-size:0.78rem;color:var(--muted);">⭐ ${g.xp} XP &nbsp;•&nbsp; 🏅 ${earnedCount} trophies</div>
-  `;
-}
-
-function renderGamification() {
-  const g = getGamState();
-  const info = getLevelInfo(g.xp);
-  const xpLabel = info.next
-    ? `${g.xp - info.xp} / ${info.xpToNext} XP to next level`
-    : `${g.xp} XP — MAX LEVEL`;
-
-  // Level badge & bar
-  const badge = document.getElementById('gam-level-badge');
-  if (badge) badge.textContent = `${info.badge} Level ${info.level} — ${info.title}`;
-  const xpLbl = document.getElementById('gam-xp-label');
-  if (xpLbl) xpLbl.textContent = xpLabel;
-  const bar = document.getElementById('gam-xp-bar');
-  if (bar) bar.style.width = info.pct + '%';
-  const chip = document.getElementById('gam-streak-chip');
-  if (chip) chip.textContent = `🔥 ${g.currentStreak} day streak`;
-
-  // Stats
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('gam-stat-xp',      g.xp);
-  set('gam-stat-streak',  g.bestStreak + ' days');
-  set('gam-stat-trophies',Object.keys(g.trophies).length);
-  set('gam-stat-level',   info.level);
-
-  // Trophy grid
-  const grid = document.getElementById('gam-trophy-grid');
-  if (!grid) return;
-  grid.innerHTML = TROPHIES_DEF.map(def => {
-    const earned = g.trophies[def.id];
-    const dateStr = earned ? new Date(earned.earnedAt).toLocaleDateString() : '';
-    return `<div class="trophy-card ${earned ? 'earned' : 'locked'}">
-      <div class="t-icon">${def.icon}</div>
-      <div class="t-name">${def.name}</div>
-      <div class="t-desc">${def.desc}</div>
-      ${earned ? `<div class="t-date">Earned ${dateStr}</div>` : '<div class="t-date" style="color:var(--muted);">Locked 🔒</div>'}
-    </div>`;
-  }).join('');
-}
-
-
 // ===================== PROFILE PAGE =====================
 function renderProfile() {
   if (!state.user) return;
@@ -2670,29 +2398,6 @@ function renderProfile() {
   if (nameBig) nameBig.textContent = name;
   const emailBig = document.getElementById('profile-email-big');
   if (emailBig) emailBig.textContent = email;
-
-  // Level badge under name
-  const g = getGamState();
-  const lvlInfo = getLevelInfo(g.xp);
-  const badgeEl = document.getElementById('profile-level-badge');
-  if (badgeEl) {
-    badgeEl.innerHTML = `
-      <span class="level-badge" style="margin-right:8px;">${lvlInfo.badge} Lv.${lvlInfo.level} ${lvlInfo.title}</span>
-      <span class="streak-chip">🔥 ${g.currentStreak} streak</span>
-    `;
-  }
-  // Mini trophies row
-  const trophyRowEl = document.getElementById('profile-trophy-row');
-  if (trophyRowEl) {
-    const earned = TROPHIES_DEF.filter(t => g.trophies[t.id]);
-    if (earned.length === 0) {
-      trophyRowEl.innerHTML = '<span style="color:var(--muted);font-size:0.78rem;">No trophies yet — keep going! 🚀</span>';
-    } else {
-      trophyRowEl.innerHTML = earned.map(t =>
-        `<span title="${t.name}" style="font-size:1.5rem;cursor:default;">${t.icon}</span>`
-      ).join('') + `<span style="font-size:0.75rem;color:var(--muted);margin-left:6px;">${earned.length}/${TROPHIES_DEF.length} earned</span>`;
-    }
-  }
 
   // Account info fields
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -2770,8 +2475,53 @@ let state = {
 
 // ===================== INIT =====================
 function init() {
-  // All login/logout handling is done in initFirebase() at the bottom of the file.
-  // This function is kept as a stub for compatibility.
+  startClock();
+  // Wait for Firebase auth state — _onFirebaseLogin / _onFirebaseLogout are set below
+  window._onFirebaseLogin = async (fbUser) => {
+    window._fbUid = fbUser.uid;
+
+    // ── Static owner check (email-based, no Firestore needed) ──
+    const OWNER_EMAIL = 'owner@gmail.com';
+    if (fbUser.email === OWNER_EMAIL) {
+      window._fbDisplayName = 'Owner';
+      showOwnerPanel();
+      return; // owner doesn't need scheduleMidnightLogout
+    }
+
+    // ── Regular student ──
+    let meta = {};
+    try {
+      const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 6000));
+      const metaSnap = await Promise.race([metaPromise, timeoutPromise]);
+      if (metaSnap && metaSnap.exists) meta = metaSnap.data();
+    } catch(e) { console.warn('Meta load failed, continuing:', e); }
+
+    const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
+    window._fbDisplayName = displayName;
+
+    // _realLogin flag is set only when user actually typed email+password
+    // If not set, this is a session restore (refresh/reopen) — don't record new login
+    state.user = { name: displayName };
+    await loadAllData();
+    showApp(!!window._realLogin);
+    window._realLogin = false; // reset after use
+    scheduleMidnightLogout();
+  };
+  window._onFirebaseLogout = () => {
+    state.user = null;
+    document.getElementById('app').classList.remove('visible');
+    document.getElementById('owner-panel').classList.remove('visible');
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-error').textContent = '';
+  };
+  // Check for owner session flag (fast path, still verified by Firestore meta on auth change)
+  if (S.get('los_owner_session') && window._fbUser) {
+    showOwnerPanel();
+    return;
+  }
 }
 
 async function showApp(isRealLogin = false) {
@@ -2821,7 +2571,6 @@ async function showApp(isRealLogin = false) {
     saveData('attendance');
     state.user.loginTime = attEntry.loginTime; // always show first login of day
     fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
-    gamHandleLogin(); // award login XP + update streak
   } else {
     // ── Session restore (refresh/reopen) — just restore loginTime from record ──
     state.user.loginTime = attEntry ? attEntry.loginTime : '—';
@@ -2847,18 +2596,16 @@ async function loadAllData() {
     withTimeout(fbLoad('leaves'),       t, S.get('los_leaves_cache')       || []),
     withTimeout(fbLoad('notes'),        t, S.get('los_notes_cache')        || []),
     withTimeout(fbLoad('activeTimers'), t, S.get('los_activeTimers_cache') || []),
-    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || []),
-    withTimeout(fbLoad('gamification'), t, S.get('los_gamification_cache')  || null)
+    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || [])
   ]);
-  state.subjects      = subjects      || [];
-  state.tasks         = tasks         || [];
-  state.sessions      = sessions      || [];
-  state.attendance    = attendance    || [];
-  state.leaves        = leaves        || [];
-  state.notes         = notes         || [];
-  state.activeTimers  = activeTimers  || [];
-  state.posts         = posts         || [];
-  state.gamification  = gamification  || null;
+  state.subjects    = subjects    || [];
+  state.tasks       = tasks       || [];
+  state.sessions    = sessions    || [];
+  state.attendance  = attendance  || [];
+  state.leaves      = leaves      || [];
+  state.notes       = notes       || [];
+  state.activeTimers= activeTimers|| [];
+  state.posts       = posts       || [];
 }
 
 function saveData(key) {
@@ -2868,7 +2615,7 @@ function saveData(key) {
     S.set('los_posts', state.posts);
     return;
   }
-  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers', gamification:'gamification' };
+  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers' };
   if (fbKeyMap[key]) {
     fbSave(fbKeyMap[key], state[key]);
     // Also cache locally for instant reload
@@ -2894,11 +2641,6 @@ function updateClock() {
   const dt = document.getElementById('dash-time');
   if (dt) dt.textContent = t;
   document.getElementById('dash-date') && (document.getElementById('dash-date').textContent = d);
-  // Update streak in dash-meta
-  const _g = getGamState();
-  const _streakEl = document.getElementById('dash-streak');
-  if (_streakEl) _streakEl.textContent = '🔥 ' + _g.currentStreak;
-  renderDashboardGamStrip();
   document.getElementById('dash-day') && (document.getElementById('dash-day').textContent = day);
   document.getElementById('dash-week') && (document.getElementById('dash-week').textContent = 'W' + week);
   state.activeTimers.forEach(t => {
@@ -2962,8 +2704,8 @@ async function doMidnightLogout() {
   showToast('Session ended. Good night! 🌙', 'success');
   state.user = null;
   // Sign out of Firebase — this clears the session so user MUST re-enter credentials
-  // Firebase signOut triggers onAuthStateChanged → handleFirebaseLogout() cleans up UI
-  try { await window._auth.signOut(); } catch(e) { handleFirebaseLogout(); }
+  try { await window._auth.signOut(); } catch(e) {}
+  // _onFirebaseLogout will handle UI cleanup (show login screen)
 }
 
 // ===================== LOGIN / LOGOUT =====================
@@ -2977,10 +2719,7 @@ async function doLogin() {
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email.'; return; }
   if (!pass)  { errEl.textContent = 'Please enter a password.'; return; }
-  if (!window._auth || !window._db) {
-    errEl.textContent = 'App is still loading — please wait 2 seconds and try again.';
-    return;
-  }
+  if (!window._fbApi) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
 
   btn.textContent = 'Signing in…';
   btn.disabled = true;
@@ -3091,7 +2830,6 @@ function navTo(page) {
   if (page === 'timer') { renderActiveTimers(); renderSessions(); }
   if (page === 'attendance') renderAttendance();
   if (page === 'profile') renderProfile();
-  if (page === 'gamification') renderGamification();
   if (page === 'community') renderPosts();
   if (page === 'analytics') renderAnalytics();
   if (page === 'notes') renderNotes();
@@ -3378,10 +3116,8 @@ function moveTopic(subjectId, idx, dir) {
 function toggleTopic(subjectId, idx) {
   const s = state.subjects.find(s => s.id === subjectId);
   if (!s) return;
-  const wasDone = s.topics[idx].done;
-  s.topics[idx].done = !wasDone;
+  s.topics[idx].done = !s.topics[idx].done;
   saveData('subjects');
-  if (!wasDone) gamHandleTopicDone(); // only award XP when marking done
   renderTopicList(s);
   renderSubjects();
 }
@@ -3519,12 +3255,10 @@ function saveTask() {
 function quickToggleTask(id) {
   const t = state.tasks.find(t => t.id === id);
   if (!t) return;
-  const wasPending = t.status === 'pending';
   if (t.status === 'pending') t.status = 'completed';
   else if (t.status === 'completed') t.status = 'cancelled';
   else t.status = 'pending';
   saveData('tasks');
-  if (wasPending) gamHandleTaskDone(); // award XP when completing
   renderTasks();
 }
 
@@ -3614,7 +3348,6 @@ function finishTimer(id, status = 'done') {
   renderActiveTimers();
   renderSessions();
   renderDashboard();
-  if (status === 'done') gamHandleSessionDone();
   showToast(status === 'done' ? `Session saved: ${formatHM(finalElapsed)}` : 'Session cancelled', status === 'done' ? 'success' : '');
 }
 
@@ -4399,7 +4132,7 @@ async function ownerLogout() {
   try {
     await window._auth.signOut();
   } catch(e) {
-    handleFirebaseLogout();
+    document.getElementById('login-screen').style.display = 'flex';
   }
 }
 
@@ -4824,72 +4557,11 @@ function escHtml(str) {
 }
 
 // ===================== START =====================
-// All functions are now defined. Safe to init Firebase listener + app.
-
-function initFirebase() {
-  // Set up auth state listener NOW — all callbacks (_onFirebaseLogin etc) are defined
-  window._auth.onAuthStateChanged(async function(user) {
-    // Enable login button — Firebase is ready
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-      loginBtn.textContent = 'Sign In / Create Account';
-      loginBtn.disabled = false;
-      loginBtn.style.opacity = '1';
-    }
-    if (user) {
-      window._fbUser = user;
-      window._fbUid  = user.uid;
-      try { await handleFirebaseLogin(user); } catch(e) { console.error('Login handler error:', e); }
-    } else {
-      window._fbUser = null;
-      window._fbUid  = null;
-      handleFirebaseLogout();
-    }
-  });
-}
-
-async function handleFirebaseLogin(fbUser) {
-  // Static owner check
-  if (fbUser.email === 'owner@gmail.com') {
-    window._fbDisplayName = 'Owner';
-    showOwnerPanel();
-    startClock();
-    return;
-  }
-  // Load user meta
-  let meta = {};
-  try {
-    const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
-    const timeout = new Promise(resolve => setTimeout(() => resolve(null), 6000));
-    const snap = await Promise.race([metaPromise, timeout]);
-    if (snap && snap.exists) meta = snap.data();
-  } catch(e) { console.warn('Meta load failed:', e); }
-
-  const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
-  window._fbDisplayName = displayName;
-  state.user = { name: displayName };
-  await loadAllData();
-  await showApp(!!window._realLogin);
-  window._realLogin = false;
-  startClock();
-  scheduleMidnightLogout();
-}
-
-function handleFirebaseLogout() {
-  state.user = null;
-  const app = document.getElementById('app');
-  const owner = document.getElementById('owner-panel');
-  if (app) app.classList.remove('visible');
-  if (owner) owner.classList.remove('visible');
-  const loginScreen = document.getElementById('login-screen');
-  if (loginScreen) loginScreen.style.display = 'flex';
-  const errEl = document.getElementById('login-error');
-  if (errEl) errEl.textContent = '';
-}
-
-// Boot
-startClock();
-initFirebase();
+// Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
+// _onFirebaseLogin / _onFirebaseLogout callbacks are registered inside init().
+// We call init() here; it sets up those callbacks. Firebase then fires
+// onAuthStateChanged which drives the UI from that point on.
+init();
 </script>
 </body>
 </html>
