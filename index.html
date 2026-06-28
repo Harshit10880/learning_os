@@ -53,6 +53,14 @@
   };
 
   auth.onAuthStateChanged(user => {
+    // Mark Firebase as ready — enable login button
+    window._firebaseReady = true;
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+      loginBtn.textContent = 'Sign In / Create Account';
+      loginBtn.disabled = false;
+      loginBtn.style.opacity = '1';
+    }
     if (user) {
       window._fbUser = user;
       window._fbUid  = user.uid;
@@ -846,7 +854,7 @@ input, textarea, select { font-family: inherit; outline: none; }
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" onclick="doLogin()" id="login-btn">Sign In / Create Account</button>
+    <button class="btn-primary" onclick="doLogin()" id="login-btn" disabled style="opacity:0.6;">⏳ Connecting…</button>
     <div id="login-error"></div>
     <div style="margin-top:14px;font-size:0.75rem;color:var(--muted2);line-height:1.5;">
       New here? Enter your email + name + password to create an account.<br>
@@ -3060,7 +3068,10 @@ async function doLogin() {
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email.'; return; }
   if (!pass)  { errEl.textContent = 'Please enter a password.'; return; }
-  if (!window._fbApi) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
+  if (!window._auth || !window._db) {
+    errEl.textContent = 'App is still loading — please wait 2 seconds and try again.';
+    return;
+  }
 
   btn.textContent = 'Signing in…';
   btn.disabled = true;
