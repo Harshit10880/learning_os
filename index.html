@@ -7,71 +7,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase Compat SDK (works with local files, no ES module issues) -->
+<!-- Firebase Compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-(function() {
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJZ7RMtnaPr56AMkJRpTneh21iSS6r5z8",
-    authDomain: "learning-os-c8be8.firebaseapp.com",
-    projectId: "learning-os-c8be8",
-    storageBucket: "learning-os-c8be8.firebasestorage.app",
-    messagingSenderId: "177429992332",
-    appId: "1:177429992332:web:7149cb46f6f73f180bfca9"
-  };
-
-  const fbApp  = firebase.initializeApp(firebaseConfig);
-  const auth   = firebase.auth();
-  const db     = firebase.firestore();
-
-  // Enable offline persistence so local file usage works even with bad connectivity
-  db.enablePersistence({ synchronizeTabs: false }).catch(() => {});
-
-  window._db   = db;
-  window._auth = auth;
-
-  // Compat API shims so our helper functions work unchanged
-  window._fbApi = {
-    doc: (db, ...path) => {
-      // path can be ('users', uid) or ('users', uid, 'data', key) etc.
-      let ref = db;
-      for (let i = 0; i < path.length; i++) {
-        ref = (i % 2 === 0) ? ref.collection(path[i]) : ref.doc(path[i]);
-      }
-      return ref;
-    },
-    getDoc: ref => ref.get(),
-    setDoc: (ref, data, opts) => opts && opts.merge ? ref.set(data, { merge: true }) : ref.set(data),
-    collection: (db, name) => db.collection(name),
-    getDocs: ref => ref.get(),
-    serverTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
-    signInWithEmailAndPassword: (auth, email, pass) => auth.signInWithEmailAndPassword(email, pass),
-    createUserWithEmailAndPassword: (auth, email, pass) => auth.createUserWithEmailAndPassword(email, pass),
-    signOut: (auth) => auth.signOut()
-  };
-
-  auth.onAuthStateChanged(user => {
-    // Mark Firebase as ready — enable login button
-    window._firebaseReady = true;
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-      loginBtn.textContent = 'Sign In / Create Account';
-      loginBtn.disabled = false;
-      loginBtn.style.opacity = '1';
-    }
-    if (user) {
-      window._fbUser = user;
-      window._fbUid  = user.uid;
-      if (window._onFirebaseLogin) window._onFirebaseLogin(user);
-    } else {
-      window._fbUser = null;
-      window._fbUid  = null;
-      if (window._onFirebaseLogout) window._onFirebaseLogout();
-    }
-  });
-})();
+// Firebase is initialized here but onAuthStateChanged is set up in initFirebase()
+// which is called at the bottom of the file AFTER all functions are defined.
+const firebaseConfig = {
+  apiKey: "AIzaSyCJZ7RMtnaPr56AMkJRpTneh21iSS6r5z8",
+  authDomain: "learning-os-c8be8.firebaseapp.com",
+  projectId: "learning-os-c8be8",
+  storageBucket: "learning-os-c8be8.firebasestorage.app",
+  messagingSenderId: "177429992332",
+  appId: "1:177429992332:web:7149cb46f6f73f180bfca9"
+};
+const _fbApp  = firebase.initializeApp(firebaseConfig);
+window._auth  = firebase.auth();
+window._db    = firebase.firestore();
+window._db.enablePersistence({ synchronizeTabs: false }).catch(() => {});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -2816,53 +2770,8 @@ let state = {
 
 // ===================== INIT =====================
 function init() {
-  startClock();
-  // Wait for Firebase auth state — _onFirebaseLogin / _onFirebaseLogout are set below
-  window._onFirebaseLogin = async (fbUser) => {
-    window._fbUid = fbUser.uid;
-
-    // ── Static owner check (email-based, no Firestore needed) ──
-    const OWNER_EMAIL = 'owner@gmail.com';
-    if (fbUser.email === OWNER_EMAIL) {
-      window._fbDisplayName = 'Owner';
-      showOwnerPanel();
-      return; // owner doesn't need scheduleMidnightLogout
-    }
-
-    // ── Regular student ──
-    let meta = {};
-    try {
-      const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
-      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 6000));
-      const metaSnap = await Promise.race([metaPromise, timeoutPromise]);
-      if (metaSnap && metaSnap.exists) meta = metaSnap.data();
-    } catch(e) { console.warn('Meta load failed, continuing:', e); }
-
-    const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
-    window._fbDisplayName = displayName;
-
-    // _realLogin flag is set only when user actually typed email+password
-    // If not set, this is a session restore (refresh/reopen) — don't record new login
-    state.user = { name: displayName };
-    await loadAllData();
-    showApp(!!window._realLogin);
-    window._realLogin = false; // reset after use
-    scheduleMidnightLogout();
-  };
-  window._onFirebaseLogout = () => {
-    state.user = null;
-    document.getElementById('app').classList.remove('visible');
-    document.getElementById('owner-panel').classList.remove('visible');
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('login-username').value = '';
-    document.getElementById('login-password').value = '';
-    document.getElementById('login-error').textContent = '';
-  };
-  // Check for owner session flag (fast path, still verified by Firestore meta on auth change)
-  if (S.get('los_owner_session') && window._fbUser) {
-    showOwnerPanel();
-    return;
-  }
+  // All login/logout handling is done in initFirebase() at the bottom of the file.
+  // This function is kept as a stub for compatibility.
 }
 
 async function showApp(isRealLogin = false) {
@@ -3053,8 +2962,8 @@ async function doMidnightLogout() {
   showToast('Session ended. Good night! 🌙', 'success');
   state.user = null;
   // Sign out of Firebase — this clears the session so user MUST re-enter credentials
-  try { await window._auth.signOut(); } catch(e) {}
-  // _onFirebaseLogout will handle UI cleanup (show login screen)
+  // Firebase signOut triggers onAuthStateChanged → handleFirebaseLogout() cleans up UI
+  try { await window._auth.signOut(); } catch(e) { handleFirebaseLogout(); }
 }
 
 // ===================== LOGIN / LOGOUT =====================
@@ -4490,7 +4399,7 @@ async function ownerLogout() {
   try {
     await window._auth.signOut();
   } catch(e) {
-    document.getElementById('login-screen').style.display = 'flex';
+    handleFirebaseLogout();
   }
 }
 
@@ -4915,11 +4824,72 @@ function escHtml(str) {
 }
 
 // ===================== START =====================
-// Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
-// _onFirebaseLogin / _onFirebaseLogout callbacks are registered inside init().
-// We call init() here; it sets up those callbacks. Firebase then fires
-// onAuthStateChanged which drives the UI from that point on.
-init();
+// All functions are now defined. Safe to init Firebase listener + app.
+
+function initFirebase() {
+  // Set up auth state listener NOW — all callbacks (_onFirebaseLogin etc) are defined
+  window._auth.onAuthStateChanged(async function(user) {
+    // Enable login button — Firebase is ready
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+      loginBtn.textContent = 'Sign In / Create Account';
+      loginBtn.disabled = false;
+      loginBtn.style.opacity = '1';
+    }
+    if (user) {
+      window._fbUser = user;
+      window._fbUid  = user.uid;
+      try { await handleFirebaseLogin(user); } catch(e) { console.error('Login handler error:', e); }
+    } else {
+      window._fbUser = null;
+      window._fbUid  = null;
+      handleFirebaseLogout();
+    }
+  });
+}
+
+async function handleFirebaseLogin(fbUser) {
+  // Static owner check
+  if (fbUser.email === 'owner@gmail.com') {
+    window._fbDisplayName = 'Owner';
+    showOwnerPanel();
+    startClock();
+    return;
+  }
+  // Load user meta
+  let meta = {};
+  try {
+    const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
+    const timeout = new Promise(resolve => setTimeout(() => resolve(null), 6000));
+    const snap = await Promise.race([metaPromise, timeout]);
+    if (snap && snap.exists) meta = snap.data();
+  } catch(e) { console.warn('Meta load failed:', e); }
+
+  const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
+  window._fbDisplayName = displayName;
+  state.user = { name: displayName };
+  await loadAllData();
+  await showApp(!!window._realLogin);
+  window._realLogin = false;
+  startClock();
+  scheduleMidnightLogout();
+}
+
+function handleFirebaseLogout() {
+  state.user = null;
+  const app = document.getElementById('app');
+  const owner = document.getElementById('owner-panel');
+  if (app) app.classList.remove('visible');
+  if (owner) owner.classList.remove('visible');
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.style.display = 'flex';
+  const errEl = document.getElementById('login-error');
+  if (errEl) errEl.textContent = '';
+}
+
+// Boot
+startClock();
+initFirebase();
 </script>
 </body>
 </html>
