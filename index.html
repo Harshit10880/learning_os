@@ -719,6 +719,40 @@ input, textarea, select { font-family: inherit; outline: none; }
   box-shadow: 0 4px 16px rgba(239,68,68,0.4);
 }
 
+
+/* ===================== GAMIFICATION STYLES ===================== */
+.gam-strip { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 14px; background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(56,189,248,0.06)); border-radius:var(--radius); margin-bottom:14px; border:1px solid rgba(124,58,237,0.15); }
+.gam-badge { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,var(--accent),#7c3aed); color:#fff; border-radius:99px; padding:4px 12px; font-size:0.75rem; font-weight:700; letter-spacing:0.3px; }
+.gam-streak { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,#f59e0b,#ef4444); color:#fff; border-radius:99px; padding:4px 12px; font-size:0.75rem; font-weight:700; }
+.gam-xp-pill { font-size:0.75rem; color:var(--muted); font-weight:600; }
+.xp-bar-wrap { background:var(--bg3); border-radius:99px; height:8px; overflow:hidden; margin:6px 0 2px; }
+.xp-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--accent),#38bdf8); transition:width 0.5s ease; }
+
+/* Trophy cabinet */
+.trophy-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; }
+.trophy-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 10px; text-align:center; }
+.trophy-card.earned { border-color:var(--accent); box-shadow:0 0 12px rgba(124,58,237,0.15); }
+.trophy-card.locked { opacity:0.35; filter:grayscale(1); }
+.trophy-card .tc-icon { font-size:2rem; margin-bottom:6px; }
+.trophy-card .tc-name { font-size:0.75rem; font-weight:700; color:var(--text); margin-bottom:3px; }
+.trophy-card .tc-desc { font-size:0.65rem; color:var(--muted); line-height:1.35; }
+.trophy-card .tc-date { font-size:0.62rem; color:var(--accent); margin-top:5px; font-weight:600; }
+
+/* XP toast popup */
+.xp-popup { position:fixed; bottom:80px; right:18px; background:linear-gradient(135deg,#7c3aed,#38bdf8); color:#fff; border-radius:99px; padding:7px 16px; font-size:0.8rem; font-weight:700; z-index:9999; animation:xpPop 2.5s forwards; pointer-events:none; }
+@keyframes xpPop { 0%{opacity:0;transform:translateY(10px)} 15%{opacity:1;transform:translateY(0)} 75%{opacity:1} 100%{opacity:0;transform:translateY(-16px)} }
+
+/* Achievements page */
+#page-achievements { padding:0 0 40px; }
+.ach-level-card { background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(56,189,248,0.08)); border:1.5px solid rgba(124,58,237,0.2); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
+.ach-stats-row { display:flex; gap:0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+.ach-stat { flex:1; text-align:center; padding:14px 8px; border-right:1px solid var(--border); }
+.ach-stat:last-child { border-right:none; }
+.ach-stat .sv { font-size:1.3rem; font-weight:800; color:var(--accent); }
+.ach-stat .sl { font-size:0.68rem; color:var(--muted); margin-top:2px; }
+.xp-log-item { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:0.8rem; }
+.xp-log-item:last-child { border-bottom:none; }
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -874,6 +908,7 @@ input, textarea, select { font-family: inherit; outline: none; }
       </div>
       <div class="nav-section">
         <div class="nav-label">Account</div>
+        <button class="nav-item" data-page="achievements" onclick="navTo('achievements')"><span class="icon">🏆</span> Achievements</button>
         <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon">👤</span> Profile</button>
       </div>
     </nav>
@@ -895,6 +930,8 @@ input, textarea, select { font-family: inherit; outline: none; }
           <div class="meta-divider"></div>
           <div class="meta-item"><div class="meta-val" id="dash-streak" style="color:var(--warn);">🔥 0</div><div class="meta-lbl">Day Streak</div></div>
         </div>
+        <!-- Gamification strip — injected by renderGamStrip() -->
+        <div id="dash-gam-strip" style="margin-bottom:12px;"></div>
         <div class="grid-2" style="margin-bottom:18px;">
           <!-- Overall progress -->
           <div class="card">
@@ -1229,6 +1266,50 @@ input, textarea, select { font-family: inherit; outline: none; }
         </div>
       </div>
 
+      <!-- Achievements Page -->
+      <div class="page" id="page-achievements">
+        <div class="page-header">
+          <div class="page-title">🏆 Achievements</div>
+          <div class="page-sub">Your XP, levels, trophies &amp; badges</div>
+        </div>
+
+        <!-- Level + XP card -->
+        <div class="ach-level-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+            <div>
+              <div id="ach-level-badge" class="gam-badge" style="margin-bottom:6px;font-size:0.82rem;padding:5px 14px;">⭐ Level 1 — Beginner</div>
+              <div id="ach-xp-label" style="font-size:0.75rem;color:var(--muted);margin-top:4px;">0 / 100 XP to next level</div>
+            </div>
+            <div id="ach-streak-chip" class="gam-streak">🔥 0 day streak</div>
+          </div>
+          <div class="xp-bar-wrap"><div class="xp-bar-fill" id="ach-xp-bar" style="width:0%;"></div></div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="ach-stats-row">
+          <div class="ach-stat"><div class="sv" id="ach-stat-xp">0</div><div class="sl">Total XP</div></div>
+          <div class="ach-stat"><div class="sv" id="ach-stat-level">1</div><div class="sl">Level</div></div>
+          <div class="ach-stat"><div class="sv" id="ach-stat-streak">0</div><div class="sl">Best Streak</div></div>
+          <div class="ach-stat"><div class="sv" id="ach-stat-trophies">0</div><div class="sl">Trophies</div></div>
+        </div>
+
+        <!-- Trophy Cabinet -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title" style="margin-bottom:14px;">🏅 Trophy Cabinet</div>
+          <div class="trophy-grid" id="ach-trophy-grid">
+            <div style="color:var(--muted);font-size:0.82rem;">Loading…</div>
+          </div>
+        </div>
+
+        <!-- XP History -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">⭐ Recent XP Earned</div>
+          <div id="ach-xp-log" style="max-height:280px;overflow-y:auto;">
+            <div style="color:var(--muted);font-size:0.82rem;">No XP earned yet</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Profile Page -->
       <div class="page" id="page-profile">
         <div class="page-header">
@@ -1243,7 +1324,11 @@ input, textarea, select { font-family: inherit; outline: none; }
             ?
           </div>
           <div id="profile-name-big" style="font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
-          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:20px;">—</div>
+          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">—</div>
+          <!-- Level badge + streak from gamification -->
+          <div id="profile-gam-badge" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;"></div>
+          <!-- Mini earned trophies row -->
+          <div id="profile-trophy-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;min-height:32px;padding:8px 12px;background:var(--bg3);border-radius:var(--radius);width:100%;box-sizing:border-box;margin-bottom:20px;"></div>
 
           <!-- Stats row -->
           <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;width:100%;">
@@ -2383,6 +2468,222 @@ function seedMLOpsEngineerSubject() {
   saveData('subjects');
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║           GAMIFICATION ENGINE — STANDALONE MODULE               ║
+// ║  No existing functions modified. Only new code added.           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+const GAM_LEVELS = [
+  { level:1,  xp:0,    title:'Beginner',    badge:'🌱' },
+  { level:2,  xp:100,  title:'Explorer',    badge:'🧭' },
+  { level:3,  xp:300,  title:'Learner',     badge:'📚' },
+  { level:4,  xp:600,  title:'Achiever',    badge:'⚡' },
+  { level:5,  xp:1000, title:'Scholar',     badge:'🎓' },
+  { level:6,  xp:1500, title:'Expert',      badge:'💡' },
+  { level:7,  xp:2200, title:'Master',      badge:'🔮' },
+  { level:8,  xp:3000, title:'Champion',    badge:'🏆' },
+  { level:9,  xp:4000, title:'Legend',      badge:'⚔️'  },
+  { level:10, xp:5500, title:'Grandmaster', badge:'👑' },
+];
+
+const GAM_TROPHIES = [
+  { id:'first_step',     icon:'🌱', name:'First Step',      desc:'First login ever' },
+  { id:'streak_3',       icon:'✨', name:'Ignition',        desc:'3-day study streak' },
+  { id:'on_fire',        icon:'🔥', name:'On Fire',         desc:'7-day study streak' },
+  { id:'diamond_mind',   icon:'💎', name:'Diamond Mind',    desc:'30-day study streak' },
+  { id:'half_century',   icon:'🥈', name:'Half Century',    desc:'Complete 50 topics total' },
+  { id:'century',        icon:'💯', name:'Century',         desc:'Complete 100 topics total' },
+  { id:'speed_learner',  icon:'⚡', name:'Speed Learner',   desc:'10 topics in one day' },
+  { id:'subject_master', icon:'👑', name:'Subject Master',  desc:'All topics in one subject done' },
+  { id:'focused',        icon:'🎯', name:'Focused',         desc:'5 sessions in one week' },
+  { id:'early_bird',     icon:'🌅', name:'Early Bird',      desc:'Login before 7 AM' },
+  { id:'night_owl',      icon:'🦉', name:'Night Owl',       desc:'Session finished after 10 PM' },
+  { id:'rocket',         icon:'🚀', name:'Rocket',          desc:'Reach Level 10' },
+];
+
+const GAM_XP = { login:10, topic:15, task:10, session:20, streak3:50, streak7:150, streak30:500 };
+
+// ── State accessor (never mutate directly outside these functions) ──
+function _gam() {
+  if (!state.gamification) {
+    state.gamification = { xp:0, level:1, currentStreak:0, bestStreak:0,
+      lastStreakDate:null, trophies:{}, xpLog:[] };
+  }
+  return state.gamification;
+}
+
+function gamLevelInfo(xp) {
+  let cur = GAM_LEVELS[0];
+  for (const l of GAM_LEVELS) { if (xp >= l.xp) cur = l; else break; }
+  const nextIdx = GAM_LEVELS.findIndex(l => l.level === cur.level);
+  const next = GAM_LEVELS[nextIdx + 1] || null;
+  const pct  = next ? Math.round(((xp - cur.xp) / (next.xp - cur.xp)) * 100) : 100;
+  return { ...cur, next, pct, xpToNext: next ? next.xp - cur.xp : 0, xpInLevel: xp - cur.xp };
+}
+
+function _gamAwardXP(reason, amount) {
+  const g = _gam();
+  g.xp += amount;
+  g.xpLog.unshift({ reason, amount, date: new Date().toISOString() });
+  if (g.xpLog.length > 50) g.xpLog.length = 50; // cap log
+  const info = gamLevelInfo(g.xp);
+  if (info.level > g.level) {
+    g.level = info.level;
+    showToast('🎉 Level Up! ' + info.badge + ' ' + info.title, 'success');
+  }
+  saveData('gamification');
+  // Show floating XP popup
+  const pop = document.createElement('div');
+  pop.className = 'xp-popup';
+  pop.textContent = '+' + amount + ' XP — ' + reason;
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 2600);
+}
+
+function _gamEarnTrophy(id) {
+  const g = _gam();
+  if (g.trophies[id]) return;
+  const def = GAM_TROPHIES.find(t => t.id === id);
+  if (!def) return;
+  g.trophies[id] = { earnedAt: new Date().toISOString() };
+  saveData('gamification');
+  showToast('🏅 Trophy: ' + def.icon + ' ' + def.name + ' unlocked!', 'success');
+}
+
+// ── Hooks — called from existing functions via wrapper (see below) ──
+function gamOnRealLogin() {
+  const g = _gam();
+  const today = toDateKey(new Date());
+  const yesterday = toDateKey(new Date(Date.now() - 86400000));
+  if (g.lastStreakDate !== today) {
+    if (g.lastStreakDate === yesterday) g.currentStreak += 1;
+    else g.currentStreak = 1;
+    g.lastStreakDate = today;
+    if (g.currentStreak > g.bestStreak) g.bestStreak = g.currentStreak;
+    if (g.currentStreak === 3)  { _gamAwardXP('3-day streak bonus', GAM_XP.streak3);  _gamEarnTrophy('streak_3'); }
+    if (g.currentStreak === 7)  { _gamAwardXP('7-day streak bonus', GAM_XP.streak7);  _gamEarnTrophy('on_fire'); }
+    if (g.currentStreak === 30) { _gamAwardXP('30-day streak bonus', GAM_XP.streak30); _gamEarnTrophy('diamond_mind'); }
+  }
+  if (new Date().getHours() < 7) _gamEarnTrophy('early_bird');
+  if (!g.trophies['first_step']) { _gamEarnTrophy('first_step'); }
+  _gamAwardXP('Daily login', GAM_XP.login);
+}
+
+function gamOnTopicDone() {
+  _gamAwardXP('Topic completed', GAM_XP.topic);
+  const g = _gam();
+  const today = toDateKey(new Date());
+  const todayCount = g.xpLog.filter(e => e.reason === 'Topic completed' && e.date.startsWith(today)).length;
+  if (todayCount >= 10) _gamEarnTrophy('speed_learner');
+  const total = state.subjects.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0);
+  if (total >= 50)  _gamEarnTrophy('half_century');
+  if (total >= 100) _gamEarnTrophy('century');
+  for (const s of state.subjects) {
+    if (s.topics.length > 0 && s.topics.every(t=>t.done)) { _gamEarnTrophy('subject_master'); break; }
+  }
+  if (gamLevelInfo(_gam().xp).level >= 10) _gamEarnTrophy('rocket');
+}
+
+function gamOnTaskDone() {
+  _gamAwardXP('Task completed', GAM_XP.task);
+}
+
+function gamOnSessionDone() {
+  _gamAwardXP('Session completed', GAM_XP.session);
+  if (new Date().getHours() >= 22) _gamEarnTrophy('night_owl');
+  const weekAgo = new Date(Date.now() - 7*86400000);
+  const weekSessions = state.sessions.filter(s => s.status==='done' && new Date(s.date)>=weekAgo).length;
+  if (weekSessions >= 5) _gamEarnTrophy('focused');
+}
+
+// ── Render functions ──
+function renderGamStrip() {
+  const el = document.getElementById('dash-gam-strip');
+  if (!el || !state.user) return;
+  const g = _gam();
+  const info = gamLevelInfo(g.xp);
+  const earned = Object.keys(g.trophies).length;
+  el.innerHTML = `<div class="gam-strip">
+    <span class="gam-badge">${info.badge} Lv.${info.level} ${info.title}</span>
+    <span class="gam-streak">🔥 ${g.currentStreak} streak</span>
+    <span class="gam-xp-pill">⭐ ${g.xp} XP &nbsp;·&nbsp; 🏅 ${earned} trophies</span>
+  </div>`;
+}
+
+function renderAchievements() {
+  if (!state.user) return;
+  const g = _gam();
+  const info = gamLevelInfo(g.xp);
+  const streak = calcStreak(); // use existing streak function
+
+  // Level card
+  const lbEl = document.getElementById('ach-level-badge');
+  if (lbEl) lbEl.textContent = info.badge + ' Level ' + info.level + ' — ' + info.title;
+  const xlEl = document.getElementById('ach-xp-label');
+  if (xlEl) xlEl.textContent = info.next ? (info.xpInLevel + ' / ' + info.xpToNext + ' XP to next level') : 'MAX LEVEL 👑';
+  const barEl = document.getElementById('ach-xp-bar');
+  if (barEl) barEl.style.width = info.pct + '%';
+  const scEl = document.getElementById('ach-streak-chip');
+  if (scEl) scEl.textContent = '🔥 ' + streak + ' day streak';
+
+  // Stats
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('ach-stat-xp',      g.xp);
+  set('ach-stat-level',   info.level);
+  set('ach-stat-streak',  g.bestStreak + 'd');
+  set('ach-stat-trophies',Object.keys(g.trophies).length + ' / ' + GAM_TROPHIES.length);
+
+  // Trophy grid
+  const grid = document.getElementById('ach-trophy-grid');
+  if (grid) {
+    grid.innerHTML = GAM_TROPHIES.map(def => {
+      const earned = g.trophies[def.id];
+      const dateStr = earned ? new Date(earned.earnedAt).toLocaleDateString() : '';
+      return `<div class="trophy-card ${earned ? 'earned' : 'locked'}">
+        <div class="tc-icon">${def.icon}</div>
+        <div class="tc-name">${def.name}</div>
+        <div class="tc-desc">${def.desc}</div>
+        <div class="tc-date">${earned ? '✅ ' + dateStr : '🔒 Locked'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // XP log
+  const logEl = document.getElementById('ach-xp-log');
+  if (logEl) {
+    if (!g.xpLog || g.xpLog.length === 0) {
+      logEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;">No XP earned yet</div>';
+    } else {
+      logEl.innerHTML = g.xpLog.slice(0,20).map(e => `
+        <div class="xp-log-item">
+          <span>${e.reason}</span>
+          <span style="color:var(--accent);font-weight:700;">+${e.amount} XP</span>
+        </div>`).join('');
+    }
+  }
+}
+
+function renderProfileGam() {
+  const g = _gam();
+  const info = gamLevelInfo(g.xp);
+  const streak = calcStreak();
+  const badgeEl = document.getElementById('profile-gam-badge');
+  if (badgeEl) {
+    badgeEl.innerHTML = `<span class="gam-badge">${info.badge} Lv.${info.level} ${info.title}</span>
+      <span class="gam-streak" style="font-size:0.72rem;">🔥 ${streak} streak</span>`;
+  }
+  const rowEl = document.getElementById('profile-trophy-row');
+  if (rowEl) {
+    const earned = GAM_TROPHIES.filter(t => g.trophies[t.id]);
+    rowEl.innerHTML = earned.length === 0
+      ? '<span style="color:var(--muted);font-size:0.78rem;">No trophies yet — keep going! 🚀</span>'
+      : earned.map(t=>`<span title="${t.name}: ${t.desc}" style="font-size:1.4rem;">${t.icon}</span>`).join('')
+        + `<span style="font-size:0.72rem;color:var(--muted);margin-left:4px;">${earned.length}/${GAM_TROPHIES.length}</span>`;
+  }
+}
+// END GAMIFICATION ENGINE
+
 // ===================== PROFILE PAGE =====================
 function renderProfile() {
   if (!state.user) return;
@@ -2571,6 +2872,7 @@ async function showApp(isRealLogin = false) {
     saveData('attendance');
     state.user.loginTime = attEntry.loginTime; // always show first login of day
     fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
+    gamOnRealLogin(); // ← gam hook — only fires on real email+password login
   } else {
     // ── Session restore (refresh/reopen) — just restore loginTime from record ──
     state.user.loginTime = attEntry ? attEntry.loginTime : '—';
@@ -2596,16 +2898,18 @@ async function loadAllData() {
     withTimeout(fbLoad('leaves'),       t, S.get('los_leaves_cache')       || []),
     withTimeout(fbLoad('notes'),        t, S.get('los_notes_cache')        || []),
     withTimeout(fbLoad('activeTimers'), t, S.get('los_activeTimers_cache') || []),
-    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || [])
+    withTimeout(fbLoadShared('posts'),      t, S.get('los_posts')              || []),
+    withTimeout(fbLoad('gamification'),     t, S.get('los_gamification_cache')  || null)
   ]);
-  state.subjects    = subjects    || [];
+  state.subjects      = subjects      || [];
   state.tasks       = tasks       || [];
   state.sessions    = sessions    || [];
   state.attendance  = attendance  || [];
   state.leaves      = leaves      || [];
   state.notes       = notes       || [];
   state.activeTimers= activeTimers|| [];
-  state.posts       = posts       || [];
+  state.posts         = posts         || [];
+  state.gamification  = gamification  || null;
 }
 
 function saveData(key) {
@@ -2615,7 +2919,7 @@ function saveData(key) {
     S.set('los_posts', state.posts);
     return;
   }
-  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers' };
+  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers', gamification:'gamification' };
   if (fbKeyMap[key]) {
     fbSave(fbKeyMap[key], state[key]);
     // Also cache locally for instant reload
@@ -2829,7 +3133,8 @@ function navTo(page) {
   if (page === 'tasks') { renderTaskSubjectFilter(); renderTasks(); }
   if (page === 'timer') { renderActiveTimers(); renderSessions(); }
   if (page === 'attendance') renderAttendance();
-  if (page === 'profile') renderProfile();
+  if (page === 'achievements') renderAchievements();
+  if (page === 'profile') { renderProfile(); renderProfileGam(); }
   if (page === 'community') renderPosts();
   if (page === 'analytics') renderAnalytics();
   if (page === 'notes') renderNotes();
@@ -2953,6 +3258,7 @@ function renderDashboard() {
   // streak
   const streakEl = document.getElementById('dash-streak');
   if (streakEl) streakEl.textContent = '🔥 ' + calcStreak();
+  renderGamStrip(); // ← gamification strip
 }
 
 function calcStreak() {
@@ -3116,8 +3422,10 @@ function moveTopic(subjectId, idx, dir) {
 function toggleTopic(subjectId, idx) {
   const s = state.subjects.find(s => s.id === subjectId);
   if (!s) return;
-  s.topics[idx].done = !s.topics[idx].done;
+  const wasDone = s.topics[idx].done;
+  s.topics[idx].done = !wasDone;
   saveData('subjects');
+  if (!wasDone) { gamOnTopicDone(); } // ← gam hook (only when marking DONE)
   renderTopicList(s);
   renderSubjects();
 }
@@ -3255,10 +3563,12 @@ function saveTask() {
 function quickToggleTask(id) {
   const t = state.tasks.find(t => t.id === id);
   if (!t) return;
+  const wasPending = t.status === 'pending';
   if (t.status === 'pending') t.status = 'completed';
   else if (t.status === 'completed') t.status = 'cancelled';
   else t.status = 'pending';
   saveData('tasks');
+  if (wasPending) { gamOnTaskDone(); } // ← gam hook (only when completing)
   renderTasks();
 }
 
@@ -3348,6 +3658,7 @@ function finishTimer(id, status = 'done') {
   renderActiveTimers();
   renderSessions();
   renderDashboard();
+  if (status === 'done') { gamOnSessionDone(); } // ← gam hook
   showToast(status === 'done' ? `Session saved: ${formatHM(finalElapsed)}` : 'Session cancelled', status === 'done' ? 'success' : '');
 }
 
