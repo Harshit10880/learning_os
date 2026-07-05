@@ -2798,7 +2798,7 @@ function init() {
     // If not set, this is a session restore (refresh/reopen) — don't record new login
     state.user = { name: displayName };
     await loadAllData();
-    showApp(!!window._realLogin);
+    await showApp(!!window._realLogin);
     window._realLogin = false; // reset after use
     scheduleMidnightLogout();
   };
@@ -2883,7 +2883,7 @@ async function loadAllData() {
     ]);
   }
   const t = 8000;
-  const [subjects, tasks, sessions, attendance, leaves, notes, activeTimers, posts] = await Promise.all([
+  const [subjects, tasks, sessions, attendance, leaves, notes, activeTimers, posts, gamification] = await Promise.all([
     withTimeout(fbLoad('subjects'),     t, S.get('los_subjects_cache')     || []),
     withTimeout(fbLoad('tasks'),        t, S.get('los_tasks_cache')        || []),
     withTimeout(fbLoad('sessions'),     t, S.get('los_sessions_cache')     || []),
@@ -2891,18 +2891,18 @@ async function loadAllData() {
     withTimeout(fbLoad('leaves'),       t, S.get('los_leaves_cache')       || []),
     withTimeout(fbLoad('notes'),        t, S.get('los_notes_cache')        || []),
     withTimeout(fbLoad('activeTimers'), t, S.get('los_activeTimers_cache') || []),
-    withTimeout(fbLoadShared('posts'),      t, S.get('los_posts')              || []),
-    withTimeout(fbLoad('gamification'),     t, S.get('los_gamification_cache')  || null)
+    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || []),
+    withTimeout(fbLoad('gamification'), t, S.get('los_gamification_cache') || null)
   ]);
-  state.subjects      = subjects      || [];
-  state.tasks       = tasks       || [];
-  state.sessions    = sessions    || [];
-  state.attendance  = attendance  || [];
-  state.leaves      = leaves      || [];
-  state.notes       = notes       || [];
-  state.activeTimers= activeTimers|| [];
-  state.posts         = posts         || [];
-  state.gamification  = gamification  || null;
+  state.subjects     = subjects     || [];
+  state.tasks        = tasks        || [];
+  state.sessions     = sessions     || [];
+  state.attendance   = attendance   || [];
+  state.leaves       = leaves       || [];
+  state.notes        = notes        || [];
+  state.activeTimers = activeTimers || [];
+  state.posts        = posts        || [];
+  state.gamification = gamification || null;
 }
 
 function saveData(key) {
