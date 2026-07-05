@@ -52,17 +52,10 @@
     signOut: (auth) => auth.signOut()
   };
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      window._fbUser = user;
-      window._fbUid  = user.uid;
-      if (window._onFirebaseLogin) window._onFirebaseLogin(user);
-    } else {
-      window._fbUser = null;
-      window._fbUid  = null;
-      if (window._onFirebaseLogout) window._onFirebaseLogout();
-    }
-  });
+  // NOTE: onAuthStateChanged is registered at the BOTTOM of the file
+  // after all functions (init, showApp, etc.) are fully defined.
+  // We just store auth/db on window here and wait.
+  window._pendingAuthUser = undefined; // will be set by deferred listener
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -861,7 +854,7 @@ input, textarea, select { font-family: inherit; outline: none; }
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" onclick="doLogin()" id="login-btn">Sign In / Create Account</button>
+    <button class="btn-primary" onclick="doLogin()" id="login-btn" disabled style="opacity:0.6;cursor:not-allowed;">⏳ Connecting…</button>
     <div id="login-error"></div>
     <div style="margin-top:14px;font-size:0.75rem;color:var(--muted2);line-height:1.5;">
       New here? Enter your email + name + password to create an account.<br>
@@ -3023,7 +3016,7 @@ async function doLogin() {
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email.'; return; }
   if (!pass)  { errEl.textContent = 'Please enter a password.'; return; }
-  if (!window._fbApi) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
+  if (!window._auth) { errEl.textContent = 'Still connecting — please wait a moment and try again.'; return; }
 
   btn.textContent = 'Signing in…';
   btn.disabled = true;
@@ -4868,11 +4861,28 @@ function escHtml(str) {
 }
 
 // ===================== START =====================
-// Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
-// _onFirebaseLogin / _onFirebaseLogout callbacks are registered inside init().
-// We call init() here; it sets up those callbacks. Firebase then fires
-// onAuthStateChanged which drives the UI from that point on.
-init();
+// All functions are now defined. Safe to register Firebase auth listener.
+init(); // sets up _onFirebaseLogin and _onFirebaseLogout callbacks
+
+// Register onAuthStateChanged HERE — after init() has set up the callbacks
+window._auth.onAuthStateChanged(function(user) {
+  // Enable login button — Firebase is connected
+  const btn = document.getElementById('login-btn');
+  if (btn && btn.disabled) {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.textContent = 'Sign In / Create Account';
+  }
+  if (user) {
+    window._fbUser = user;
+    window._fbUid  = user.uid;
+    if (window._onFirebaseLogin) window._onFirebaseLogin(user);
+  } else {
+    window._fbUser = null;
+    window._fbUid  = null;
+    if (window._onFirebaseLogout) window._onFirebaseLogout();
+  }
+});
 </script>
 </body>
 </html>
