@@ -754,6 +754,186 @@ input, textarea, select { font-family: inherit; outline: none; }
 }
 #topbar-offline-dot { transition: opacity 0.3s; }
 
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║         PHASE 3 — MOBILE OPTIMIZATION                          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ── Safe Area (iPhone notch + Android cutout) ──────────────────── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ── Bottom Navigation Bar ──────────────────────────────────────── */
+#bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(58px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 200;
+  flex-direction: row;
+  align-items: stretch;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+.bnav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer;
+  background: transparent; border: none;
+  color: var(--muted); font-size: 0.58rem;
+  font-weight: 600; letter-spacing: 0.3px;
+  padding: 6px 2px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 48px; transition: color 0.15s;
+  position: relative; overflow: hidden;
+}
+.bnav-icon { font-size: 1.3rem; line-height: 1; display: block; }
+.bnav-item.active { color: var(--accent3); }
+.bnav-item.active .bnav-icon {
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+.bnav-item:active { background: rgba(124,58,237,0.07); }
+
+/* ── Sidebar overlay ────────────────────────────────────────────── */
+#sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+#sidebar-overlay.visible { display: block; }
+
+/* ── Ripple animation ───────────────────────────────────────────── */
+@keyframes rippleFx {
+  to { transform: scale(4); opacity: 0; }
+}
+.ripple-fx {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  width: 10px; height: 10px; margin: -5px;
+  transform: scale(0); animation: rippleFx 0.5s linear;
+  pointer-events: none;
+}
+
+/* ── Mobile overrides ───────────────────────────────────────────── */
+@media (max-width: 700px) {
+  /* Show bottom nav, hide sidebar */
+  #bottom-nav { display: flex; }
+  #sidebar { display: none !important; }
+
+  /* Content above bottom nav */
+  #main {
+    padding: 16px 14px calc(68px + var(--safe-bottom)) !important;
+  }
+
+  /* Topbar */
+  #topbar { padding: 0 12px; height: 50px; }
+  .topbar-logo { font-size: 1.05rem; }
+  .topbar-user { display: none; }
+  .topbar-time { font-size: 0.75rem; }
+  .btn-logout { padding: 6px 10px; font-size: 0.72rem; }
+
+  /* Cards */
+  .card { padding: 14px 12px; border-radius: 12px; }
+
+  /* Inputs — prevent iOS zoom (must be 16px+) */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Touch targets */
+  .btn-primary { padding: 13px 18px; font-size: 0.92rem; min-height: 48px; }
+  .btn-icon { min-height: 40px; min-width: 40px; }
+  .nav-item { min-height: 44px; }
+  .topic-check { width: 26px; height: 26px; min-width: 26px; min-height: 26px; }
+
+  /* Page headers */
+  .page-header { margin-bottom: 16px; }
+  .page-title { font-size: 1.25rem; }
+  .page-sub { font-size: 0.8rem; }
+
+  /* Dashboard meta strip */
+  #dash-meta { padding: 10px 12px; gap: 6px; }
+  .meta-val { font-size: 0.95rem; }
+  .meta-lbl { font-size: 0.58rem; }
+  .meta-divider { display: none; }
+
+  /* Login card */
+  .login-card { padding: 28px 18px; margin: 12px; border-radius: 18px; }
+  .login-logo { font-size: 2rem; }
+
+  /* Modal full-screen */
+  .modal-content {
+    margin: 6px;
+    border-radius: 16px 16px 0 0;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    max-height: 92dvh; overflow-y: auto;
+  }
+
+  /* Profile avatar */
+  #profile-avatar-circle { width: 88px; height: 88px; font-size: 2rem; }
+
+  /* Subject cards */
+  .subject-card { padding: 12px; }
+
+  /* Timer cards */
+  .timer-card { padding: 12px; }
+  .timer-display { font-size: 2.4rem; }
+
+  /* Attendance calendar */
+  .att-day { min-height: 32px; font-size: 0.68rem; }
+
+  /* Grids */
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Very small screens ─────────────────────────────────────────── */
+@media (max-width: 370px) {
+  .bnav-icon { font-size: 1.15rem; }
+  .bnav-item { font-size: 0.52rem; }
+  #dash-meta { gap: 4px; }
+  .meta-val { font-size: 0.85rem; }
+}
+
+/* ── Standalone PWA (installed on home screen) ──────────────────── */
+@media (display-mode: standalone) {
+  #topbar {
+    padding-top: var(--safe-top);
+    height: calc(50px + var(--safe-top));
+  }
+  #bottom-nav { padding-bottom: var(--safe-bottom); }
+  #pwa-install-banner { display: none !important; }
+  #main { scroll-behavior: smooth; }
+}
+
+/* ── Smooth momentum scroll on iOS ─────────────────────────────── */
+#main, .modal-body, .topic-list, .session-history {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── No tap highlight on interactive elements ───────────────────── */
+button, a, .nav-item, .bnav-item, .card, .topic-item {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+input, textarea { -webkit-user-select: text; user-select: text; }
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -874,6 +1054,28 @@ input, textarea, select { font-family: inherit; outline: none; }
 
 <!-- ============ APP ============ -->
 <div id="app">
+  <!-- Sidebar overlay (tap to close on mobile) -->
+  <div id="sidebar-overlay" onclick="closeSidebarMobile()"></div>
+
+  <!-- Bottom Navigation Bar (mobile only, hidden on desktop via CSS) -->
+  <nav id="bottom-nav" aria-label="Main navigation">
+    <button class="bnav-item active" id="bnav-dashboard"  onclick="navTo('dashboard')"  aria-label="Dashboard">
+      <span class="bnav-icon">⬛</span>Home
+    </button>
+    <button class="bnav-item" id="bnav-subjects"   onclick="navTo('subjects')"   aria-label="Subjects">
+      <span class="bnav-icon">📚</span>Subjects
+    </button>
+    <button class="bnav-item" id="bnav-sessions"   onclick="navTo('sessions')"   aria-label="Sessions">
+      <span class="bnav-icon">⏱</span>Sessions
+    </button>
+    <button class="bnav-item" id="bnav-attendance" onclick="navTo('attendance')" aria-label="Attendance">
+      <span class="bnav-icon">📅</span>Attend
+    </button>
+    <button class="bnav-item" id="bnav-profile"    onclick="navTo('profile')"    aria-label="Profile">
+      <span class="bnav-icon">👤</span>Profile
+    </button>
+  </nav>
+
   <!-- Topbar -->
   <div id="topbar">
     <button class="hamburger" onclick="toggleSidebar()" id="ham-btn">
@@ -2871,25 +3073,54 @@ async function doLogout(auto = false) {
 
 // ===================== NAVIGATION =====================
 function navTo(page) {
+  // Pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+
+  // Sidebar nav
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`page-${page}`).classList.add('active');
-  const navBtn = document.querySelector(`.nav-item[data-page="${page}"]`);
+  const navBtn = document.querySelector('.nav-item[data-page="' + page + '"]');
   if (navBtn) navBtn.classList.add('active');
-  if (page === 'dashboard') renderDashboard();
-  if (page === 'subjects') renderSubjects();
-  if (page === 'tasks') { renderTaskSubjectFilter(); renderTasks(); }
-  if (page === 'timer') { renderActiveTimers(); renderSessions(); }
+
+  // Bottom nav (mobile)
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  const bnavBtn = document.getElementById('bnav-' + page);
+  if (bnavBtn) bnavBtn.classList.add('active');
+
+  // Render hooks
+  if (page === 'dashboard')  renderDashboard();
+  if (page === 'subjects')   renderSubjects();
+  if (page === 'tasks')      { renderTaskSubjectFilter(); renderTasks(); }
+  if (page === 'timer')      { renderActiveTimers(); renderSessions(); }
   if (page === 'attendance') renderAttendance();
-  if (page === 'profile') renderProfile();
-  if (page === 'community') renderPosts();
-  if (page === 'analytics') renderAnalytics();
-  if (page === 'notes') renderNotes();
-  // close sidebar on mobile
-  document.getElementById('sidebar').classList.remove('open');
+  if (page === 'profile')    renderProfile();
+  if (page === 'community')  renderPosts();
+  if (page === 'analytics')  renderAnalytics();
+  if (page === 'notes')      renderNotes();
+
+  // Close sidebar + overlay on mobile
+  closeSidebarMobile();
 }
+
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen  = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeSidebarMobile();
+  } else {
+    sidebar.classList.add('open');
+    if (overlay) { overlay.classList.add('visible'); }
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSidebarMobile() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov) ov.classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 // ===================== DASHBOARD =====================
@@ -4858,6 +5089,84 @@ window.addEventListener('offline', () => {
   showToast('📡 Offline — changes will sync when connected', '');
 });
 if (!navigator.onLine) { showOfflineBanner(); updateOfflineDot(); }
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         PHASE 3 — MOBILE UX ENHANCEMENTS                       ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── Swipe to open/close sidebar ──────────────────────────────────
+(function initSwipeGesture() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const SWIPE_THRESHOLD = 60;
+  const EDGE_ZONE = 30; // px from left edge to trigger open
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx)) return; // vertical scroll, ignore
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return; // too short
+
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (dx > 0 && touchStartX < EDGE_ZONE) {
+      // Swipe right from left edge → open sidebar
+      sidebar.classList.add('open');
+      const ov = document.getElementById('sidebar-overlay');
+      if (ov) ov.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    } else if (dx < 0 && sidebar.classList.contains('open')) {
+      // Swipe left → close sidebar
+      closeSidebarMobile();
+    }
+  }, { passive: true });
+})();
+
+// ── Ripple effect on bottom nav buttons ──────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bnav-item').forEach(btn => {
+    btn.addEventListener('touchstart', function(e) {
+      const touch  = e.touches[0];
+      const rect   = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple-fx';
+      ripple.style.left = (touch.clientX - rect.left) + 'px';
+      ripple.style.top  = (touch.clientY - rect.top)  + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }, { passive: true });
+  });
+});
+
+// ── Prevent pull-to-refresh in standalone PWA ────────────────────
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.body.addEventListener('touchmove', e => {
+    if (window.scrollY === 0 && e.touches[0].clientY > 0) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+}
+
+// ── Double-tap topbar logo to scroll to top ──────────────────────
+(function() {
+  let lastTap = 0;
+  const logo = document.querySelector('.topbar-logo');
+  if (!logo) return;
+  logo.addEventListener('touchend', () => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      document.getElementById('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    lastTap = now;
+  });
+})();
+
 </script>
 </body>
 </html>
