@@ -747,6 +747,13 @@ input, textarea, select { font-family: inherit; outline: none; }
   box-shadow: 0 4px 16px rgba(239,68,68,0.4);
 }
 
+/* ── Phase 2 PWA ── */
+@keyframes pulseDot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(1.3); }
+}
+#topbar-offline-dot { transition: opacity 0.3s; }
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -874,6 +881,9 @@ input, textarea, select { font-family: inherit; outline: none; }
     </button>
     <div class="topbar-logo">LearnOS</div>
     <div class="topbar-right">
+      <div id="topbar-offline-dot" title="Offline — changes queued for sync"
+        style="display:none;width:8px;height:8px;border-radius:50%;
+        background:#ef4444;flex-shrink:0;animation:pulseDot 1.5s infinite;"></div>
       <div class="topbar-time" id="topbar-time">--:--:--</div>
       <div class="topbar-user">Hey, <span id="topbar-name">—</span></div>
       <button class="btn-logout" onclick="doLogout()">Log out</button>
@@ -2637,17 +2647,31 @@ async function loadAllData() {
 }
 
 function saveData(key) {
-  // Write to Firestore (async, fire-and-forget) + local cache for speed
+  // Always write to local cache immediately (instant, works offline)
+  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions',
+    attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers' };
+
   if (key === 'posts') {
-    fbSaveShared('posts', state.posts);
     S.set('los_posts', state.posts);
+    if (navigator.onLine && window._db && window._fbUid) {
+      fbSaveShared('posts', state.posts);
+    } else {
+      offlineQueueAdd({ type:'SAVE_SHARED', key:'posts', data: state.posts });
+    }
     return;
   }
-  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers' };
+
   if (fbKeyMap[key]) {
-    fbSave(fbKeyMap[key], state[key]);
-    // Also cache locally for instant reload
+    // 1. Write to localStorage immediately (works offline, instant UI)
     S.set('los_' + fbKeyMap[key] + '_cache', state[key]);
+
+    // 2. Write to Firestore if online, queue if offline
+    if (navigator.onLine && window._db && window._fbUid) {
+      fbSave(fbKeyMap[key], state[key]);
+    } else {
+      offlineQueueAdd({ type:'SAVE_DATA', key: fbKeyMap[key], data: state[key] });
+      console.log('[Offline] Queued save for:', key);
+    }
   }
 }
 
@@ -4596,30 +4620,136 @@ init();
 <!-- PWA: Service Worker Registration + Install Prompt           -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <script>
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         OFFLINE QUEUE — Phase 2                                 ║
+// ║  Saves actions when offline, syncs when connection returns      ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+const OFFLINE_QUEUE_KEY = 'learnos_offline_queue';
+
+// Add an action to the offline queue
+function offlineQueueAdd(action) {
+  try {
+    const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+    queue.push({ ...action, queuedAt: new Date().toISOString(), id: Date.now() });
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    console.log('[OfflineQueue] Added:', action.type);
+  } catch(e) { console.warn('[OfflineQueue] Failed to add:', e); }
+}
+
+// Process all queued actions when back online
+async function offlineQueueProcess() {
+  if (!navigator.onLine) return;
+  if (!window._db || !window._fbUid) return;
+
+  let queue = [];
+  try {
+    queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+  } catch { return; }
+
+  if (queue.length === 0) return;
+  console.log('[OfflineQueue] Processing', queue.length, 'queued actions…');
+
+  const successful = [];
+
+  for (const action of queue) {
+    try {
+      switch(action.type) {
+        case 'SAVE_DATA':
+          await fbSave(action.key, action.data);
+          successful.push(action.id);
+          break;
+        case 'SAVE_SHARED':
+          await fbSaveShared(action.key, action.data);
+          successful.push(action.id);
+          break;
+        case 'SAVE_META':
+          await fbSaveUserMeta(action.data);
+          successful.push(action.id);
+          break;
+      }
+    } catch(e) {
+      console.warn('[OfflineQueue] Action failed:', action.type, e);
+    }
+  }
+
+  // Remove successful actions from queue
+  const remaining = queue.filter(a => !successful.includes(a.id));
+  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remaining));
+
+  if (successful.length > 0) {
+    console.log('[OfflineQueue] Synced', successful.length, 'actions ✅');
+    showToast(`☁️ Synced ${successful.length} offline action${successful.length > 1 ? 's' : ''}`, 'success');
+  }
+}
+
+// Listen for SW message to process queue
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data?.type === 'PROCESS_OFFLINE_QUEUE') {
+      offlineQueueProcess();
+    }
+  });
+}
+
+// Auto-process when coming back online
+window.addEventListener('online', () => {
+  setTimeout(offlineQueueProcess, 1500); // small delay to let Firebase reconnect
+});
+
 // ── Service Worker Registration ──────────────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => {
-        console.log('✅ LearnOS SW registered:', reg.scope);
-        // Listen for updates
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showToast('🔄 App updated! Refresh for latest version.', 'success');
-            }
-          });
-        });
-      })
-      .catch(err => console.warn('SW registration failed:', err));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      console.log('✅ LearnOS SW Phase 2 registered:', reg.scope);
 
-    // Listen for sync messages from SW
-    navigator.serviceWorker.addEventListener('message', event => {
-      if (event.data?.type === 'SYNC_REQUIRED') {
-        console.log('SW requested sync');
+      // Listen for SW updates
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Auto-update: tell SW to activate immediately
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            showToast('🔄 App updated to latest version!', 'success');
+          }
+        });
+      });
+
+      // Register Background Sync for offline queue
+      if ('SyncManager' in window) {
+        try {
+          await reg.sync.register('learnos-offline-queue');
+          console.log('✅ Background Sync registered');
+        } catch(e) { console.warn('Background Sync not supported:', e); }
       }
+
+      // Register Periodic Sync to keep cache fresh (every 24h)
+      if ('periodicSync' in reg) {
+        try {
+          const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+          if (status.state === 'granted') {
+            await reg.periodicSync.register('learnos-cache-refresh', {
+              minInterval: 24 * 60 * 60 * 1000 // 24 hours
+            });
+            console.log('✅ Periodic Sync registered');
+          }
+        } catch(e) { console.warn('Periodic Sync not supported:', e); }
+      }
+
+    } catch(err) {
+      console.warn('SW registration failed:', err);
+    }
+
+    // Listen for SW messages
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data?.type === 'PROCESS_OFFLINE_QUEUE') offlineQueueProcess();
     });
+
+    // Process any pending offline queue on load
+    window.addEventListener('online', () => setTimeout(offlineQueueProcess, 1500));
+    if (navigator.onLine) setTimeout(offlineQueueProcess, 3000);
   });
 }
 
@@ -4712,9 +4842,22 @@ function hideOfflineBanner() {
   if (el) el.style.display = 'none';
 }
 
-window.addEventListener('online',  () => { hideOfflineBanner(); showToast('✅ Back online!', 'success'); });
-window.addEventListener('offline', () => showOfflineBanner());
-if (!navigator.onLine) showOfflineBanner();
+function updateOfflineDot() {
+  const dot = document.getElementById('topbar-offline-dot');
+  if (dot) dot.style.display = navigator.onLine ? 'none' : 'block';
+}
+window.addEventListener('online',  () => {
+  hideOfflineBanner();
+  updateOfflineDot();
+  showToast('✅ Back online — syncing data…', 'success');
+  setTimeout(offlineQueueProcess, 1500);
+});
+window.addEventListener('offline', () => {
+  showOfflineBanner();
+  updateOfflineDot();
+  showToast('📡 Offline — changes will sync when connected', '');
+});
+if (!navigator.onLine) { showOfflineBanner(); updateOfflineDot(); }
 </script>
 </body>
 </html>
