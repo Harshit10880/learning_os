@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnOS — Offline</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    background:#0f0f1a; color:#fff;
+    font-family:'Inter',sans-serif; padding:24px; text-align:center;
+  }
+  .logo { font-size:2.5rem; font-weight:800; color:#7c3aed; margin-bottom:8px; }
+  .icon { font-size:4rem; margin-bottom:24px; }
+  h1 { font-size:1.4rem; font-weight:700; margin-bottom:10px; color:#fff; }
+  p { color:#888; font-size:0.9rem; line-height:1.6; max-width:300px; margin-bottom:32px; }
+  button {
+    background:linear-gradient(135deg,#7c3aed,#38bdf8);
+    color:#fff; border:none; border-radius:12px;
+    padding:14px 32px; font-size:1rem; font-weight:600;
+    cursor:pointer; width:100%; max-width:280px;
+  }
+  .status { margin-top:20px; font-size:0.75rem; color:#555; }
+</style>
+</head>
+<body>
+  <div class="logo">LearnOS</div>
+  <div class="icon">📡</div>
+  <h1>You're Offline</h1>
+  <p>No internet connection detected. Please check your network and try again. Your data is safe in the cloud.</p>
+  <button onclick="window.location.reload()">🔄 Try Again</button>
+  <div class="status" id="status">Waiting for connection…</div>
+  <script>
+    window.addEventListener('online', () => {
+      document.getElementById('status').textContent = '✅ Back online! Reloading…';
+      setTimeout(() => window.location.href = '/', 1000);
+    });
+    setInterval(() => {
+      if (navigator.onLine) {
+        document.getElementById('status').textContent = '✅ Connected! Reloading…';
+        setTimeout(() => window.location.href = '/', 500);
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
