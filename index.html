@@ -834,6 +834,12 @@ input, textarea, select { font-family: inherit; outline: none; }
   100% { background-position: -200% 0; }
 }
 
+/* ── More menu animation ───────────────────────────────── */
+@keyframes slideUpMenu {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
 /* ── Phase 4: Slow connection mode ──────────────────────── */
 .slow-connection .analytics-chart,
 .slow-connection canvas,
@@ -1187,21 +1193,53 @@ input, textarea { -webkit-user-select: text; user-select: text; }
   <!-- Bottom Navigation Bar (mobile only, hidden on desktop via CSS) -->
   <nav id="bottom-nav" aria-label="Main navigation">
     <button class="bnav-item active" id="bnav-dashboard"  onclick="navTo('dashboard')"  aria-label="Dashboard">
-      <span class="bnav-icon">⬛</span>Home
+      <span class="bnav-icon">🏠</span>Home
     </button>
     <button class="bnav-item" id="bnav-subjects"   onclick="navTo('subjects')"   aria-label="Subjects">
       <span class="bnav-icon">📚</span>Subjects
     </button>
-    <button class="bnav-item" id="bnav-sessions"   onclick="navTo('sessions')"   aria-label="Sessions">
-      <span class="bnav-icon">⏱</span>Sessions
+    <button class="bnav-item" id="bnav-timer"      onclick="navTo('timer')"      aria-label="Timer">
+      <span class="bnav-icon">⏱</span>Timer
     </button>
     <button class="bnav-item" id="bnav-attendance" onclick="navTo('attendance')" aria-label="Attendance">
       <span class="bnav-icon">📅</span>Attend
     </button>
-    <button class="bnav-item" id="bnav-profile"    onclick="navTo('profile')"    aria-label="Profile">
-      <span class="bnav-icon">👤</span>Profile
+    <button class="bnav-item" id="bnav-more"       onclick="toggleMoreMenu()"    aria-label="More">
+      <span class="bnav-icon">⋯</span>More
     </button>
   </nav>
+
+  <!-- More Menu (slides up from bottom nav) -->
+  <div id="more-menu" style="
+    display:none; position:fixed; bottom:calc(58px + var(--safe-bottom));
+    left:0; right:0; background:var(--bg2);
+    border-top:1px solid var(--border); border-radius:16px 16px 0 0;
+    z-index:9998; padding:12px 8px 8px;
+    box-shadow:0 -8px 32px rgba(0,0,0,0.4);
+    animation:slideUpMenu 0.22s ease;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      <button onclick="navTo('tasks');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">✅</span>Tasks
+      </button>
+      <button onclick="navTo('analytics');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">📊</span>Analytics
+      </button>
+      <button onclick="navTo('notes');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">📝</span>Notes
+      </button>
+      <button onclick="navTo('community');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">🌐</span>Community
+      </button>
+      <button onclick="navTo('profile');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">👤</span>Profile
+      </button>
+      <button onclick="navTo('achievements');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">🏆</span>Trophies
+      </button>
+    </div>
+  </div>
+  <!-- More menu overlay -->
+  <div id="more-overlay" onclick="closeMoreMenu()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,0.4);"></div>
 
   <!-- Topbar -->
   <div id="topbar">
@@ -3230,8 +3268,9 @@ function navTo(page) {
   if (page === 'analytics')  renderAnalytics();
   if (page === 'notes')      renderNotes();
 
-  // Close sidebar + overlay on mobile
+  // Close sidebar + overlay + more menu on mobile
   closeSidebarMobile();
+  closeMoreMenu();
 }
 
 function toggleSidebar() {
@@ -3252,6 +3291,31 @@ function closeSidebarMobile() {
   const ov = document.getElementById('sidebar-overlay');
   if (ov) ov.classList.remove('visible');
   document.body.style.overflow = '';
+}
+
+function toggleMoreMenu() {
+  const menu = document.getElementById('more-menu');
+  const overlay = document.getElementById('more-overlay');
+  if (!menu) return;
+  const isOpen = menu.style.display === 'block';
+  if (isOpen) {
+    closeMoreMenu();
+  } else {
+    menu.style.display = 'block';
+    if (overlay) overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    // Highlight More button
+    document.getElementById('bnav-more')?.classList.add('active');
+  }
+}
+
+function closeMoreMenu() {
+  const menu = document.getElementById('more-menu');
+  const overlay = document.getElementById('more-overlay');
+  if (menu) menu.style.display = 'none';
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+  document.getElementById('bnav-more')?.classList.remove('active');
 }
 
 // ===================== DASHBOARD =====================
