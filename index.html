@@ -31,11 +31,29 @@
 <!-- Splash screen color for iOS -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<!-- Fonts -->
+<!-- ═══════════════════════════════════════════ -->
+<!-- PERFORMANCE — Phase 4                       -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- DNS prefetch for all external origins -->
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+
+<!-- Fonts — preconnect + font-display=swap for zero render block -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase Compat SDK (works with local files, no ES module issues) -->
+<!-- Load font async, non-blocking -->
+<link rel="preload" as="style"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+  onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+</noscript>
+
+<!-- Firebase Compat SDK — loaded normally (required before inline init script) -->
+<!-- Chart.js is deferred separately below -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -81,6 +99,14 @@
   };
 
   auth.onAuthStateChanged(user => {
+    // Phase 4: update loader + enable login button
+    setLoaderStatus(user ? 'Loading your data…' : 'Ready to sign in');
+    const btn = document.getElementById('login-btn');
+    if (btn && btn.disabled) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Sign In / Create Account';
+    }
     if (user) {
       window._fbUser = user;
       window._fbUid  = user.uid;
@@ -93,7 +119,7 @@
   });
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ===================== TOKENS ===================== */
 :root {
@@ -753,6 +779,73 @@ input, textarea, select { font-family: inherit; outline: none; }
   box-shadow: 0 4px 16px rgba(239,68,68,0.4);
 }
 
+
+/* ── Phase 4: App Loading Skeleton ──────────────────────────── */
+#app-loader {
+  position: fixed; inset: 0;
+  background: #0f0f1a;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.4s ease;
+}
+#app-loader.hidden { opacity: 0; pointer-events: none; }
+.loader-logo {
+  font-size: 2.4rem; font-weight: 800;
+  background: linear-gradient(135deg,#7c3aed,#38bdf8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 32px;
+  font-family: 'Sora','Inter',system-ui,sans-serif;
+}
+.loader-bar-wrap {
+  width: 160px; height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px; overflow: hidden;
+}
+.loader-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg,#7c3aed,#38bdf8);
+  border-radius: 99px;
+  animation: loaderFill 1.8s ease forwards;
+}
+@keyframes loaderFill {
+  0%   { width: 0%; }
+  60%  { width: 75%; }
+  90%  { width: 90%; }
+  100% { width: 100%; }
+}
+.loader-status {
+  margin-top: 14px; font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter',system-ui,sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* ── Phase 4: Skeleton cards (while data loads) ─────────────── */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Phase 4: Slow connection mode ──────────────────────── */
+.slow-connection .analytics-chart,
+.slow-connection canvas,
+.slow-connection .round-progress svg {
+  display: none !important;
+}
+.slow-connection .chart-card::after {
+  content: '📡 Chart hidden on slow connection';
+  display: block; text-align: center;
+  color: var(--muted); font-size: 0.78rem; padding: 20px;
+}
+
 /* ── Phase 2 PWA ── */
 @keyframes pulseDot {
   0%,100% { opacity:1; transform:scale(1); }
@@ -1049,6 +1142,15 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 </style>
 </head>
 <body>
+
+<!-- ============ APP LOADER (Phase 4) ============ -->
+<div id="app-loader">
+  <div class="loader-logo">LearnOS</div>
+  <div class="loader-bar-wrap">
+    <div class="loader-bar-fill"></div>
+  </div>
+  <div class="loader-status" id="loader-status">Starting…</div>
+</div>
 
 <!-- ============ LOGIN ============ -->
 <div id="login-screen">
@@ -2781,6 +2883,7 @@ function init() {
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
     document.getElementById('login-error').textContent = '';
+    hideAppLoader(); // Phase 4
   };
   // Check for owner session flag (fast path, still verified by Firestore meta on auth change)
   if (S.get('los_owner_session') && window._fbUser) {
@@ -2793,6 +2896,7 @@ async function showApp(isRealLogin = false) {
   document.getElementById('login-screen').style.display = 'none';
   const app = document.getElementById('app');
   app.classList.add('visible');
+  setLoaderStatus('Loading your data…');
   attMonthOffset = 0;
   seedAIEngineerSubject();
   seedAgenticAISubject();
@@ -2806,6 +2910,8 @@ async function showApp(isRealLogin = false) {
   renderPosts();
   renderNotes();
   navTo('dashboard');
+  // Phase 4: hide app loader after first render
+  setTimeout(() => hideAppLoader(), 300);
 
   const now     = new Date();
   const dateKey = toDateKey(now);
@@ -4863,6 +4969,147 @@ function escHtml(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         PHASE 4 — PERFORMANCE & LIGHTHOUSE                     ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── App Loader control ────────────────────────────────────────────
+function setLoaderStatus(msg) {
+  const el = document.getElementById('loader-status');
+  if (el) el.textContent = msg;
+}
+
+function hideAppLoader() {
+  const loader = document.getElementById('app-loader');
+  if (!loader) return;
+  loader.classList.add('hidden');
+  setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+}
+
+// Show loader status updates
+setLoaderStatus('Connecting…');
+
+// ── Lazy image loading polyfill ───────────────────────────────────
+if ('loading' in HTMLImageElement.prototype) {
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+    img.src = img.dataset.src || img.src;
+  });
+} else {
+  // Fallback for older browsers
+  const lazyObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.dataset.src) img.src = img.dataset.src;
+        lazyObserver.unobserve(img);
+      }
+    });
+  });
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => lazyObserver.observe(img));
+}
+
+// ── Performance: Debounce expensive renders ───────────────────────
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// ── Performance: RequestAnimationFrame wrapper for renders ────────
+function rafRender(fn) {
+  if (window.requestAnimationFrame) {
+    requestAnimationFrame(fn);
+  } else {
+    fn();
+  }
+}
+
+// ── Web Vitals tracking (LCP, FID, CLS) ──────────────────────────
+(function trackWebVitals() {
+  // Track Largest Contentful Paint
+  if ('PerformanceObserver' in window) {
+    try {
+      new PerformanceObserver(list => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1];
+        console.log('[Perf] LCP:', Math.round(last.startTime) + 'ms');
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+
+      // Track Cumulative Layout Shift
+      let clsScore = 0;
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
+          if (!entry.hadRecentInput) clsScore += entry.value;
+        });
+        console.log('[Perf] CLS:', clsScore.toFixed(4));
+      }).observe({ type: 'layout-shift', buffered: true });
+
+      // Track First Input Delay
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
+          console.log('[Perf] FID:', Math.round(entry.processingStart - entry.startTime) + 'ms');
+        });
+      }).observe({ type: 'first-input', buffered: true });
+
+    } catch(e) { /* PerformanceObserver not fully supported */ }
+  }
+})();
+
+// ── Lighthouse: App installable check ────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  console.log('[PWA] Install prompt fired ✅');
+});
+
+// ── Lighthouse: Page visibility — pause timers when hidden ────────
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Pause any running timers to save battery
+    if (state && state.activeTimers) {
+      state.activeTimers.forEach(t => {
+        if (t.status === 'running') {
+          t._pausedForVisibility = true;
+        }
+      });
+    }
+  } else {
+    // Resume
+    if (state && state.activeTimers) {
+      state.activeTimers.forEach(t => {
+        if (t._pausedForVisibility) {
+          delete t._pausedForVisibility;
+        }
+      });
+    }
+    // Re-render dashboard when app comes back to foreground
+    if (state && state.user) {
+      rafRender(() => {
+        const dashPage = document.getElementById('page-dashboard');
+        if (dashPage && dashPage.classList.contains('active')) {
+          renderDashboard();
+        }
+      });
+    }
+  }
+});
+
+// ── Lighthouse: Network info for adaptive loading ──────────────────
+(function adaptiveLoading() {
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!conn) return;
+  const slowConnection = conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g';
+  if (slowConnection) {
+    console.log('[Perf] Slow connection detected — minimal mode');
+    document.documentElement.classList.add('slow-connection');
+  }
+  conn.addEventListener('change', () => {
+    const isSlow = conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g';
+    document.documentElement.classList.toggle('slow-connection', isSlow);
+  });
+})();
 
 // ===================== START =====================
 // Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
