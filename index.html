@@ -2,12 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>LearnOS — Personal Learning System</title>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PWA META TAGS                               -->
+<!-- ═══════════════════════════════════════════ -->
+<meta name="description" content="Your personal learning command center. Track subjects, attendance, sessions and performance.">
+<meta name="theme-color" content="#7c3aed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LearnOS">
+<meta name="application-name" content="LearnOS">
+<meta name="msapplication-TileColor" content="#7c3aed">
+<meta name="msapplication-tap-highlight" content="no">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
+
+<!-- Splash screen color for iOS -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PERFORMANCE — Phase 4                       -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- DNS prefetch for all external origins -->
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+
+<!-- Fonts — preconnect + font-display=swap for zero render block -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase Compat SDK (works with local files, no ES module issues) -->
+<!-- Load font async, non-blocking -->
+<link rel="preload" as="style"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+  onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+</noscript>
+
+<!-- Firebase Compat SDK — loaded normally (required before inline init script) -->
+<!-- Chart.js is deferred separately below -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -52,13 +98,28 @@
     signOut: (auth) => auth.signOut()
   };
 
-  // NOTE: onAuthStateChanged is registered at the BOTTOM of the file
-  // after all functions (init, showApp, etc.) are fully defined.
-  // We just store auth/db on window here and wait.
-  window._pendingAuthUser = undefined; // will be set by deferred listener
+  auth.onAuthStateChanged(user => {
+    // Phase 4: update loader + enable login button
+    setLoaderStatus(user ? 'Loading your data…' : 'Ready to sign in');
+    const btn = document.getElementById('login-btn');
+    if (btn && btn.disabled) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Sign In / Create Account';
+    }
+    if (user) {
+      window._fbUser = user;
+      window._fbUid  = user.uid;
+      if (window._onFirebaseLogin) window._onFirebaseLogin(user);
+    } else {
+      window._fbUser = null;
+      window._fbUid  = null;
+      if (window._onFirebaseLogout) window._onFirebaseLogout();
+    }
+  });
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ===================== TOKENS ===================== */
 :root {
@@ -88,10 +149,16 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
+html { overflow-x: hidden; max-width: 100vw; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; max-width: 100vw; }
+/* Hide scrollbar on mobile, show thin on desktop */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+@media (max-width: 700px) {
+  ::-webkit-scrollbar { width: 0; display: none; }
+  * { scrollbar-width: none; }
+}
 button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 input, textarea, select { font-family: inherit; outline: none; }
 
@@ -147,7 +214,7 @@ input, textarea, select { font-family: inherit; outline: none; }
 #login-error { color: var(--danger); font-size: 0.83rem; margin-top: 10px; min-height: 18px; }
 
 /* ===================== APP SHELL ===================== */
-#app { display: none; height: 100vh; flex-direction: column; }
+#app { display: none; height: 100vh; flex-direction: column; max-width: 100vw; overflow-x: hidden; position: relative; }
 #app.visible { display: flex; }
 
 /* ===================== OWNER PANEL ===================== */
@@ -713,38 +780,277 @@ input, textarea, select { font-family: inherit; outline: none; }
 }
 
 
-/* ===================== GAMIFICATION STYLES ===================== */
-.gam-strip { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 14px; background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(56,189,248,0.06)); border-radius:var(--radius); margin-bottom:14px; border:1px solid rgba(124,58,237,0.15); }
-.gam-badge { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,var(--accent),#7c3aed); color:#fff; border-radius:99px; padding:4px 12px; font-size:0.75rem; font-weight:700; letter-spacing:0.3px; }
-.gam-streak { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,#f59e0b,#ef4444); color:#fff; border-radius:99px; padding:4px 12px; font-size:0.75rem; font-weight:700; }
-.gam-xp-pill { font-size:0.75rem; color:var(--muted); font-weight:600; }
-.xp-bar-wrap { background:var(--bg3); border-radius:99px; height:8px; overflow:hidden; margin:6px 0 2px; }
-.xp-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--accent),#38bdf8); transition:width 0.5s ease; }
+/* ── Phase 4: App Loading Skeleton ──────────────────────────── */
+#app-loader {
+  position: fixed; inset: 0;
+  background: #0f0f1a;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.4s ease;
+}
+#app-loader.hidden { opacity: 0; pointer-events: none; }
+.loader-logo {
+  font-size: 2.4rem; font-weight: 800;
+  background: linear-gradient(135deg,#7c3aed,#38bdf8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 32px;
+  font-family: 'Sora','Inter',system-ui,sans-serif;
+}
+.loader-bar-wrap {
+  width: 160px; height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px; overflow: hidden;
+}
+.loader-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg,#7c3aed,#38bdf8);
+  border-radius: 99px;
+  animation: loaderFill 1.8s ease forwards;
+}
+@keyframes loaderFill {
+  0%   { width: 0%; }
+  60%  { width: 75%; }
+  90%  { width: 90%; }
+  100% { width: 100%; }
+}
+.loader-status {
+  margin-top: 14px; font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter',system-ui,sans-serif;
+  letter-spacing: 0.5px;
+}
 
-/* Trophy cabinet */
-.trophy-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; }
-.trophy-card { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 10px; text-align:center; }
-.trophy-card.earned { border-color:var(--accent); box-shadow:0 0 12px rgba(124,58,237,0.15); }
-.trophy-card.locked { opacity:0.35; filter:grayscale(1); }
-.trophy-card .tc-icon { font-size:2rem; margin-bottom:6px; }
-.trophy-card .tc-name { font-size:0.75rem; font-weight:700; color:var(--text); margin-bottom:3px; }
-.trophy-card .tc-desc { font-size:0.65rem; color:var(--muted); line-height:1.35; }
-.trophy-card .tc-date { font-size:0.62rem; color:var(--accent); margin-top:5px; font-weight:600; }
+/* ── Phase 4: Skeleton cards (while data loads) ─────────────── */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
-/* XP toast popup */
-.xp-popup { position:fixed; bottom:80px; right:18px; background:linear-gradient(135deg,#7c3aed,#38bdf8); color:#fff; border-radius:99px; padding:7px 16px; font-size:0.8rem; font-weight:700; z-index:9999; animation:xpPop 2.5s forwards; pointer-events:none; }
-@keyframes xpPop { 0%{opacity:0;transform:translateY(10px)} 15%{opacity:1;transform:translateY(0)} 75%{opacity:1} 100%{opacity:0;transform:translateY(-16px)} }
+/* ── Phase 4: Slow connection mode ──────────────────────── */
+.slow-connection .analytics-chart,
+.slow-connection canvas,
+.slow-connection .round-progress svg {
+  display: none !important;
+}
+.slow-connection .chart-card::after {
+  content: '📡 Chart hidden on slow connection';
+  display: block; text-align: center;
+  color: var(--muted); font-size: 0.78rem; padding: 20px;
+}
 
-/* Achievements page */
-#page-achievements { padding:0 0 40px; }
-.ach-level-card { background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(56,189,248,0.08)); border:1.5px solid rgba(124,58,237,0.2); border-radius:var(--radius); padding:20px; margin-bottom:16px; }
-.ach-stats-row { display:flex; gap:0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
-.ach-stat { flex:1; text-align:center; padding:14px 8px; border-right:1px solid var(--border); }
-.ach-stat:last-child { border-right:none; }
-.ach-stat .sv { font-size:1.3rem; font-weight:800; color:var(--accent); }
-.ach-stat .sl { font-size:0.68rem; color:var(--muted); margin-top:2px; }
-.xp-log-item { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:0.8rem; }
-.xp-log-item:last-child { border-bottom:none; }
+/* ── Phase 2 PWA ── */
+@keyframes pulseDot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(1.3); }
+}
+#topbar-offline-dot { transition: opacity 0.3s; }
+
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║         PHASE 3 — MOBILE OPTIMIZATION                          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ── Safe Area (iPhone notch + Android cutout) ──────────────────── */
+:root {
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ── Bottom Navigation Bar ──────────────────────────────────────── */
+#bottom-nav {
+  display: none;                   /* hidden by default on desktop */
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important; right: 0 !important;
+  height: calc(58px + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 9999 !important;        /* above everything */
+  flex-direction: row;
+  align-items: stretch;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+}
+.bnav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer;
+  background: transparent; border: none;
+  color: var(--muted); font-size: 0.58rem;
+  font-weight: 600; letter-spacing: 0.3px;
+  padding: 6px 2px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 48px; transition: color 0.15s;
+  position: relative; overflow: hidden;
+}
+.bnav-icon { font-size: 1.3rem; line-height: 1; display: block; }
+.bnav-item.active { color: var(--accent3); }
+.bnav-item.active .bnav-icon {
+  filter: drop-shadow(0 0 5px var(--accent));
+}
+.bnav-item:active { background: rgba(124,58,237,0.07); }
+
+/* ── Sidebar overlay ────────────────────────────────────────────── */
+#sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+#sidebar-overlay.visible { display: block; }
+
+/* ── Ripple animation ───────────────────────────────────────────── */
+@keyframes rippleFx {
+  to { transform: scale(4); opacity: 0; }
+}
+.ripple-fx {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  width: 10px; height: 10px; margin: -5px;
+  transform: scale(0); animation: rippleFx 0.5s linear;
+  pointer-events: none;
+}
+
+/* ── Mobile overrides ───────────────────────────────────────────── */
+@media (max-width: 700px) {
+  /* Show bottom nav, fully hide sidebar */
+  #bottom-nav { display: flex !important; }
+  #sidebar { display: none !important; width: 0 !important; }
+  #layout { overflow: visible; }
+
+  /* Prevent horizontal scroll / right overflow */
+  html, body, #app { overflow-x: hidden !important; max-width: 100vw; }
+
+  /* Content above bottom nav */
+  #main {
+    padding: 14px 12px calc(70px + var(--safe-bottom)) !important;
+    overflow-x: hidden;
+  }
+
+  /* Topbar — clean minimal */
+  #topbar {
+    padding: 0 12px !important;
+    height: 50px !important;
+    overflow: hidden;
+  }
+  .topbar-logo { font-size: 1rem !important; }
+  .topbar-user { display: none !important; }        /* hide "Hey, try" */
+  .topbar-time { font-size: 0.72rem !important; }
+  .btn-logout {
+    padding: 4px 8px !important;
+    font-size: 1.15rem !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--muted) !important;
+    min-height: 36px !important;
+  }
+  /* Hide hamburger on mobile since we have bottom nav */
+  #ham-btn { display: none !important; }
+
+  /* Cards */
+  .card { padding: 14px 12px; border-radius: 12px; }
+
+  /* Inputs — prevent iOS zoom (must be 16px+) */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Touch targets */
+  .btn-primary { padding: 13px 18px; font-size: 0.92rem; min-height: 48px; }
+  .btn-icon { min-height: 40px; min-width: 40px; }
+  .nav-item { min-height: 44px; }
+  .topic-check { width: 26px; height: 26px; min-width: 26px; min-height: 26px; }
+
+  /* Page headers */
+  .page-header { margin-bottom: 16px; }
+  .page-title { font-size: 1.25rem; }
+  .page-sub { font-size: 0.8rem; }
+
+  /* Dashboard meta strip */
+  #dash-meta { padding: 10px 12px; gap: 6px; }
+  .meta-val { font-size: 0.95rem; }
+  .meta-lbl { font-size: 0.58rem; }
+  .meta-divider { display: none; }
+
+  /* Login card */
+  .login-card { padding: 28px 18px; margin: 12px; border-radius: 18px; }
+  .login-logo { font-size: 2rem; }
+
+  /* Modal full-screen */
+  .modal-content {
+    margin: 6px;
+    border-radius: 16px 16px 0 0;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    max-height: 92dvh; overflow-y: auto;
+  }
+
+  /* Profile avatar */
+  #profile-avatar-circle { width: 88px; height: 88px; font-size: 2rem; }
+
+  /* Subject cards */
+  .subject-card { padding: 12px; }
+
+  /* Timer cards */
+  .timer-card { padding: 12px; }
+  .timer-display { font-size: 2.4rem; }
+
+  /* Attendance calendar */
+  .att-day { min-height: 32px; font-size: 0.68rem; }
+
+  /* Grids */
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Very small screens ─────────────────────────────────────────── */
+@media (max-width: 370px) {
+  .bnav-icon { font-size: 1.15rem; }
+  .bnav-item { font-size: 0.52rem; }
+  #dash-meta { gap: 4px; }
+  .meta-val { font-size: 0.85rem; }
+}
+
+/* ── Standalone PWA (installed on home screen) ──────────────────── */
+@media (display-mode: standalone) {
+  #topbar {
+    padding-top: var(--safe-top);
+    height: calc(50px + var(--safe-top));
+  }
+  #bottom-nav { padding-bottom: var(--safe-bottom); }
+  #pwa-install-banner { display: none !important; }
+  #main { scroll-behavior: smooth; }
+}
+
+/* ── Smooth momentum scroll on iOS ─────────────────────────────── */
+#main, .modal-body, .topic-list, .session-history {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── No tap highlight on interactive elements ───────────────────── */
+button, a, .nav-item, .bnav-item, .card, .topic-item {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+input, textarea { -webkit-user-select: text; user-select: text; }
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
@@ -837,6 +1143,15 @@ input, textarea, select { font-family: inherit; outline: none; }
 </head>
 <body>
 
+<!-- ============ APP LOADER (Phase 4) ============ -->
+<div id="app-loader">
+  <div class="loader-logo">LearnOS</div>
+  <div class="loader-bar-wrap">
+    <div class="loader-bar-fill"></div>
+  </div>
+  <div class="loader-status" id="loader-status">Starting…</div>
+</div>
+
 <!-- ============ LOGIN ============ -->
 <div id="login-screen">
   <div class="login-card">
@@ -854,7 +1169,7 @@ input, textarea, select { font-family: inherit; outline: none; }
       <label>Password</label>
       <input type="password" id="login-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-primary" onclick="doLogin()" id="login-btn" disabled style="opacity:0.6;cursor:not-allowed;">⏳ Connecting…</button>
+    <button class="btn-primary" onclick="doLogin()" id="login-btn">Sign In / Create Account</button>
     <div id="login-error"></div>
     <div style="margin-top:14px;font-size:0.75rem;color:var(--muted2);line-height:1.5;">
       New here? Enter your email + name + password to create an account.<br>
@@ -866,6 +1181,28 @@ input, textarea, select { font-family: inherit; outline: none; }
 
 <!-- ============ APP ============ -->
 <div id="app">
+  <!-- Sidebar overlay (tap to close on mobile) -->
+  <div id="sidebar-overlay" onclick="closeSidebarMobile()"></div>
+
+  <!-- Bottom Navigation Bar (mobile only, hidden on desktop via CSS) -->
+  <nav id="bottom-nav" aria-label="Main navigation">
+    <button class="bnav-item active" id="bnav-dashboard"  onclick="navTo('dashboard')"  aria-label="Dashboard">
+      <span class="bnav-icon">⬛</span>Home
+    </button>
+    <button class="bnav-item" id="bnav-subjects"   onclick="navTo('subjects')"   aria-label="Subjects">
+      <span class="bnav-icon">📚</span>Subjects
+    </button>
+    <button class="bnav-item" id="bnav-sessions"   onclick="navTo('sessions')"   aria-label="Sessions">
+      <span class="bnav-icon">⏱</span>Sessions
+    </button>
+    <button class="bnav-item" id="bnav-attendance" onclick="navTo('attendance')" aria-label="Attendance">
+      <span class="bnav-icon">📅</span>Attend
+    </button>
+    <button class="bnav-item" id="bnav-profile"    onclick="navTo('profile')"    aria-label="Profile">
+      <span class="bnav-icon">👤</span>Profile
+    </button>
+  </nav>
+
   <!-- Topbar -->
   <div id="topbar">
     <button class="hamburger" onclick="toggleSidebar()" id="ham-btn">
@@ -873,9 +1210,12 @@ input, textarea, select { font-family: inherit; outline: none; }
     </button>
     <div class="topbar-logo">LearnOS</div>
     <div class="topbar-right">
+      <div id="topbar-offline-dot" title="Offline — changes queued for sync"
+        style="display:none;width:8px;height:8px;border-radius:50%;
+        background:#ef4444;flex-shrink:0;animation:pulseDot 1.5s infinite;"></div>
       <div class="topbar-time" id="topbar-time">--:--:--</div>
-      <div class="topbar-user">Hey, <span id="topbar-name">—</span></div>
-      <button class="btn-logout" onclick="doLogout()">Log out</button>
+      <div class="topbar-user"><span id="topbar-name">—</span></div>
+      <button class="btn-logout" onclick="doLogout()" title="Logout">🚪</button>
     </div>
   </div>
   <!-- Layout -->
@@ -901,7 +1241,6 @@ input, textarea, select { font-family: inherit; outline: none; }
       </div>
       <div class="nav-section">
         <div class="nav-label">Account</div>
-        <button class="nav-item" data-page="achievements" onclick="navTo('achievements')"><span class="icon">🏆</span> Achievements</button>
         <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon">👤</span> Profile</button>
       </div>
     </nav>
@@ -923,8 +1262,6 @@ input, textarea, select { font-family: inherit; outline: none; }
           <div class="meta-divider"></div>
           <div class="meta-item"><div class="meta-val" id="dash-streak" style="color:var(--warn);">🔥 0</div><div class="meta-lbl">Day Streak</div></div>
         </div>
-        <!-- Gamification strip — injected by renderGamStrip() -->
-        <div id="dash-gam-strip" style="margin-bottom:12px;"></div>
         <div class="grid-2" style="margin-bottom:18px;">
           <!-- Overall progress -->
           <div class="card">
@@ -1259,50 +1596,6 @@ input, textarea, select { font-family: inherit; outline: none; }
         </div>
       </div>
 
-      <!-- Achievements Page -->
-      <div class="page" id="page-achievements">
-        <div class="page-header">
-          <div class="page-title">🏆 Achievements</div>
-          <div class="page-sub">Your XP, levels, trophies &amp; badges</div>
-        </div>
-
-        <!-- Level + XP card -->
-        <div class="ach-level-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-            <div>
-              <div id="ach-level-badge" class="gam-badge" style="margin-bottom:6px;font-size:0.82rem;padding:5px 14px;">⭐ Level 1 — Beginner</div>
-              <div id="ach-xp-label" style="font-size:0.75rem;color:var(--muted);margin-top:4px;">0 / 100 XP to next level</div>
-            </div>
-            <div id="ach-streak-chip" class="gam-streak">🔥 0 day streak</div>
-          </div>
-          <div class="xp-bar-wrap"><div class="xp-bar-fill" id="ach-xp-bar" style="width:0%;"></div></div>
-        </div>
-
-        <!-- Stats row -->
-        <div class="ach-stats-row">
-          <div class="ach-stat"><div class="sv" id="ach-stat-xp">0</div><div class="sl">Total XP</div></div>
-          <div class="ach-stat"><div class="sv" id="ach-stat-level">1</div><div class="sl">Level</div></div>
-          <div class="ach-stat"><div class="sv" id="ach-stat-streak">0</div><div class="sl">Best Streak</div></div>
-          <div class="ach-stat"><div class="sv" id="ach-stat-trophies">0</div><div class="sl">Trophies</div></div>
-        </div>
-
-        <!-- Trophy Cabinet -->
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-title" style="margin-bottom:14px;">🏅 Trophy Cabinet</div>
-          <div class="trophy-grid" id="ach-trophy-grid">
-            <div style="color:var(--muted);font-size:0.82rem;">Loading…</div>
-          </div>
-        </div>
-
-        <!-- XP History -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">⭐ Recent XP Earned</div>
-          <div id="ach-xp-log" style="max-height:280px;overflow-y:auto;">
-            <div style="color:var(--muted);font-size:0.82rem;">No XP earned yet</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Profile Page -->
       <div class="page" id="page-profile">
         <div class="page-header">
@@ -1317,11 +1610,7 @@ input, textarea, select { font-family: inherit; outline: none; }
             ?
           </div>
           <div id="profile-name-big" style="font-size:1.5rem;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
-          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">—</div>
-          <!-- Level badge + streak from gamification -->
-          <div id="profile-gam-badge" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;"></div>
-          <!-- Mini earned trophies row -->
-          <div id="profile-trophy-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;min-height:32px;padding:8px 12px;background:var(--bg3);border-radius:var(--radius);width:100%;box-sizing:border-box;margin-bottom:20px;"></div>
+          <div id="profile-email-big" style="font-size:0.88rem;color:var(--muted);margin-bottom:20px;">—</div>
 
           <!-- Stats row -->
           <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;width:100%;">
@@ -2461,222 +2750,6 @@ function seedMLOpsEngineerSubject() {
   saveData('subjects');
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║           GAMIFICATION ENGINE — STANDALONE MODULE               ║
-// ║  No existing functions modified. Only new code added.           ║
-// ╚══════════════════════════════════════════════════════════════════╝
-
-const GAM_LEVELS = [
-  { level:1,  xp:0,    title:'Beginner',    badge:'🌱' },
-  { level:2,  xp:100,  title:'Explorer',    badge:'🧭' },
-  { level:3,  xp:300,  title:'Learner',     badge:'📚' },
-  { level:4,  xp:600,  title:'Achiever',    badge:'⚡' },
-  { level:5,  xp:1000, title:'Scholar',     badge:'🎓' },
-  { level:6,  xp:1500, title:'Expert',      badge:'💡' },
-  { level:7,  xp:2200, title:'Master',      badge:'🔮' },
-  { level:8,  xp:3000, title:'Champion',    badge:'🏆' },
-  { level:9,  xp:4000, title:'Legend',      badge:'⚔️'  },
-  { level:10, xp:5500, title:'Grandmaster', badge:'👑' },
-];
-
-const GAM_TROPHIES = [
-  { id:'first_step',     icon:'🌱', name:'First Step',      desc:'First login ever' },
-  { id:'streak_3',       icon:'✨', name:'Ignition',        desc:'3-day study streak' },
-  { id:'on_fire',        icon:'🔥', name:'On Fire',         desc:'7-day study streak' },
-  { id:'diamond_mind',   icon:'💎', name:'Diamond Mind',    desc:'30-day study streak' },
-  { id:'half_century',   icon:'🥈', name:'Half Century',    desc:'Complete 50 topics total' },
-  { id:'century',        icon:'💯', name:'Century',         desc:'Complete 100 topics total' },
-  { id:'speed_learner',  icon:'⚡', name:'Speed Learner',   desc:'10 topics in one day' },
-  { id:'subject_master', icon:'👑', name:'Subject Master',  desc:'All topics in one subject done' },
-  { id:'focused',        icon:'🎯', name:'Focused',         desc:'5 sessions in one week' },
-  { id:'early_bird',     icon:'🌅', name:'Early Bird',      desc:'Login before 7 AM' },
-  { id:'night_owl',      icon:'🦉', name:'Night Owl',       desc:'Session finished after 10 PM' },
-  { id:'rocket',         icon:'🚀', name:'Rocket',          desc:'Reach Level 10' },
-];
-
-const GAM_XP = { login:10, topic:15, task:10, session:20, streak3:50, streak7:150, streak30:500 };
-
-// ── State accessor (never mutate directly outside these functions) ──
-function _gam() {
-  if (!state.gamification) {
-    state.gamification = { xp:0, level:1, currentStreak:0, bestStreak:0,
-      lastStreakDate:null, trophies:{}, xpLog:[] };
-  }
-  return state.gamification;
-}
-
-function gamLevelInfo(xp) {
-  let cur = GAM_LEVELS[0];
-  for (const l of GAM_LEVELS) { if (xp >= l.xp) cur = l; else break; }
-  const nextIdx = GAM_LEVELS.findIndex(l => l.level === cur.level);
-  const next = GAM_LEVELS[nextIdx + 1] || null;
-  const pct  = next ? Math.round(((xp - cur.xp) / (next.xp - cur.xp)) * 100) : 100;
-  return { ...cur, next, pct, xpToNext: next ? next.xp - cur.xp : 0, xpInLevel: xp - cur.xp };
-}
-
-function _gamAwardXP(reason, amount) {
-  const g = _gam();
-  g.xp += amount;
-  g.xpLog.unshift({ reason, amount, date: new Date().toISOString() });
-  if (g.xpLog.length > 50) g.xpLog.length = 50; // cap log
-  const info = gamLevelInfo(g.xp);
-  if (info.level > g.level) {
-    g.level = info.level;
-    showToast('🎉 Level Up! ' + info.badge + ' ' + info.title, 'success');
-  }
-  saveData('gamification');
-  // Show floating XP popup
-  const pop = document.createElement('div');
-  pop.className = 'xp-popup';
-  pop.textContent = '+' + amount + ' XP — ' + reason;
-  document.body.appendChild(pop);
-  setTimeout(() => pop.remove(), 2600);
-}
-
-function _gamEarnTrophy(id) {
-  const g = _gam();
-  if (g.trophies[id]) return;
-  const def = GAM_TROPHIES.find(t => t.id === id);
-  if (!def) return;
-  g.trophies[id] = { earnedAt: new Date().toISOString() };
-  saveData('gamification');
-  showToast('🏅 Trophy: ' + def.icon + ' ' + def.name + ' unlocked!', 'success');
-}
-
-// ── Hooks — called from existing functions via wrapper (see below) ──
-function gamOnRealLogin() {
-  const g = _gam();
-  const today = toDateKey(new Date());
-  const yesterday = toDateKey(new Date(Date.now() - 86400000));
-  if (g.lastStreakDate !== today) {
-    if (g.lastStreakDate === yesterday) g.currentStreak += 1;
-    else g.currentStreak = 1;
-    g.lastStreakDate = today;
-    if (g.currentStreak > g.bestStreak) g.bestStreak = g.currentStreak;
-    if (g.currentStreak === 3)  { _gamAwardXP('3-day streak bonus', GAM_XP.streak3);  _gamEarnTrophy('streak_3'); }
-    if (g.currentStreak === 7)  { _gamAwardXP('7-day streak bonus', GAM_XP.streak7);  _gamEarnTrophy('on_fire'); }
-    if (g.currentStreak === 30) { _gamAwardXP('30-day streak bonus', GAM_XP.streak30); _gamEarnTrophy('diamond_mind'); }
-  }
-  if (new Date().getHours() < 7) _gamEarnTrophy('early_bird');
-  if (!g.trophies['first_step']) { _gamEarnTrophy('first_step'); }
-  _gamAwardXP('Daily login', GAM_XP.login);
-}
-
-function gamOnTopicDone() {
-  _gamAwardXP('Topic completed', GAM_XP.topic);
-  const g = _gam();
-  const today = toDateKey(new Date());
-  const todayCount = g.xpLog.filter(e => e.reason === 'Topic completed' && e.date.startsWith(today)).length;
-  if (todayCount >= 10) _gamEarnTrophy('speed_learner');
-  const total = state.subjects.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0);
-  if (total >= 50)  _gamEarnTrophy('half_century');
-  if (total >= 100) _gamEarnTrophy('century');
-  for (const s of state.subjects) {
-    if (s.topics.length > 0 && s.topics.every(t=>t.done)) { _gamEarnTrophy('subject_master'); break; }
-  }
-  if (gamLevelInfo(_gam().xp).level >= 10) _gamEarnTrophy('rocket');
-}
-
-function gamOnTaskDone() {
-  _gamAwardXP('Task completed', GAM_XP.task);
-}
-
-function gamOnSessionDone() {
-  _gamAwardXP('Session completed', GAM_XP.session);
-  if (new Date().getHours() >= 22) _gamEarnTrophy('night_owl');
-  const weekAgo = new Date(Date.now() - 7*86400000);
-  const weekSessions = state.sessions.filter(s => s.status==='done' && new Date(s.date)>=weekAgo).length;
-  if (weekSessions >= 5) _gamEarnTrophy('focused');
-}
-
-// ── Render functions ──
-function renderGamStrip() {
-  const el = document.getElementById('dash-gam-strip');
-  if (!el || !state.user) return;
-  const g = _gam();
-  const info = gamLevelInfo(g.xp);
-  const earned = Object.keys(g.trophies).length;
-  el.innerHTML = `<div class="gam-strip">
-    <span class="gam-badge">${info.badge} Lv.${info.level} ${info.title}</span>
-    <span class="gam-streak">🔥 ${g.currentStreak} streak</span>
-    <span class="gam-xp-pill">⭐ ${g.xp} XP &nbsp;·&nbsp; 🏅 ${earned} trophies</span>
-  </div>`;
-}
-
-function renderAchievements() {
-  if (!state.user) return;
-  const g = _gam();
-  const info = gamLevelInfo(g.xp);
-  const streak = calcStreak(); // use existing streak function
-
-  // Level card
-  const lbEl = document.getElementById('ach-level-badge');
-  if (lbEl) lbEl.textContent = info.badge + ' Level ' + info.level + ' — ' + info.title;
-  const xlEl = document.getElementById('ach-xp-label');
-  if (xlEl) xlEl.textContent = info.next ? (info.xpInLevel + ' / ' + info.xpToNext + ' XP to next level') : 'MAX LEVEL 👑';
-  const barEl = document.getElementById('ach-xp-bar');
-  if (barEl) barEl.style.width = info.pct + '%';
-  const scEl = document.getElementById('ach-streak-chip');
-  if (scEl) scEl.textContent = '🔥 ' + streak + ' day streak';
-
-  // Stats
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('ach-stat-xp',      g.xp);
-  set('ach-stat-level',   info.level);
-  set('ach-stat-streak',  g.bestStreak + 'd');
-  set('ach-stat-trophies',Object.keys(g.trophies).length + ' / ' + GAM_TROPHIES.length);
-
-  // Trophy grid
-  const grid = document.getElementById('ach-trophy-grid');
-  if (grid) {
-    grid.innerHTML = GAM_TROPHIES.map(def => {
-      const earned = g.trophies[def.id];
-      const dateStr = earned ? new Date(earned.earnedAt).toLocaleDateString() : '';
-      return `<div class="trophy-card ${earned ? 'earned' : 'locked'}">
-        <div class="tc-icon">${def.icon}</div>
-        <div class="tc-name">${def.name}</div>
-        <div class="tc-desc">${def.desc}</div>
-        <div class="tc-date">${earned ? '✅ ' + dateStr : '🔒 Locked'}</div>
-      </div>`;
-    }).join('');
-  }
-
-  // XP log
-  const logEl = document.getElementById('ach-xp-log');
-  if (logEl) {
-    if (!g.xpLog || g.xpLog.length === 0) {
-      logEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;">No XP earned yet</div>';
-    } else {
-      logEl.innerHTML = g.xpLog.slice(0,20).map(e => `
-        <div class="xp-log-item">
-          <span>${e.reason}</span>
-          <span style="color:var(--accent);font-weight:700;">+${e.amount} XP</span>
-        </div>`).join('');
-    }
-  }
-}
-
-function renderProfileGam() {
-  const g = _gam();
-  const info = gamLevelInfo(g.xp);
-  const streak = calcStreak();
-  const badgeEl = document.getElementById('profile-gam-badge');
-  if (badgeEl) {
-    badgeEl.innerHTML = `<span class="gam-badge">${info.badge} Lv.${info.level} ${info.title}</span>
-      <span class="gam-streak" style="font-size:0.72rem;">🔥 ${streak} streak</span>`;
-  }
-  const rowEl = document.getElementById('profile-trophy-row');
-  if (rowEl) {
-    const earned = GAM_TROPHIES.filter(t => g.trophies[t.id]);
-    rowEl.innerHTML = earned.length === 0
-      ? '<span style="color:var(--muted);font-size:0.78rem;">No trophies yet — keep going! 🚀</span>'
-      : earned.map(t=>`<span title="${t.name}: ${t.desc}" style="font-size:1.4rem;">${t.icon}</span>`).join('')
-        + `<span style="font-size:0.72rem;color:var(--muted);margin-left:4px;">${earned.length}/${GAM_TROPHIES.length}</span>`;
-  }
-}
-// END GAMIFICATION ENGINE
-
 // ===================== PROFILE PAGE =====================
 function renderProfile() {
   if (!state.user) return;
@@ -2798,7 +2871,7 @@ function init() {
     // If not set, this is a session restore (refresh/reopen) — don't record new login
     state.user = { name: displayName };
     await loadAllData();
-    await showApp(!!window._realLogin);
+    showApp(!!window._realLogin);
     window._realLogin = false; // reset after use
     scheduleMidnightLogout();
   };
@@ -2810,6 +2883,7 @@ function init() {
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
     document.getElementById('login-error').textContent = '';
+    hideAppLoader(); // Phase 4
   };
   // Check for owner session flag (fast path, still verified by Firestore meta on auth change)
   if (S.get('los_owner_session') && window._fbUser) {
@@ -2822,6 +2896,7 @@ async function showApp(isRealLogin = false) {
   document.getElementById('login-screen').style.display = 'none';
   const app = document.getElementById('app');
   app.classList.add('visible');
+  setLoaderStatus('Loading your data…');
   attMonthOffset = 0;
   seedAIEngineerSubject();
   seedAgenticAISubject();
@@ -2835,6 +2910,8 @@ async function showApp(isRealLogin = false) {
   renderPosts();
   renderNotes();
   navTo('dashboard');
+  // Phase 4: hide app loader after first render
+  setTimeout(() => hideAppLoader(), 300);
 
   const now     = new Date();
   const dateKey = toDateKey(now);
@@ -2865,7 +2942,6 @@ async function showApp(isRealLogin = false) {
     saveData('attendance');
     state.user.loginTime = attEntry.loginTime; // always show first login of day
     fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
-    gamOnRealLogin(); // ← gam hook — only fires on real email+password login
   } else {
     // ── Session restore (refresh/reopen) — just restore loginTime from record ──
     state.user.loginTime = attEntry ? attEntry.loginTime : '—';
@@ -2883,7 +2959,7 @@ async function loadAllData() {
     ]);
   }
   const t = 8000;
-  const [subjects, tasks, sessions, attendance, leaves, notes, activeTimers, posts, gamification] = await Promise.all([
+  const [subjects, tasks, sessions, attendance, leaves, notes, activeTimers, posts] = await Promise.all([
     withTimeout(fbLoad('subjects'),     t, S.get('los_subjects_cache')     || []),
     withTimeout(fbLoad('tasks'),        t, S.get('los_tasks_cache')        || []),
     withTimeout(fbLoad('sessions'),     t, S.get('los_sessions_cache')     || []),
@@ -2891,32 +2967,44 @@ async function loadAllData() {
     withTimeout(fbLoad('leaves'),       t, S.get('los_leaves_cache')       || []),
     withTimeout(fbLoad('notes'),        t, S.get('los_notes_cache')        || []),
     withTimeout(fbLoad('activeTimers'), t, S.get('los_activeTimers_cache') || []),
-    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || []),
-    withTimeout(fbLoad('gamification'), t, S.get('los_gamification_cache') || null)
+    withTimeout(fbLoadShared('posts'),  t, S.get('los_posts')              || [])
   ]);
-  state.subjects     = subjects     || [];
-  state.tasks        = tasks        || [];
-  state.sessions     = sessions     || [];
-  state.attendance   = attendance   || [];
-  state.leaves       = leaves       || [];
-  state.notes        = notes        || [];
-  state.activeTimers = activeTimers || [];
-  state.posts        = posts        || [];
-  state.gamification = gamification || null;
+  state.subjects    = subjects    || [];
+  state.tasks       = tasks       || [];
+  state.sessions    = sessions    || [];
+  state.attendance  = attendance  || [];
+  state.leaves      = leaves      || [];
+  state.notes       = notes       || [];
+  state.activeTimers= activeTimers|| [];
+  state.posts       = posts       || [];
 }
 
 function saveData(key) {
-  // Write to Firestore (async, fire-and-forget) + local cache for speed
+  // Always write to local cache immediately (instant, works offline)
+  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions',
+    attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers' };
+
   if (key === 'posts') {
-    fbSaveShared('posts', state.posts);
     S.set('los_posts', state.posts);
+    if (navigator.onLine && window._db && window._fbUid) {
+      fbSaveShared('posts', state.posts);
+    } else {
+      offlineQueueAdd({ type:'SAVE_SHARED', key:'posts', data: state.posts });
+    }
     return;
   }
-  const fbKeyMap = { subjects:'subjects', tasks:'tasks', sessions:'sessions', attendance:'attendance', leaves:'leaves', notes:'notes', activeTimers:'activeTimers', gamification:'gamification' };
+
   if (fbKeyMap[key]) {
-    fbSave(fbKeyMap[key], state[key]);
-    // Also cache locally for instant reload
+    // 1. Write to localStorage immediately (works offline, instant UI)
     S.set('los_' + fbKeyMap[key] + '_cache', state[key]);
+
+    // 2. Write to Firestore if online, queue if offline
+    if (navigator.onLine && window._db && window._fbUid) {
+      fbSave(fbKeyMap[key], state[key]);
+    } else {
+      offlineQueueAdd({ type:'SAVE_DATA', key: fbKeyMap[key], data: state[key] });
+      console.log('[Offline] Queued save for:', key);
+    }
   }
 }
 
@@ -3016,7 +3104,7 @@ async function doLogin() {
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email.'; return; }
   if (!pass)  { errEl.textContent = 'Please enter a password.'; return; }
-  if (!window._auth) { errEl.textContent = 'Still connecting — please wait a moment and try again.'; return; }
+  if (!window._fbApi) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
 
   btn.textContent = 'Signing in…';
   btn.disabled = true;
@@ -3116,26 +3204,54 @@ async function doLogout(auto = false) {
 
 // ===================== NAVIGATION =====================
 function navTo(page) {
+  // Pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+
+  // Sidebar nav
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`page-${page}`).classList.add('active');
-  const navBtn = document.querySelector(`.nav-item[data-page="${page}"]`);
+  const navBtn = document.querySelector('.nav-item[data-page="' + page + '"]');
   if (navBtn) navBtn.classList.add('active');
-  if (page === 'dashboard') renderDashboard();
-  if (page === 'subjects') renderSubjects();
-  if (page === 'tasks') { renderTaskSubjectFilter(); renderTasks(); }
-  if (page === 'timer') { renderActiveTimers(); renderSessions(); }
+
+  // Bottom nav (mobile)
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  const bnavBtn = document.getElementById('bnav-' + page);
+  if (bnavBtn) bnavBtn.classList.add('active');
+
+  // Render hooks
+  if (page === 'dashboard')  renderDashboard();
+  if (page === 'subjects')   renderSubjects();
+  if (page === 'tasks')      { renderTaskSubjectFilter(); renderTasks(); }
+  if (page === 'timer')      { renderActiveTimers(); renderSessions(); }
   if (page === 'attendance') renderAttendance();
-  if (page === 'achievements') renderAchievements();
-  if (page === 'profile') { renderProfile(); renderProfileGam(); }
-  if (page === 'community') renderPosts();
-  if (page === 'analytics') renderAnalytics();
-  if (page === 'notes') renderNotes();
-  // close sidebar on mobile
-  document.getElementById('sidebar').classList.remove('open');
+  if (page === 'profile')    renderProfile();
+  if (page === 'community')  renderPosts();
+  if (page === 'analytics')  renderAnalytics();
+  if (page === 'notes')      renderNotes();
+
+  // Close sidebar + overlay on mobile
+  closeSidebarMobile();
 }
+
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen  = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeSidebarMobile();
+  } else {
+    sidebar.classList.add('open');
+    if (overlay) { overlay.classList.add('visible'); }
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSidebarMobile() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov) ov.classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 // ===================== DASHBOARD =====================
@@ -3251,7 +3367,6 @@ function renderDashboard() {
   // streak
   const streakEl = document.getElementById('dash-streak');
   if (streakEl) streakEl.textContent = '🔥 ' + calcStreak();
-  renderGamStrip(); // ← gamification strip
 }
 
 function calcStreak() {
@@ -3415,10 +3530,8 @@ function moveTopic(subjectId, idx, dir) {
 function toggleTopic(subjectId, idx) {
   const s = state.subjects.find(s => s.id === subjectId);
   if (!s) return;
-  const wasDone = s.topics[idx].done;
-  s.topics[idx].done = !wasDone;
+  s.topics[idx].done = !s.topics[idx].done;
   saveData('subjects');
-  if (!wasDone) { gamOnTopicDone(); } // ← gam hook (only when marking DONE)
   renderTopicList(s);
   renderSubjects();
 }
@@ -3556,12 +3669,10 @@ function saveTask() {
 function quickToggleTask(id) {
   const t = state.tasks.find(t => t.id === id);
   if (!t) return;
-  const wasPending = t.status === 'pending';
   if (t.status === 'pending') t.status = 'completed';
   else if (t.status === 'completed') t.status = 'cancelled';
   else t.status = 'pending';
   saveData('tasks');
-  if (wasPending) { gamOnTaskDone(); } // ← gam hook (only when completing)
   renderTasks();
 }
 
@@ -3651,7 +3762,6 @@ function finishTimer(id, status = 'done') {
   renderActiveTimers();
   renderSessions();
   renderDashboard();
-  if (status === 'done') { gamOnSessionDone(); } // ← gam hook
   showToast(status === 'done' ? `Session saved: ${formatHM(finalElapsed)}` : 'Session cancelled', status === 'done' ? 'success' : '');
 }
 
@@ -4860,29 +4970,475 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ===================== START =====================
-// All functions are now defined. Safe to register Firebase auth listener.
-init(); // sets up _onFirebaseLogin and _onFirebaseLogout callbacks
 
-// Register onAuthStateChanged HERE — after init() has set up the callbacks
-window._auth.onAuthStateChanged(function(user) {
-  // Enable login button — Firebase is connected
-  const btn = document.getElementById('login-btn');
-  if (btn && btn.disabled) {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.textContent = 'Sign In / Create Account';
-  }
-  if (user) {
-    window._fbUser = user;
-    window._fbUid  = user.uid;
-    if (window._onFirebaseLogin) window._onFirebaseLogin(user);
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         PHASE 4 — PERFORMANCE & LIGHTHOUSE                     ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── App Loader control ────────────────────────────────────────────
+function setLoaderStatus(msg) {
+  const el = document.getElementById('loader-status');
+  if (el) el.textContent = msg;
+}
+
+function hideAppLoader() {
+  const loader = document.getElementById('app-loader');
+  if (!loader) return;
+  loader.classList.add('hidden');
+  setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
+}
+
+// Show loader status updates
+setLoaderStatus('Connecting…');
+
+// ── Lazy image loading polyfill ───────────────────────────────────
+if ('loading' in HTMLImageElement.prototype) {
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+    img.src = img.dataset.src || img.src;
+  });
+} else {
+  // Fallback for older browsers
+  const lazyObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.dataset.src) img.src = img.dataset.src;
+        lazyObserver.unobserve(img);
+      }
+    });
+  });
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => lazyObserver.observe(img));
+}
+
+// ── Performance: Debounce expensive renders ───────────────────────
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// ── Performance: RequestAnimationFrame wrapper for renders ────────
+function rafRender(fn) {
+  if (window.requestAnimationFrame) {
+    requestAnimationFrame(fn);
   } else {
-    window._fbUser = null;
-    window._fbUid  = null;
-    if (window._onFirebaseLogout) window._onFirebaseLogout();
+    fn();
+  }
+}
+
+// ── Web Vitals tracking (LCP, FID, CLS) ──────────────────────────
+(function trackWebVitals() {
+  // Track Largest Contentful Paint
+  if ('PerformanceObserver' in window) {
+    try {
+      new PerformanceObserver(list => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1];
+        console.log('[Perf] LCP:', Math.round(last.startTime) + 'ms');
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+
+      // Track Cumulative Layout Shift
+      let clsScore = 0;
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
+          if (!entry.hadRecentInput) clsScore += entry.value;
+        });
+        console.log('[Perf] CLS:', clsScore.toFixed(4));
+      }).observe({ type: 'layout-shift', buffered: true });
+
+      // Track First Input Delay
+      new PerformanceObserver(list => {
+        list.getEntries().forEach(entry => {
+          console.log('[Perf] FID:', Math.round(entry.processingStart - entry.startTime) + 'ms');
+        });
+      }).observe({ type: 'first-input', buffered: true });
+
+    } catch(e) { /* PerformanceObserver not fully supported */ }
+  }
+})();
+
+// ── Lighthouse: App installable check ────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  console.log('[PWA] Install prompt fired ✅');
+});
+
+// ── Lighthouse: Page visibility — pause timers when hidden ────────
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Pause any running timers to save battery
+    if (state && state.activeTimers) {
+      state.activeTimers.forEach(t => {
+        if (t.status === 'running') {
+          t._pausedForVisibility = true;
+        }
+      });
+    }
+  } else {
+    // Resume
+    if (state && state.activeTimers) {
+      state.activeTimers.forEach(t => {
+        if (t._pausedForVisibility) {
+          delete t._pausedForVisibility;
+        }
+      });
+    }
+    // Re-render dashboard when app comes back to foreground
+    if (state && state.user) {
+      rafRender(() => {
+        const dashPage = document.getElementById('page-dashboard');
+        if (dashPage && dashPage.classList.contains('active')) {
+          renderDashboard();
+        }
+      });
+    }
   }
 });
+
+// ── Lighthouse: Network info for adaptive loading ──────────────────
+(function adaptiveLoading() {
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!conn) return;
+  const slowConnection = conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g';
+  if (slowConnection) {
+    console.log('[Perf] Slow connection detected — minimal mode');
+    document.documentElement.classList.add('slow-connection');
+  }
+  conn.addEventListener('change', () => {
+    const isSlow = conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g';
+    document.documentElement.classList.toggle('slow-connection', isSlow);
+  });
+})();
+
+// ===================== START =====================
+// Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
+// _onFirebaseLogin / _onFirebaseLogout callbacks are registered inside init().
+// We call init() here; it sets up those callbacks. Firebase then fires
+// onAuthStateChanged which drives the UI from that point on.
+init();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PWA: Service Worker Registration + Install Prompt           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         OFFLINE QUEUE — Phase 2                                 ║
+// ║  Saves actions when offline, syncs when connection returns      ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+const OFFLINE_QUEUE_KEY = 'learnos_offline_queue';
+
+// Add an action to the offline queue
+function offlineQueueAdd(action) {
+  try {
+    const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+    queue.push({ ...action, queuedAt: new Date().toISOString(), id: Date.now() });
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    console.log('[OfflineQueue] Added:', action.type);
+  } catch(e) { console.warn('[OfflineQueue] Failed to add:', e); }
+}
+
+// Process all queued actions when back online
+async function offlineQueueProcess() {
+  if (!navigator.onLine) return;
+  if (!window._db || !window._fbUid) return;
+
+  let queue = [];
+  try {
+    queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+  } catch { return; }
+
+  if (queue.length === 0) return;
+  console.log('[OfflineQueue] Processing', queue.length, 'queued actions…');
+
+  const successful = [];
+
+  for (const action of queue) {
+    try {
+      switch(action.type) {
+        case 'SAVE_DATA':
+          await fbSave(action.key, action.data);
+          successful.push(action.id);
+          break;
+        case 'SAVE_SHARED':
+          await fbSaveShared(action.key, action.data);
+          successful.push(action.id);
+          break;
+        case 'SAVE_META':
+          await fbSaveUserMeta(action.data);
+          successful.push(action.id);
+          break;
+      }
+    } catch(e) {
+      console.warn('[OfflineQueue] Action failed:', action.type, e);
+    }
+  }
+
+  // Remove successful actions from queue
+  const remaining = queue.filter(a => !successful.includes(a.id));
+  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remaining));
+
+  if (successful.length > 0) {
+    console.log('[OfflineQueue] Synced', successful.length, 'actions ✅');
+    showToast(`☁️ Synced ${successful.length} offline action${successful.length > 1 ? 's' : ''}`, 'success');
+  }
+}
+
+// Listen for SW message to process queue
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data?.type === 'PROCESS_OFFLINE_QUEUE') {
+      offlineQueueProcess();
+    }
+  });
+}
+
+// Auto-process when coming back online
+window.addEventListener('online', () => {
+  setTimeout(offlineQueueProcess, 1500); // small delay to let Firebase reconnect
+});
+
+// ── Service Worker Registration ──────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      console.log('✅ LearnOS SW Phase 2 registered:', reg.scope);
+
+      // Listen for SW updates
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Auto-update: tell SW to activate immediately
+            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            showToast('🔄 App updated to latest version!', 'success');
+          }
+        });
+      });
+
+      // Register Background Sync for offline queue
+      if ('SyncManager' in window) {
+        try {
+          await reg.sync.register('learnos-offline-queue');
+          console.log('✅ Background Sync registered');
+        } catch(e) { console.warn('Background Sync not supported:', e); }
+      }
+
+      // Register Periodic Sync to keep cache fresh (every 24h)
+      if ('periodicSync' in reg) {
+        try {
+          const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+          if (status.state === 'granted') {
+            await reg.periodicSync.register('learnos-cache-refresh', {
+              minInterval: 24 * 60 * 60 * 1000 // 24 hours
+            });
+            console.log('✅ Periodic Sync registered');
+          }
+        } catch(e) { console.warn('Periodic Sync not supported:', e); }
+      }
+
+    } catch(err) {
+      console.warn('SW registration failed:', err);
+    }
+
+    // Listen for SW messages
+    navigator.serviceWorker.addEventListener('message', event => {
+      if (event.data?.type === 'PROCESS_OFFLINE_QUEUE') offlineQueueProcess();
+    });
+
+    // Process any pending offline queue on load
+    window.addEventListener('online', () => setTimeout(offlineQueueProcess, 1500));
+    if (navigator.onLine) setTimeout(offlineQueueProcess, 3000);
+  });
+}
+
+// ── PWA Install Prompt ────────────────────────────────────────
+let _deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+  // Show install banner after 3 seconds if not already installed
+  setTimeout(showInstallBanner, 3000);
+});
+
+window.addEventListener('appinstalled', () => {
+  _deferredInstallPrompt = null;
+  hideInstallBanner();
+  showToast('🎉 LearnOS installed! Find it on your home screen.', 'success');
+});
+
+function showInstallBanner() {
+  if (!_deferredInstallPrompt) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  let banner = document.getElementById('pwa-install-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;flex:1;">
+        <img src="/icon-192.png" style="width:40px;height:40px;border-radius:10px;" onerror="this.style.display='none'">
+        <div>
+          <div style="font-weight:700;font-size:0.88rem;">Install LearnOS</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.75);">Add to home screen for best experience</div>
+        </div>
+      </div>
+      <button onclick="installPWA()" style="background:#fff;color:#7c3aed;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:0.82rem;cursor:pointer;white-space:nowrap;">Install</button>
+      <button onclick="hideInstallBanner()" style="background:transparent;border:none;color:rgba(255,255,255,0.6);font-size:1.2rem;cursor:pointer;padding:4px 8px;line-height:1;">×</button>
+    `;
+    banner.style.cssText = `
+      position:fixed;bottom:0;left:0;right:0;
+      background:linear-gradient(135deg,#7c3aed,#5b21b6);
+      color:#fff;padding:14px 16px;
+      display:flex;align-items:center;gap:10px;
+      z-index:99999;box-shadow:0 -4px 20px rgba(124,58,237,0.4);
+      animation:slideUp 0.3s ease;
+    `;
+    // Add animation
+    if (!document.getElementById('pwa-anim-style')) {
+      const style = document.createElement('style');
+      style.id = 'pwa-anim-style';
+      style.textContent = '@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}';
+      document.head.appendChild(style);
+    }
+    document.body.appendChild(banner);
+  }
+  banner.style.display = 'flex';
+}
+
+function hideInstallBanner() {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.style.display = 'none';
+  // Don't show again this session
+  _deferredInstallPrompt = null;
+}
+
+async function installPWA() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  const { outcome } = await _deferredInstallPrompt.userChoice;
+  console.log('Install outcome:', outcome);
+  _deferredInstallPrompt = null;
+  hideInstallBanner();
+}
+
+// ── Online/Offline Status Banner ──────────────────────────────
+function showOfflineBanner() {
+  let el = document.getElementById('offline-status-bar');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'offline-status-bar';
+    el.style.cssText = `position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;
+      text-align:center;padding:6px;font-size:0.78rem;font-weight:600;z-index:99998;`;
+    el.textContent = '📡 No internet connection — working offline';
+    document.body.prepend(el);
+  }
+  el.style.display = 'block';
+}
+
+function hideOfflineBanner() {
+  const el = document.getElementById('offline-status-bar');
+  if (el) el.style.display = 'none';
+}
+
+function updateOfflineDot() {
+  const dot = document.getElementById('topbar-offline-dot');
+  if (dot) dot.style.display = navigator.onLine ? 'none' : 'block';
+}
+window.addEventListener('online',  () => {
+  hideOfflineBanner();
+  updateOfflineDot();
+  showToast('✅ Back online — syncing data…', 'success');
+  setTimeout(offlineQueueProcess, 1500);
+});
+window.addEventListener('offline', () => {
+  showOfflineBanner();
+  updateOfflineDot();
+  showToast('📡 Offline — changes will sync when connected', '');
+});
+if (!navigator.onLine) { showOfflineBanner(); updateOfflineDot(); }
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         PHASE 3 — MOBILE UX ENHANCEMENTS                       ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── Swipe to open/close sidebar ──────────────────────────────────
+(function initSwipeGesture() {
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const SWIPE_THRESHOLD = 60;
+  const EDGE_ZONE = 30; // px from left edge to trigger open
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx)) return; // vertical scroll, ignore
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return; // too short
+
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (dx > 0 && touchStartX < EDGE_ZONE) {
+      // Swipe right from left edge → open sidebar
+      sidebar.classList.add('open');
+      const ov = document.getElementById('sidebar-overlay');
+      if (ov) ov.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    } else if (dx < 0 && sidebar.classList.contains('open')) {
+      // Swipe left → close sidebar
+      closeSidebarMobile();
+    }
+  }, { passive: true });
+})();
+
+// ── Ripple effect on bottom nav buttons ──────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.bnav-item').forEach(btn => {
+    btn.addEventListener('touchstart', function(e) {
+      const touch  = e.touches[0];
+      const rect   = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple-fx';
+      ripple.style.left = (touch.clientX - rect.left) + 'px';
+      ripple.style.top  = (touch.clientY - rect.top)  + 'px';
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }, { passive: true });
+  });
+});
+
+// ── Prevent pull-to-refresh in standalone PWA ────────────────────
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.body.addEventListener('touchmove', e => {
+    if (window.scrollY === 0 && e.touches[0].clientY > 0) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+}
+
+// ── Double-tap topbar logo to scroll to top ──────────────────────
+(function() {
+  let lastTap = 0;
+  const logo = document.querySelector('.topbar-logo');
+  if (!logo) return;
+  logo.addEventListener('touchend', () => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      document.getElementById('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    lastTap = now;
+  });
+})();
+
 </script>
 </body>
 </html>
