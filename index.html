@@ -1066,6 +1066,50 @@ button, a, .nav-item, .bnav-item, .card, .topic-item {
 }
 input, textarea { -webkit-user-select: text; user-select: text; }
 
+
+/* ===================== FRIENDS PAGE ===================== */
+.friend-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; background:var(--bg3);
+  border-radius:var(--radius); border:1px solid var(--border);
+}
+.friend-avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.95rem; font-weight:700; color:#fff; flex-shrink:0;
+}
+.friend-info { flex:1; min-width:0; }
+.friend-name { font-size:0.85rem; font-weight:600; color:var(--text); }
+.friend-email { font-size:0.72rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.friend-actions { display:flex; gap:6px; flex-shrink:0; }
+.btn-accept { background:#22c55e; color:#fff; border:none; border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; }
+.btn-decline { background:var(--bg2); color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:5px 12px; font-size:0.75rem; font-weight:600; cursor:pointer; }
+.btn-unfriend { background:transparent; color:#ef4444; border:1px solid #ef4444; border-radius:8px; padding:4px 10px; font-size:0.7rem; cursor:pointer; }
+
+/* Shared message card */
+.share-msg-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:10px; padding:10px 12px;
+  display:flex; flex-direction:column; gap:5px;
+  cursor:pointer; transition:border-color 0.15s;
+}
+.share-msg-card:hover { border-color:var(--accent); }
+.share-msg-meta { font-size:0.7rem; color:var(--muted); }
+.share-msg-preview {
+  font-size:0.8rem; color:var(--text);
+  display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden;
+}
+.share-type-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:0.65rem; font-weight:700; border-radius:99px;
+  padding:2px 8px; width:fit-content;
+}
+.badge-prompt { background:rgba(124,58,237,0.15); color:var(--accent3); }
+.badge-image  { background:rgba(34,197,94,0.12);  color:#22c55e; }
+.badge-pdf    { background:rgba(239,68,68,0.12);   color:#ef4444; }
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -1238,6 +1282,9 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <button onclick="navTo('community');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
         <span style="font-size:1.5rem;">🌐</span>Community
       </button>
+      <button onclick="navTo('friends');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <span style="font-size:1.5rem;">🤝</span>Friends
+      </button>
       <button onclick="navTo('profile');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
         <span style="font-size:1.5rem;">👤</span>Profile
       </button>
@@ -1284,6 +1331,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <div class="nav-section">
         <div class="nav-label">Social</div>
         <button class="nav-item" data-page="community" onclick="navTo('community')"><span class="icon">🌐</span> Community</button>
+        <button class="nav-item" data-page="friends" onclick="navTo('friends')"><span class="icon">🤝</span> Friends <span id="friends-nav-badge" class="nav-badge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:0.65rem;font-weight:700;margin-left:4px;"></span></button>
       </div>
       <div class="nav-section">
         <div class="nav-label">Account</div>
@@ -1715,6 +1763,153 @@ input, textarea { -webkit-user-select: text; user-select: text; }
         <div class="card">
           <div class="card-title" style="margin-bottom:16px;">Subject Progress</div>
           <div id="profile-subject-list"></div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- FRIENDS PAGE                                            -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div class="page" id="page-friends">
+        <div class="page-header">
+          <div class="page-title">🤝 Friends</div>
+          <div class="page-sub">Connect, share prompts & files privately</div>
+        </div>
+
+        <!-- Top bar: friend count + add button + requests -->
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+          <div id="friends-count-pill" style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;">
+            👥 <span id="friends-total-count">0</span> Friends
+          </div>
+          <button onclick="openFriendsListPopup()" style="background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;color:var(--accent3);cursor:pointer;">
+            📋 View List
+          </button>
+          <button onclick="openAddFriendModal()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:99px;padding:7px 16px;font-size:0.82rem;font-weight:700;color:#fff;cursor:pointer;margin-left:auto;">
+            ➕ Add Friend
+          </button>
+          <button onclick="openRequestsModal()" style="position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;color:var(--text);cursor:pointer;">
+            🔔 Requests <span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.6rem;font-weight:700;"></span>
+          </button>
+        </div>
+
+        <!-- Send to Friend -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title" style="margin-bottom:14px;">📤 Send to Friend</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <select id="share-friend-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.85rem;width:100%;">
+              <option value="">— Select a friend —</option>
+            </select>
+            <textarea id="share-prompt-text" placeholder="Type a prompt, note, or message to share privately…" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.85rem;width:100%;min-height:80px;resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--muted);">
+                📎 Attach File (Image/PDF)
+                <input type="file" id="share-file-input" accept="image/*,.pdf" style="display:none;" onchange="previewShareFile(this)">
+              </label>
+              <span id="share-file-preview" style="font-size:0.78rem;color:var(--accent3);"></span>
+              <button onclick="sendToFriend()" style="margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:9px 20px;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;">
+                Send 🚀
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sent & Received split -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <!-- SENT -->
+          <div class="card" style="min-width:0;">
+            <div class="card-title" style="margin-bottom:12px;">📤 Sent</div>
+            <div id="friends-sent-list" style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;">
+              <div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:20px 0;">Nothing sent yet</div>
+            </div>
+          </div>
+
+          <!-- RECEIVED -->
+          <div class="card" style="min-width:0;">
+            <div class="card-title" style="margin-bottom:12px;">📥 Received</div>
+            <div id="friends-received-list" style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;">
+              <div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:20px 0;">Nothing received yet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile: stack sent/received -->
+        <style>
+          @media(max-width:600px){
+            #friends-split-grid { grid-template-columns:1fr !important; }
+          }
+        </style>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- ADD FRIEND MODAL                            -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="modal-add-friend" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:420px;">
+          <div class="modal-header">
+            <div class="modal-title">➕ Add Friend</div>
+            <button class="modal-close" onclick="closeModal('modal-add-friend')">×</button>
+          </div>
+          <div class="modal-body">
+            <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Enter your friend's email address to send them a friend request.</p>
+            <div class="form-group">
+              <label>Friend's Email</label>
+              <input type="email" id="add-friend-email" placeholder="friend@gmail.com" style="width:100%;box-sizing:border-box;">
+            </div>
+            <div id="add-friend-msg" style="font-size:0.8rem;margin-top:8px;min-height:18px;"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal('modal-add-friend')">Cancel</button>
+            <button class="btn-primary" onclick="sendFriendRequest()">Send Invitation 📨</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- REQUESTS MODAL                              -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="modal-friend-requests" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:460px;">
+          <div class="modal-header">
+            <div class="modal-title">🔔 Friend Requests</div>
+            <button class="modal-close" onclick="closeModal('modal-friend-requests')">×</button>
+          </div>
+          <div class="modal-body">
+            <div id="requests-list" style="display:flex;flex-direction:column;gap:12px;min-height:60px;">
+              <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No pending requests</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- FRIENDS LIST POPUP                          -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="modal-friends-list" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:460px;">
+          <div class="modal-header">
+            <div class="modal-title">👥 Your Friends</div>
+            <button class="modal-close" onclick="closeModal('modal-friends-list')">×</button>
+          </div>
+          <div class="modal-body">
+            <div id="friends-full-list" style="display:flex;flex-direction:column;gap:10px;min-height:60px;">
+              <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No friends yet — add some!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- CONTENT VIEW POPUP (prompt/image/pdf)       -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div id="modal-content-view" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:520px;">
+          <div class="modal-header">
+            <div class="modal-title" id="content-view-title">Content</div>
+            <button class="modal-close" onclick="closeModal('modal-content-view')">×</button>
+          </div>
+          <div class="modal-body" id="content-view-body" style="word-break:break-word;"></div>
+          <div class="modal-footer" id="content-view-footer"></div>
         </div>
       </div>
 
@@ -2796,6 +2991,462 @@ function seedMLOpsEngineerSubject() {
   saveData('subjects');
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         FRIENDS SYSTEM — Firestore-backed                       ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── State ────────────────────────────────────────────────────────
+let _friendsList        = [];   // accepted friends
+let _pendingRequests    = [];   // incoming requests for me
+let _sentRequests       = [];   // requests I sent
+let _friendMessages     = [];   // all messages (sent + received)
+let _friendsUnsubscribe = null; // Firestore listener cleanup
+
+// ── Init (called when Friends page opens) ────────────────────────
+async function initFriends() {
+  if (!window._db || !window._fbUid) return;
+  await Promise.all([
+    loadFriendsList(),
+    loadFriendRequests(),
+    loadFriendMessages(),
+  ]);
+  renderFriendsPage();
+}
+
+// ── Load friends list ─────────────────────────────────────────────
+async function loadFriendsList() {
+  try {
+    const snap = await window._db
+      .collection('friends').doc(window._fbUid)
+      .collection('list').get();
+    _friendsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.warn('loadFriendsList:', e); }
+}
+
+// ── Load friend requests ──────────────────────────────────────────
+async function loadFriendRequests() {
+  try {
+    // Incoming requests (to me)
+    const inSnap = await window._db.collection('friendRequests')
+      .where('toUid', '==', window._fbUid)
+      .where('status', '==', 'pending')
+      .get();
+    _pendingRequests = inSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Sent requests (from me)
+    const outSnap = await window._db.collection('friendRequests')
+      .where('fromUid', '==', window._fbUid)
+      .where('status', '==', 'pending')
+      .get();
+    _sentRequests = outSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.warn('loadFriendRequests:', e); }
+}
+
+// ── Load messages ─────────────────────────────────────────────────
+async function loadFriendMessages() {
+  try {
+    const [sentSnap, recvSnap] = await Promise.all([
+      window._db.collection('friendMessages')
+        .where('fromUid', '==', window._fbUid).get(),
+      window._db.collection('friendMessages')
+        .where('toUid', '==', window._fbUid).get(),
+    ]);
+    const sent = sentSnap.docs.map(d => ({ id: d.id, dir: 'sent', ...d.data() }));
+    const recv = recvSnap.docs.map(d => ({ id: d.id, dir: 'received', ...d.data() }));
+    _friendMessages = [...sent, ...recv].sort((a,b) => {
+      const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+  } catch(e) { console.warn('loadFriendMessages:', e); }
+}
+
+// ── Render everything ─────────────────────────────────────────────
+function renderFriendsPage() {
+  // Count
+  const countEl = document.getElementById('friends-total-count');
+  if (countEl) countEl.textContent = _friendsList.length;
+
+  // Badge on nav
+  const badge = document.getElementById('friends-nav-badge');
+  if (badge) {
+    if (_pendingRequests.length > 0) {
+      badge.textContent = _pendingRequests.length;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // Request badge button
+  const reqBadge = document.getElementById('requests-badge');
+  if (reqBadge) {
+    if (_pendingRequests.length > 0) {
+      reqBadge.textContent = _pendingRequests.length;
+      reqBadge.style.display = 'inline';
+    } else {
+      reqBadge.style.display = 'none';
+    }
+  }
+
+  // Friend select dropdown
+  const sel = document.getElementById('share-friend-select');
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select a friend —</option>' +
+      _friendsList.map(f => `<option value="${f.uid}">${escHtml(f.name)} (${escHtml(f.email)})</option>`).join('');
+    if (cur) sel.value = cur;
+  }
+
+  // Sent messages
+  renderFriendMessageList('friends-sent-list', 'sent');
+
+  // Received messages
+  renderFriendMessageList('friends-received-list', 'received');
+}
+
+function renderFriendMessageList(containerId, dir) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const msgs = _friendMessages.filter(m => m.dir === dir);
+  if (msgs.length === 0) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:20px 0;">
+      ${dir === 'sent' ? 'Nothing sent yet' : 'Nothing received yet'}</div>`;
+    return;
+  }
+  el.innerHTML = msgs.slice(0, 30).map(m => {
+    const isPrompt = m.type === 'prompt';
+    const isImage  = m.type === 'image';
+    const isPDF    = m.type === 'pdf';
+    const badgeCls = isPrompt ? 'badge-prompt' : isImage ? 'badge-image' : 'badge-pdf';
+    const badgeIcon= isPrompt ? '📋 Prompt' : isImage ? '🖼️ Image' : '📄 PDF';
+    const preview  = isPrompt ? (m.content || '').slice(0, 80) : (m.fileName || 'File');
+    const peer     = dir === 'sent'
+      ? `To: <b>${escHtml(m.toName || m.toEmail || '?')}</b>`
+      : `From: <b>${escHtml(m.fromName || m.fromEmail || '?')}</b>`;
+    const ts = m.createdAt?.toDate ? m.createdAt.toDate().toLocaleString() : '';
+    return `<div class="share-msg-card" onclick="viewSharedContent('${m.id}')">
+      <div class="share-msg-meta">${peer} &nbsp;·&nbsp; ${escHtml(ts)}</div>
+      <span class="share-type-badge ${badgeCls}">${badgeIcon}</span>
+      <div class="share-msg-preview">${escHtml(preview)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Add Friend Modal ──────────────────────────────────────────────
+function openAddFriendModal() {
+  document.getElementById('add-friend-email').value = '';
+  document.getElementById('add-friend-msg').textContent = '';
+  openModal('modal-add-friend');
+}
+
+async function sendFriendRequest() {
+  const email = document.getElementById('add-friend-email').value.trim().toLowerCase();
+  const msgEl = document.getElementById('add-friend-msg');
+  if (!email) { msgEl.style.color='#ef4444'; msgEl.textContent='Please enter an email.'; return; }
+  if (email === window._auth.currentUser?.email?.toLowerCase()) {
+    msgEl.style.color='#ef4444'; msgEl.textContent="You can't add yourself!"; return;
+  }
+
+  // Check already friends
+  if (_friendsList.some(f => f.email?.toLowerCase() === email)) {
+    msgEl.style.color='#f59e0b'; msgEl.textContent='Already friends with this person.'; return;
+  }
+
+  // Check already sent
+  if (_sentRequests.some(r => r.toEmail?.toLowerCase() === email)) {
+    msgEl.style.color='#f59e0b'; msgEl.textContent='Request already sent to this email.'; return;
+  }
+
+  msgEl.style.color='var(--muted)'; msgEl.textContent='Sending…';
+
+  try {
+    // Find the user by email in Firestore users collection
+    const usersSnap = await window._db.collection('users')
+      .where('email', '==', email).get();
+
+    if (usersSnap.empty) {
+      msgEl.style.color='#ef4444';
+      msgEl.textContent='No LearnOS account found with that email.';
+      return;
+    }
+
+    const targetDoc = usersSnap.docs[0];
+    const targetUid = targetDoc.id;
+    const targetData = targetDoc.data();
+    const myEmail = window._auth.currentUser.email;
+    const myName  = window._fbDisplayName || myEmail.split('@')[0];
+
+    // Create friend request in Firestore
+    await window._db.collection('friendRequests').add({
+      fromUid:   window._fbUid,
+      fromEmail: myEmail,
+      fromName:  myName,
+      toUid:     targetUid,
+      toEmail:   email,
+      toName:    targetData.displayName || email.split('@')[0],
+      status:    'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    msgEl.style.color='#22c55e';
+    msgEl.textContent = `✅ Request sent to ${targetData.displayName || email}!`;
+    await loadFriendRequests();
+    renderFriendsPage();
+    setTimeout(() => closeModal('modal-add-friend'), 1800);
+  } catch(e) {
+    console.error(e);
+    msgEl.style.color='#ef4444';
+    msgEl.textContent='Error sending request. Try again.';
+  }
+}
+
+// ── Requests Modal ────────────────────────────────────────────────
+async function openRequestsModal() {
+  await loadFriendRequests();
+  const el = document.getElementById('requests-list');
+  if (_pendingRequests.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No pending requests</div>';
+  } else {
+    el.innerHTML = _pendingRequests.map(r => `
+      <div class="friend-item">
+        <div class="friend-avatar">${(r.fromName||'?')[0].toUpperCase()}</div>
+        <div class="friend-info">
+          <div class="friend-name">${escHtml(r.fromName || '?')}</div>
+          <div class="friend-email">${escHtml(r.fromEmail || '')}</div>
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">Wants to be your friend</div>
+        </div>
+        <div class="friend-actions">
+          <button class="btn-accept" onclick="acceptFriendRequest('${r.id}','${r.fromUid}','${escHtml(r.fromName||'')}','${escHtml(r.fromEmail||'')}')">✅ Accept</button>
+          <button class="btn-decline" onclick="declineFriendRequest('${r.id}')">❌</button>
+        </div>
+      </div>`).join('');
+  }
+  openModal('modal-friend-requests');
+}
+
+async function acceptFriendRequest(reqId, fromUid, fromName, fromEmail) {
+  try {
+    const myEmail = window._auth.currentUser.email;
+    const myName  = window._fbDisplayName || myEmail.split('@')[0];
+
+    // Update request status
+    await window._db.collection('friendRequests').doc(reqId).update({ status: 'accepted' });
+
+    // Add to both users' friend lists
+    const batch = window._db.batch();
+    batch.set(
+      window._db.collection('friends').doc(window._fbUid).collection('list').doc(fromUid),
+      { uid: fromUid, name: fromName, email: fromEmail, addedAt: firebase.firestore.FieldValue.serverTimestamp() }
+    );
+    batch.set(
+      window._db.collection('friends').doc(fromUid).collection('list').doc(window._fbUid),
+      { uid: window._fbUid, name: myName, email: myEmail, addedAt: firebase.firestore.FieldValue.serverTimestamp() }
+    );
+    await batch.commit();
+
+    showToast(`🎉 You and ${fromName} are now friends!`, 'success');
+    await loadFriendsList();
+    await loadFriendRequests();
+    renderFriendsPage();
+    closeModal('modal-friend-requests');
+  } catch(e) {
+    console.error(e);
+    showToast('Error accepting request. Try again.', '');
+  }
+}
+
+async function declineFriendRequest(reqId) {
+  try {
+    await window._db.collection('friendRequests').doc(reqId).update({ status: 'declined' });
+    showToast('Request declined.', '');
+    await loadFriendRequests();
+    renderFriendsPage();
+    closeModal('modal-friend-requests');
+  } catch(e) { showToast('Error. Try again.', ''); }
+}
+
+// ── Friends List Popup ────────────────────────────────────────────
+async function openFriendsListPopup() {
+  await loadFriendsList();
+  const el = document.getElementById('friends-full-list');
+  if (_friendsList.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No friends yet — add some!</div>';
+  } else {
+    el.innerHTML = _friendsList.map(f => `
+      <div class="friend-item">
+        <div class="friend-avatar">${(f.name||'?')[0].toUpperCase()}</div>
+        <div class="friend-info">
+          <div class="friend-name">${escHtml(f.name||'?')}</div>
+          <div class="friend-email">${escHtml(f.email||'')}</div>
+        </div>
+        <button class="btn-unfriend" onclick="unfriend('${f.uid}','${escHtml(f.name||'')}')">Remove</button>
+      </div>`).join('');
+  }
+  openModal('modal-friends-list');
+}
+
+async function unfriend(uid, name) {
+  if (!confirm(`Remove ${name} from friends?`)) return;
+  try {
+    await window._db.collection('friends').doc(window._fbUid).collection('list').doc(uid).delete();
+    await window._db.collection('friends').doc(uid).collection('list').doc(window._fbUid).delete();
+    showToast(`Removed ${name} from friends.`, '');
+    await loadFriendsList();
+    renderFriendsPage();
+    closeModal('modal-friends-list');
+  } catch(e) { showToast('Error. Try again.', ''); }
+}
+
+// ── Send Prompt/File to Friend ────────────────────────────────────
+let _shareFileData = null;
+let _shareFileType = null;
+let _shareFileName = null;
+
+function previewShareFile(input) {
+  const file = input.files[0];
+  const preview = document.getElementById('share-file-preview');
+  if (!file) { _shareFileData = null; preview.textContent = ''; return; }
+  _shareFileName = file.name;
+  _shareFileType = file.type.startsWith('image/') ? 'image' : 'pdf';
+  preview.textContent = `📎 ${file.name}`;
+
+  const reader = new FileReader();
+  reader.onload = e => { _shareFileData = e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+async function sendToFriend() {
+  const toUid = document.getElementById('share-friend-select').value;
+  const text  = document.getElementById('share-prompt-text').value.trim();
+
+  if (!toUid) { showToast('Please select a friend.', ''); return; }
+  if (!text && !_shareFileData) { showToast('Enter a message or attach a file.', ''); return; }
+
+  const friend = _friendsList.find(f => f.uid === toUid);
+  if (!friend) return;
+
+  const myEmail = window._auth.currentUser.email;
+  const myName  = window._fbDisplayName || myEmail.split('@')[0];
+
+  showToast('Sending…', '');
+
+  try {
+    const msgData = {
+      fromUid:   window._fbUid,
+      fromEmail: myEmail,
+      fromName:  myName,
+      toUid:     toUid,
+      toEmail:   friend.email,
+      toName:    friend.name,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      read:      false,
+    };
+
+    if (_shareFileData) {
+      // Store file as base64 in Firestore (small files only — up to ~900KB)
+      msgData.type     = _shareFileType;
+      msgData.fileName = _shareFileName;
+      msgData.fileData = _shareFileData;
+      msgData.content  = text || '';
+    } else {
+      msgData.type    = 'prompt';
+      msgData.content = text;
+    }
+
+    await window._db.collection('friendMessages').add(msgData);
+
+    // Reset form
+    document.getElementById('share-prompt-text').value = '';
+    document.getElementById('share-file-input').value = '';
+    document.getElementById('share-file-preview').textContent = '';
+    _shareFileData = null; _shareFileType = null; _shareFileName = null;
+
+    showToast(`✅ Sent to ${friend.name}!`, 'success');
+    await loadFriendMessages();
+    renderFriendsPage();
+  } catch(e) {
+    console.error(e);
+    showToast('Error sending. Try again.', '');
+  }
+}
+
+// ── View Shared Content Popup ─────────────────────────────────────
+function viewSharedContent(msgId) {
+  const msg = _friendMessages.find(m => m.id === msgId);
+  if (!msg) return;
+
+  const titleEl  = document.getElementById('content-view-title');
+  const bodyEl   = document.getElementById('content-view-body');
+  const footerEl = document.getElementById('content-view-footer');
+
+  const peer = msg.dir === 'sent'
+    ? `To: ${msg.toName || msg.toEmail}`
+    : `From: ${msg.fromName || msg.fromEmail}`;
+  const ts = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : '';
+
+  if (msg.type === 'prompt') {
+    titleEl.textContent = '📋 Prompt';
+    bodyEl.innerHTML = `
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">${escHtml(peer)} · ${escHtml(ts)}</div>
+      <div style="background:var(--bg3);border-radius:10px;padding:14px;font-size:0.88rem;line-height:1.6;white-space:pre-wrap;">${escHtml(msg.content||'')}</div>`;
+    footerEl.innerHTML = `
+      <button class="btn-secondary" onclick="closeModal('modal-content-view')">Close</button>
+      <button class="btn-primary" onclick="navigator.clipboard.writeText(${JSON.stringify(msg.content||'')}).then(()=>showToast('Copied!','success'))">📋 Copy Prompt</button>`;
+
+  } else if (msg.type === 'image') {
+    titleEl.textContent = '🖼️ Image';
+    bodyEl.innerHTML = `
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">${escHtml(peer)} · ${escHtml(ts)}</div>
+      <img src="${msg.fileData}" alt="${escHtml(msg.fileName||'image')}" style="max-width:100%;border-radius:10px;display:block;margin:0 auto;">`;
+    footerEl.innerHTML = `
+      <button class="btn-secondary" onclick="closeModal('modal-content-view')">Close</button>
+      <a href="${msg.fileData}" download="${escHtml(msg.fileName||'image')}" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">⬇️ Download</a>`;
+
+  } else if (msg.type === 'pdf') {
+    titleEl.textContent = '📄 PDF';
+    bodyEl.innerHTML = `
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">${escHtml(peer)} · ${escHtml(ts)}</div>
+      <div style="background:var(--bg3);border-radius:10px;padding:16px;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">📄</div>
+        <div style="font-size:0.9rem;font-weight:600;">${escHtml(msg.fileName||'document.pdf')}</div>
+      </div>`;
+    footerEl.innerHTML = `
+      <button class="btn-secondary" onclick="closeModal('modal-content-view')">Close</button>
+      <a href="${msg.fileData}" download="${escHtml(msg.fileName||'document.pdf')}" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">⬇️ Download PDF</a>
+      <button class="btn-primary" onclick="window.open('${msg.fileData}','_blank')">👁️ Open</button>`;
+  }
+
+  openModal('modal-content-view');
+}
+
+// ── Wire navTo for friends ────────────────────────────────────────
+// (appended to existing navTo via render call — see navTo patch below)
+
+// ── Check friend requests on login (show badge) ──────────────────
+async function checkFriendRequestsOnLogin() {
+  if (!window._db || !window._fbUid) return;
+  try {
+    const snap = await window._db.collection('friendRequests')
+      .where('toUid', '==', window._fbUid)
+      .where('status', '==', 'pending')
+      .get();
+    const count = snap.docs.length;
+    _pendingRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const badge = document.getElementById('friends-nav-badge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline';
+        showToast(`🤝 You have ${count} friend request${count > 1 ? 's' : ''}!`, 'success');
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch(e) { console.warn('checkFriendRequestsOnLogin:', e); }
+}
+
 // ===================== PROFILE PAGE =====================
 function renderProfile() {
   if (!state.user) return;
@@ -2958,6 +3609,8 @@ async function showApp(isRealLogin = false) {
   navTo('dashboard');
   // Phase 4: hide app loader after first render
   setTimeout(() => hideAppLoader(), 300);
+  // Check for pending friend requests on login
+  setTimeout(checkFriendRequestsOnLogin, 2000);
 
   const now     = new Date();
   const dateKey = toDateKey(now);
@@ -3275,6 +3928,7 @@ function navTo(page) {
   if (page === 'community')  renderPosts();
   if (page === 'analytics')  renderAnalytics();
   if (page === 'notes')      renderNotes();
+  if (page === 'friends')    initFriends();
 
   // Close sidebar + overlay + more menu on mobile
   closeSidebarMobile();
