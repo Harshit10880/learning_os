@@ -3611,6 +3611,8 @@ async function showApp(isRealLogin = false) {
   setTimeout(() => hideAppLoader(), 300);
   // Check for pending friend requests on login
   setTimeout(checkFriendRequestsOnLogin, 2000);
+  // Auto-delete completed tasks older than 24h
+  scheduleTaskAutoClean();
 
   const now     = new Date();
   const dateKey = toDateKey(now);
@@ -4395,9 +4397,16 @@ function saveTask() {
 function quickToggleTask(id) {
   const t = state.tasks.find(t => t.id === id);
   if (!t) return;
-  if (t.status === 'pending') t.status = 'completed';
-  else if (t.status === 'completed') t.status = 'cancelled';
-  else t.status = 'pending';
+  if (t.status === 'pending') {
+    t.status = 'completed';
+    t.completedAt = Date.now(); // stamp completion time for 24h auto-delete
+  } else if (t.status === 'completed') {
+    t.status = 'cancelled';
+    t.completedAt = null;
+  } else {
+    t.status = 'pending';
+    t.completedAt = null;
+  }
   saveData('tasks');
   renderTasks();
 }
@@ -4408,6 +4417,34 @@ function deleteTask(id) {
   saveData('tasks');
   renderTasks();
   showToast('Task deleted');
+}
+
+// ── Auto-delete completed tasks after 24 hours ────────────────────
+function autoDeleteCompletedTasks() {
+  if (!state.tasks || state.tasks.length === 0) return;
+  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const before = state.tasks.length;
+
+  state.tasks = state.tasks.filter(t => {
+    // Only remove tasks that are completed AND have a completedAt stamp older than 24h
+    if (t.status === 'completed' && t.completedAt) {
+      return (now - t.completedAt) < TWENTY_FOUR_HOURS;
+    }
+    return true; // keep all non-completed and completed-without-stamp tasks
+  });
+
+  const removed = before - state.tasks.length;
+  if (removed > 0) {
+    saveData('tasks');
+    console.log(`[AutoClean] Removed ${removed} completed task(s) older than 24h`);
+  }
+}
+
+// Run auto-delete every hour while app is open
+function scheduleTaskAutoClean() {
+  autoDeleteCompletedTasks(); // run once immediately on load
+  setInterval(autoDeleteCompletedTasks, 60 * 60 * 1000); // then every hour
 }
 
 // ===================== TIMER (MULTI, PARALLEL) =====================
