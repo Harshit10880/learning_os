@@ -1844,8 +1844,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <!-- ═══════════════════════════════════════════ -->
       <!-- ADD FRIEND MODAL                            -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="modal-add-friend" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:420px;">
+      <div class="modal-overlay" id="modal-add-friend">
+        <div class="modal" style="max-width:420px;">
           <div class="modal-header">
             <div class="modal-title">➕ Add Friend</div>
             <button class="modal-close" onclick="closeModal('modal-add-friend')">×</button>
@@ -1854,7 +1854,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
             <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Enter your friend's email address to send them a friend request.</p>
             <div class="form-group">
               <label>Friend's Email</label>
-              <input type="email" id="add-friend-email" placeholder="friend@gmail.com" style="width:100%;box-sizing:border-box;">
+              <input type="email" id="add-friend-email" placeholder="friend@gmail.com" style="width:100%;box-sizing:border-box;" onkeydown="if(event.key==='Enter')sendFriendRequest()">
             </div>
             <div id="add-friend-msg" style="font-size:0.8rem;margin-top:8px;min-height:18px;"></div>
           </div>
@@ -1868,8 +1868,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <!-- ═══════════════════════════════════════════ -->
       <!-- REQUESTS MODAL                              -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="modal-friend-requests" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:460px;">
+      <div class="modal-overlay" id="modal-friend-requests">
+        <div class="modal" style="max-width:460px;">
           <div class="modal-header">
             <div class="modal-title">🔔 Friend Requests</div>
             <button class="modal-close" onclick="closeModal('modal-friend-requests')">×</button>
@@ -1885,8 +1885,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <!-- ═══════════════════════════════════════════ -->
       <!-- FRIENDS LIST POPUP                          -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="modal-friends-list" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:460px;">
+      <div class="modal-overlay" id="modal-friends-list">
+        <div class="modal" style="max-width:460px;">
           <div class="modal-header">
             <div class="modal-title">👥 Your Friends</div>
             <button class="modal-close" onclick="closeModal('modal-friends-list')">×</button>
@@ -1902,8 +1902,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <!-- ═══════════════════════════════════════════ -->
       <!-- CONTENT VIEW POPUP (prompt/image/pdf)       -->
       <!-- ═══════════════════════════════════════════ -->
-      <div id="modal-content-view" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:520px;">
+      <div class="modal-overlay" id="modal-content-view">
+        <div class="modal" style="max-width:520px;">
           <div class="modal-header">
             <div class="modal-title" id="content-view-title">Content</div>
             <button class="modal-close" onclick="closeModal('modal-content-view')">×</button>
