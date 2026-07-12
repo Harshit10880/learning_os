@@ -4690,17 +4690,24 @@ function autoDeleteCompletedTasks() {
   const before = state.tasks.length;
 
   state.tasks = state.tasks.filter(t => {
-    // Only remove tasks that are completed AND have a completedAt stamp older than 24h
-    if (t.status === 'completed' && t.completedAt) {
+    if (t.status !== 'completed') return true; // keep pending/cancelled
+
+    if (t.completedAt) {
+      // Has timestamp — delete if older than 24h
       return (now - t.completedAt) < TWENTY_FOUR_HOURS;
+    } else {
+      // No timestamp (completed before this feature) — stamp now and delete on next run
+      t.completedAt = now - TWENTY_FOUR_HOURS - 1; // mark as already expired
+      return false; // delete immediately
     }
-    return true; // keep all non-completed and completed-without-stamp tasks
   });
 
   const removed = before - state.tasks.length;
   if (removed > 0) {
     saveData('tasks');
-    console.log(`[AutoClean] Removed ${removed} completed task(s) older than 24h`);
+    showToast(`🗑️ ${removed} completed task${removed > 1 ? 's' : ''} auto-removed`, '');
+    renderTasks();
+    console.log(`[AutoClean] Removed ${removed} completed task(s)`);
   }
 }
 
