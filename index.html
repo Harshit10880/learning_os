@@ -99,22 +99,47 @@
   };
 
   auth.onAuthStateChanged(user => {
-    // Phase 4: update loader + enable login button
-    setLoaderStatus(user ? 'Loading your data…' : 'Ready to sign in');
+    // Enable login button
     const btn = document.getElementById('login-btn');
     if (btn && btn.disabled) {
       btn.disabled = false;
       btn.style.opacity = '1';
       btn.textContent = 'Sign In / Create Account';
     }
+
     if (user) {
       window._fbUser = user;
       window._fbUid  = user.uid;
-      if (window._onFirebaseLogin) window._onFirebaseLogin(user);
+      setLoaderStatus('Loading your data…');
+
+      if (window._onFirebaseLogin) {
+        // Callbacks ready — fire immediately
+        window._onFirebaseLogin(user);
+      } else {
+        // init() not run yet — queue and retry after DOM ready
+        window._pendingAuthUser = user;
+        const waitForInit = setInterval(() => {
+          if (window._onFirebaseLogin) {
+            clearInterval(waitForInit);
+            window._onFirebaseLogin(window._pendingAuthUser);
+            window._pendingAuthUser = null;
+          }
+        }, 50);
+        // Give up after 5s if still no init
+        setTimeout(() => clearInterval(waitForInit), 5000);
+      }
     } else {
       window._fbUser = null;
       window._fbUid  = null;
-      if (window._onFirebaseLogout) window._onFirebaseLogout();
+      setLoaderStatus('Ready to sign in');
+      if (window._onFirebaseLogout) {
+        window._onFirebaseLogout();
+      } else {
+        // Show login screen immediately if no callback yet
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) loginScreen.style.display = 'flex';
+        hideAppLoader();
+      }
     }
   });
 })();
@@ -3865,6 +3890,14 @@ function init() {
     showOwnerPanel();
     return;
   }
+
+  // If onAuthStateChanged already fired BEFORE init() ran, process the queued user now
+  if (window._pendingAuthUser) {
+    console.log('[LearnOS] Processing queued auth user from before init()');
+    const u = window._pendingAuthUser;
+    window._pendingAuthUser = null;
+    window._onFirebaseLogin(u);
+  }
 }
 
 async function showApp(isRealLogin = false) {
@@ -6045,6 +6078,19 @@ function hideAppLoader() {
   loader.classList.add('hidden');
   setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 500);
 }
+
+// ── Hard timeout: if loader still showing after 10s → show login screen ──
+setTimeout(() => {
+  const loader = document.getElementById('app-loader');
+  if (!loader || loader.classList.contains('hidden')) return;
+  console.warn('[LearnOS] Loader timeout — showing login screen');
+  hideAppLoader();
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.style.display = 'flex';
+  const btn = document.getElementById('login-btn');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Sign In / Create Account'; }
+  setLoaderStatus('Ready to sign in');
+}, 10000);
 
 // Show loader status updates
 setLoaderStatus('Connecting…');
