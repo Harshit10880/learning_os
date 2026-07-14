@@ -3888,6 +3888,7 @@ function init() {
     const OWNER_EMAIL = 'owner@gmail.com';
     if (fbUser.email === OWNER_EMAIL) {
       window._fbDisplayName = 'Owner';
+      hideAppLoader();
       showOwnerPanel();
       return; // owner doesn't need scheduleMidnightLogout
     }
@@ -3896,20 +3897,31 @@ function init() {
     let meta = {};
     try {
       const metaPromise = window._db.collection('users').doc(fbUser.uid).get();
-      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 6000));
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 3000));
       const metaSnap = await Promise.race([metaPromise, timeoutPromise]);
       if (metaSnap && metaSnap.exists) meta = metaSnap.data();
     } catch(e) { console.warn('Meta load failed, continuing:', e); }
 
     const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
     window._fbDisplayName = displayName;
-
-    // _realLogin flag is set only when user actually typed email+password
-    // If not set, this is a session restore (refresh/reopen) — don't record new login
     state.user = { name: displayName };
-    await loadAllData();
-    showApp(!!window._realLogin);
-    window._realLogin = false; // reset after use
+
+    try {
+      await loadAllData();
+    } catch(e) {
+      console.warn('loadAllData failed, continuing with empty state:', e);
+    }
+
+    try {
+      await showApp(!!window._realLogin);
+    } catch(e) {
+      console.warn('showApp failed:', e);
+      // Force show app even if showApp errors
+      hideAppLoader();
+      document.getElementById('app')?.classList.add('visible');
+    }
+
+    window._realLogin = false;
     scheduleMidnightLogout();
   };
   window._onFirebaseLogout = () => {
@@ -3938,10 +3950,11 @@ function init() {
 }
 
 async function showApp(isRealLogin = false) {
+  // Hide loader and show app IMMEDIATELY — don't wait for renders
+  hideAppLoader();
   document.getElementById('login-screen').style.display = 'none';
   const app = document.getElementById('app');
   app.classList.add('visible');
-  setLoaderStatus('Loading your data…');
   attMonthOffset = 0;
   seedAIEngineerSubject();
   seedAgenticAISubject();
@@ -3955,8 +3968,6 @@ async function showApp(isRealLogin = false) {
   renderPosts();
   renderNotes();
   navTo('dashboard');
-  // Phase 4: hide app loader after first render
-  setTimeout(() => hideAppLoader(), 300);
   // Check for pending friend requests on login
   setTimeout(checkFriendRequestsOnLogin, 2000);
   // Auto-delete completed tasks older than 24h
@@ -4008,7 +4019,7 @@ async function loadAllData() {
       new Promise(resolve => setTimeout(() => resolve(fallback), ms))
     ]);
   }
-  const t = 8000;
+  const t = 4000; // 4s timeout per request — faster loading
   const [subjects, tasks, sessions, attendance, leaves, notes, activeTimers, posts] = await Promise.all([
     withTimeout(fbLoad('subjects'),     t, S.get('los_subjects_cache')     || []),
     withTimeout(fbLoad('tasks'),        t, S.get('los_tasks_cache')        || []),
@@ -6127,7 +6138,7 @@ setTimeout(() => {
   const btn = document.getElementById('login-btn');
   if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Sign In / Create Account'; }
   setLoaderStatus('Ready to sign in');
-}, 10000);
+}, 6000); // 6s hard timeout — show login if Firebase doesn't respond
 
 // Show loader status updates
 setLoaderStatus('Connecting…');
