@@ -1001,6 +1001,11 @@ input, textarea, select { font-family: inherit; outline: none; }
     height: auto !important;
     overflow: visible !important;
   }
+  /* Ensure active pages always show */
+  .page.active {
+    display: block !important;
+    min-height: 100px !important;
+  }
 
   /* Topbar — clean minimal */
   #topbar {
@@ -3631,50 +3636,59 @@ function gamLevelInfo(xp) {
 }
 
 function _gamAwardXP(reason, amount) {
-  const g = _gam();
-  g.xp += amount;
-  g.xpLog.unshift({ reason, amount, date: new Date().toISOString() });
-  if (g.xpLog.length > 50) g.xpLog.length = 50;
-  const info = gamLevelInfo(g.xp);
-  if (info.level > g.level) {
-    g.level = info.level;
-    showToast('🎉 Level Up! ' + info.badge + ' ' + info.title, 'success');
-  }
-  saveData('gamification');
-  // Floating XP popup
-  const pop = document.createElement('div');
-  pop.textContent = '+' + amount + ' XP — ' + reason;
-  pop.style.cssText = 'position:fixed;bottom:80px;right:16px;background:linear-gradient(135deg,#7c3aed,#38bdf8);color:#fff;border-radius:99px;padding:7px 16px;font-size:0.8rem;font-weight:700;z-index:9999;pointer-events:none;animation:xpPop 2.5s forwards;';
-  document.body.appendChild(pop);
-  setTimeout(() => pop.remove(), 2600);
+  try {
+    const g = _gam();
+    g.xp = (g.xp || 0) + amount;
+    if (!g.xpLog) g.xpLog = [];
+    g.xpLog.unshift({ reason, amount, date: new Date().toISOString() });
+    if (g.xpLog.length > 50) g.xpLog.length = 50;
+    const info = gamLevelInfo(g.xp);
+    if (info.level > (g.level || 1)) {
+      g.level = info.level;
+      showToast('🎉 Level Up! ' + info.badge + ' ' + info.title, 'success');
+    }
+    saveData('gamification');
+    // Floating XP popup
+    const pop = document.createElement('div');
+    pop.textContent = '+' + amount + ' XP — ' + reason;
+    pop.style.cssText = 'position:fixed;bottom:80px;right:16px;background:linear-gradient(135deg,#7c3aed,#38bdf8);color:#fff;border-radius:99px;padding:7px 16px;font-size:0.8rem;font-weight:700;z-index:9999;pointer-events:none;animation:xpPop 2.5s forwards;';
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 2600);
+  } catch(e) { console.warn('_gamAwardXP error:', e); }
 }
 
 function _gamEarnTrophy(id) {
-  const g = _gam();
-  if (g.trophies[id]) return;
-  const def = GAM_TROPHIES.find(t => t.id === id);
-  if (!def) return;
-  g.trophies[id] = { earnedAt: new Date().toISOString() };
-  saveData('gamification');
-  showToast('🏅 Trophy: ' + def.icon + ' ' + def.name + ' unlocked!', 'success');
+  try {
+    const g = _gam();
+    if (!g.trophies) g.trophies = {};
+    if (g.trophies[id]) return;
+    const def = GAM_TROPHIES.find(t => t.id === id);
+    if (!def) return;
+    g.trophies[id] = { earnedAt: new Date().toISOString() };
+    saveData('gamification');
+    showToast('🏅 Trophy: ' + def.icon + ' ' + def.name + ' unlocked!', 'success');
+  } catch(e) { console.warn('_gamEarnTrophy error:', e); }
 }
 
 function gamOnRealLogin() {
-  const g = _gam();
-  const today = toDateKey(new Date());
-  const yesterday = toDateKey(new Date(Date.now() - 86400000));
-  if (g.lastStreakDate !== today) {
-    if (g.lastStreakDate === yesterday) g.currentStreak += 1;
-    else g.currentStreak = 1;
-    g.lastStreakDate = today;
-    if (g.currentStreak > g.bestStreak) g.bestStreak = g.currentStreak;
-    if (g.currentStreak === 3)  { _gamAwardXP('3-day streak bonus', GAM_XP.streak3);  _gamEarnTrophy('streak_3'); }
-    if (g.currentStreak === 7)  { _gamAwardXP('7-day streak bonus', GAM_XP.streak7);  _gamEarnTrophy('on_fire'); }
-    if (g.currentStreak === 30) { _gamAwardXP('30-day streak bonus', GAM_XP.streak30); _gamEarnTrophy('diamond_mind'); }
-  }
-  if (new Date().getHours() < 7) _gamEarnTrophy('early_bird');
-  if (!g.trophies['first_step']) _gamEarnTrophy('first_step');
-  _gamAwardXP('Daily login', GAM_XP.login);
+  try {
+    const g = _gam();
+    if (!g.trophies) g.trophies = {};
+    const today = toDateKey(new Date());
+    const yesterday = toDateKey(new Date(Date.now() - 86400000));
+    if (g.lastStreakDate !== today) {
+      if (g.lastStreakDate === yesterday) g.currentStreak = (g.currentStreak || 0) + 1;
+      else g.currentStreak = 1;
+      g.lastStreakDate = today;
+      if ((g.currentStreak || 0) > (g.bestStreak || 0)) g.bestStreak = g.currentStreak;
+      if (g.currentStreak === 3)  { _gamAwardXP('3-day streak bonus', GAM_XP.streak3);  _gamEarnTrophy('streak_3'); }
+      if (g.currentStreak === 7)  { _gamAwardXP('7-day streak bonus', GAM_XP.streak7);  _gamEarnTrophy('on_fire'); }
+      if (g.currentStreak === 30) { _gamAwardXP('30-day streak bonus', GAM_XP.streak30); _gamEarnTrophy('diamond_mind'); }
+    }
+    if (new Date().getHours() < 7) _gamEarnTrophy('early_bird');
+    if (!g.trophies['first_step']) _gamEarnTrophy('first_step');
+    _gamAwardXP('Daily login', GAM_XP.login);
+  } catch(e) { console.warn('gamOnRealLogin error:', e); }
 }
 
 function gamOnTopicDone() {
@@ -3704,23 +3718,41 @@ function gamOnSessionDone() {
 
 function renderAchievements() {
   if (!state.user) return;
-  const g = _gam();
-  const info = gamLevelInfo(g.xp);
-  const streak = calcStreak();
 
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  // Ensure page is visible
+  const pageEl = document.getElementById('page-achievements');
+  if (pageEl) pageEl.style.display = 'block';
+
+  let g, info, streak;
+  try {
+    g      = _gam();
+    info   = gamLevelInfo(g.xp);
+    streak = typeof calcStreak === 'function' ? calcStreak() : g.currentStreak || 0;
+  } catch(e) {
+    console.warn('renderAchievements error:', e);
+    return;
+  }
+
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
   const lbEl = document.getElementById('ach-level-badge');
   if (lbEl) lbEl.textContent = info.badge + ' Level ' + info.level + ' — ' + info.title;
+
   const xlEl = document.getElementById('ach-xp-label');
-  if (xlEl) xlEl.textContent = info.next ? (info.xpInLevel + ' / ' + info.xpToNext + ' XP to next level') : 'MAX LEVEL 👑';
+  if (xlEl) xlEl.textContent = info.next
+    ? (info.xpInLevel + ' / ' + info.xpToNext + ' XP to next level')
+    : 'MAX LEVEL 👑';
+
   const bar = document.getElementById('ach-xp-bar');
   if (bar) bar.style.width = info.pct + '%';
+
   const sc = document.getElementById('ach-streak-chip');
   if (sc) sc.textContent = '🔥 ' + streak + ' day streak';
+
   set('ach-stat-xp',      g.xp);
   set('ach-stat-level',   info.level);
-  set('ach-stat-streak',  g.bestStreak + 'd');
-  set('ach-stat-trophies', Object.keys(g.trophies).length + ' / ' + GAM_TROPHIES.length);
+  set('ach-stat-streak',  (g.bestStreak || 0) + 'd');
+  set('ach-stat-trophies', Object.keys(g.trophies || {}).length + ' / ' + GAM_TROPHIES.length);
 
   // Trophy grid
   const grid = document.getElementById('ach-trophy-grid');
@@ -3740,12 +3772,16 @@ function renderAchievements() {
   // XP log
   const logEl = document.getElementById('ach-xp-log');
   if (logEl) {
-    if (!g.xpLog || g.xpLog.length === 0) {
-      logEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No XP earned yet</div>';
+    const log = g.xpLog || [];
+    if (log.length === 0) {
+      logEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px;">No XP earned yet — complete tasks, topics and sessions!</div>';
     } else {
-      logEl.innerHTML = g.xpLog.slice(0,20).map(e => {
+      logEl.innerHTML = log.slice(0, 20).map(e => {
         const d = new Date(e.date).toLocaleString();
-        return `<div class="xp-log-row"><span>${escHtml(e.reason)}</span><span style="color:#7c3aed;font-weight:700;">+${e.amount} XP</span></div>`;
+        return `<div class="xp-log-row">
+          <span>${escHtml(e.reason)}</span>
+          <span style="color:#7c3aed;font-weight:700;">+${e.amount} XP</span>
+        </div>`;
       }).join('');
     }
   }
