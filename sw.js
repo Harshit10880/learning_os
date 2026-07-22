@@ -3,16 +3,15 @@
 // ║         Enhanced caching + Offline Queue + Background Sync      ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-const SW_VERSION   = 'learnos-v4';
-const SHELL_CACHE  = 'learnos-shell-v4';   // App shell — rarely changes
-const ASSET_CACHE  = 'learnos-assets-v4';  // Fonts, scripts, icons
-const PAGE_CACHE   = 'learnos-pages-v4';   // HTML pages
+const SW_VERSION   = 'learnos-v5';
+const SHELL_CACHE  = 'learnos-shell-v5';   // App shell — rarely changes
+const ASSET_CACHE  = 'learnos-assets-v5';  // Fonts, scripts, icons
+const PAGE_CACHE   = 'learnos-pages-v5';   // HTML pages
 const OFFLINE_URL  = '/offline.html';
 
-// App Shell — cache immediately, serve always from cache
+// App Shell — cache static assets but NEVER cache index.html
+// index.html must always be fetched fresh so new code deploys reach all devices
 const SHELL_ASSETS = [
-  '/',
-  '/index.html',
   '/offline.html',
   '/manifest.json',
   '/icon-192.png',
@@ -20,6 +19,9 @@ const SHELL_ASSETS = [
   '/icon-maskable-192.png',
   '/icon-maskable-512.png',
 ];
+
+// These are NEVER cached — always network
+const NEVER_CACHE = ['/', '/index.html'];
 
 // External assets — cache on first use
 const EXTERNAL_ORIGINS = [
@@ -87,7 +89,15 @@ self.addEventListener('fetch', event => {
   // 2. Firebase & auth — always network, never cache
   if (SKIP_CACHE_ORIGINS.some(o => url.hostname.includes(o))) return;
 
-  // 3. App Shell — Cache first, always fast
+  // 3. index.html — ALWAYS network first, never from cache
+  if (NEVER_CACHE.includes(url.pathname) && url.origin === self.location.origin) {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+
+  // 3b. Other shell assets — Cache first, always fast
   if (SHELL_ASSETS.includes(url.pathname) && url.origin === self.location.origin) {
     event.respondWith(cacheFirst(request, SHELL_CACHE));
     return;
