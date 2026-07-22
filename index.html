@@ -4004,8 +4004,13 @@ async function showApp(isRealLogin = false) {
     fbSaveUserMeta({ displayName: state.user.name, lastLogin: now.toISOString(), role: 'student' }).catch(()=>{});
     gamOnRealLogin();
   } else {
-    // ── Session restore (refresh/reopen) — just restore loginTime from record ──
+    // ── Session restore (refresh/reopen) — restore loginTime from cloud record
+    // This is the key fix for multi-device: attendance from device 1 is already
+    // in Firestore, so device 2 just reads it correctly after loadAllData()
     state.user.loginTime = attEntry ? attEntry.loginTime : '—';
+    // If no attendance entry today on this device, it means we haven't logged in
+    // today on THIS device — but other devices may have. Don't create a new entry.
+    // The cloud data (loaded in loadAllData) is the source of truth.
   }
 
   document.getElementById('topbar-name').textContent = state.user.name;
@@ -6360,16 +6365,25 @@ if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.register('/sw.js');
       console.log('✅ LearnOS SW Phase 2 registered:', reg.scope);
 
-      // Listen for SW updates
+      // Listen for SW updates — auto-update immediately
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Auto-update: tell SW to activate immediately
+          if (newWorker.state === 'installed') {
+            // Tell new SW to activate immediately (skip waiting)
             newWorker.postMessage({ type: 'SKIP_WAITING' });
-            showToast('🔄 App updated to latest version!', 'success');
+            if (navigator.serviceWorker.controller) {
+              // Reload page to use new SW immediately
+              showToast('🔄 App updated — reloading...', 'success');
+              setTimeout(() => window.location.reload(), 1500);
+            }
           }
         });
+      });
+
+      // Check for SW updates every time page becomes visible
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) reg.update();
       });
 
       // Register Background Sync for offline queue
@@ -6400,6 +6414,15 @@ if ('serviceWorker' in navigator) {
     // Listen for SW messages
     navigator.serviceWorker.addEventListener('message', event => {
       if (event.data?.type === 'PROCESS_OFFLINE_QUEUE') offlineQueueProcess();
+    });
+
+    // When SW controller changes (new version activated), reload for fresh code
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
     });
 
     // Process any pending offline queue on load
