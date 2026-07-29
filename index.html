@@ -1187,6 +1187,173 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 }
 .xp-log-row:last-child { border-bottom:none; }
 
+
+/* ===================== DAILY GOAL / FOCUS MODE ===================== */
+#daily-goal-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(56,189,248,0.06));
+  border: 1.5px solid rgba(124,58,237,0.25);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+#daily-goal-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #38bdf8);
+}
+.goal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.goal-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.goal-edit-btn {
+  background: transparent;
+  border: 1px solid rgba(124,58,237,0.3);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  color: var(--accent3);
+  cursor: pointer;
+  font-weight: 600;
+}
+.goal-subject {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.goal-target {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.goal-progress-wrap {
+  background: var(--bg3);
+  border-radius: 99px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #7c3aed, #38bdf8);
+  transition: width 0.5s ease;
+  min-width: 4px;
+}
+.goal-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.goal-complete-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  border-radius: 99px;
+  padding: 3px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.goal-empty-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+  width: 100%;
+  text-align: left;
+}
+.goal-empty-btn:hover { color: var(--accent3); }
+
+/* Goal setup modal styles */
+.goal-time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+.goal-time-btn {
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.goal-time-btn.selected {
+  border-color: var(--accent);
+  color: var(--accent3);
+  background: rgba(124,58,237,0.1);
+}
+
+/* Focus mode overlay */
+#focus-mode-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(10,5,25,0.96);
+  z-index: 9990;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#focus-mode-overlay.active { display: flex; }
+.focus-subject-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.focus-time-display {
+  font-size: 5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, #7c3aed, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin: 24px 0;
+}
+.focus-goal-bar-wrap {
+  width: 280px;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 0 auto 32px;
+}
+.focus-goal-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #38bdf8);
+  border-radius: 99px;
+  transition: width 1s ease;
+}
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -1476,6 +1643,17 @@ input, textarea { -webkit-user-select: text; user-select: text; }
           <div class="meta-divider"></div>
           <div class="meta-item"><div class="meta-val" id="dash-streak" style="color:var(--warn);">🔥 0</div><div class="meta-lbl">Day Streak</div></div>
         </div>
+        <!-- ── Daily Goal Card ── -->
+        <div id="daily-goal-card">
+          <div class="goal-header">
+            <span class="goal-title">🎯 Today's Focus Goal</span>
+            <button class="goal-edit-btn" onclick="openGoalModal()">✏️ Change</button>
+          </div>
+          <div id="goal-card-content">
+            <!-- Rendered by renderDailyGoal() -->
+          </div>
+        </div>
+
         <div class="grid-2" style="margin-bottom:18px;">
           <!-- Overall progress -->
           <div class="card">
@@ -3857,6 +4035,276 @@ function renderAchievements() {
   }
 }
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║         DAILY GOAL / FOCUS MODE ENGINE                         ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+let _goalSelectedMins = 60;
+let _focusInterval = null;
+let _focusStartTime = null;
+let _focusElapsedMs = 0;
+
+// ── Goal state helpers ────────────────────────────────────────────
+function _getGoalKey() {
+  return 'learnos_goal_' + toDateKey(new Date());
+}
+
+function _getGoal() {
+  try {
+    const raw = localStorage.getItem(_getGoalKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function _saveGoal(goal) {
+  try {
+    localStorage.setItem(_getGoalKey(), JSON.stringify(goal));
+    // Also clean up goals older than 7 days
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('learnos_goal_'));
+    const cutoff = toDateKey(new Date(Date.now() - 7*86400000));
+    keys.forEach(k => {
+      const dateStr = k.replace('learnos_goal_', '');
+      if (dateStr < cutoff) localStorage.removeItem(k);
+    });
+  } catch(e) {}
+}
+
+// ── Open goal setup modal ─────────────────────────────────────────
+function openGoalModal() {
+  // Populate subject dropdown
+  const sel = document.getElementById('goal-subject-select');
+  if (sel) {
+    const existing = _getGoal();
+    sel.innerHTML = '<option value="">— Pick a subject —</option>' +
+      state.subjects.map(s =>
+        `<option value="${s.id}" ${existing && existing.subjectId === s.id ? 'selected' : ''}>${escHtml(s.name)}</option>`
+      ).join('');
+  }
+  // Restore previous time selection
+  const existing = _getGoal();
+  _goalSelectedMins = existing ? existing.targetMins : 60;
+  selectGoalTime(_goalSelectedMins);
+  // Restore note
+  const noteEl = document.getElementById('goal-note-input');
+  if (noteEl) noteEl.value = existing ? (existing.note || '') : '';
+  const msgEl = document.getElementById('goal-modal-msg');
+  if (msgEl) msgEl.textContent = '';
+  openModal('modal-daily-goal');
+}
+
+function selectGoalTime(mins) {
+  _goalSelectedMins = mins;
+  document.querySelectorAll('.goal-time-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.mins) === mins);
+  });
+}
+
+function saveGoal() {
+  const subjectId = document.getElementById('goal-subject-select')?.value;
+  const note      = document.getElementById('goal-note-input')?.value.trim() || '';
+  const msgEl     = document.getElementById('goal-modal-msg');
+
+  if (!subjectId) {
+    if (msgEl) { msgEl.style.color='#ef4444'; msgEl.textContent = 'Please pick a subject.'; }
+    return;
+  }
+  if (!_goalSelectedMins) {
+    if (msgEl) { msgEl.style.color='#ef4444'; msgEl.textContent = 'Please select a time goal.'; }
+    return;
+  }
+
+  const subject = state.subjects.find(s => s.id === subjectId);
+  const goal = {
+    subjectId,
+    subjectName: subject ? subject.name : 'Unknown',
+    targetMins: _goalSelectedMins,
+    note,
+    achievedMins: _getGoal()?.achievedMins || 0,
+    completed: false,
+    createdAt: new Date().toISOString(),
+    date: toDateKey(new Date())
+  };
+
+  _saveGoal(goal);
+  if (msgEl) { msgEl.style.color='#22c55e'; msgEl.textContent = '✅ Goal set!'; }
+  setTimeout(() => {
+    closeModal('modal-daily-goal');
+    renderDailyGoal();
+  }, 800);
+}
+
+// ── Render goal card on dashboard ────────────────────────────────
+function renderDailyGoal() {
+  const el = document.getElementById('goal-card-content');
+  if (!el) return;
+
+  const goal = _getGoal();
+
+  if (!goal || !goal.subjectId) {
+    // No goal set yet
+    el.innerHTML = `
+      <button class="goal-empty-btn" onclick="openGoalModal()">
+        <span style="font-size:1.6rem;">🎯</span>
+        <div>
+          <div style="font-weight:600;color:var(--text);font-size:0.88rem;">Set your focus goal for today</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">Pick a subject + time target to stay on track</div>
+        </div>
+        <span style="margin-left:auto;font-size:1.2rem;">›</span>
+      </button>`;
+    return;
+  }
+
+  // Calculate today's actual study time for this subject from sessions
+  const todayKey = toDateKey(new Date());
+  const todaySessions = state.sessions.filter(s =>
+    s.status === 'done' && s.date === todayKey &&
+    (s.subjectId === goal.subjectId || s.subject === goal.subjectName)
+  );
+  const achievedMs  = todaySessions.reduce((a, s) => a + (s.duration || 0), 0);
+  const achievedMin = Math.round(achievedMs / 60000);
+  const targetMin   = goal.targetMins;
+  const pct         = Math.min(100, Math.round((achievedMin / targetMin) * 100));
+  const isComplete  = pct >= 100;
+
+  // Update saved goal with latest achieved
+  goal.achievedMins = achievedMin;
+  goal.completed    = isComplete;
+  _saveGoal(goal);
+
+  const fmtTarget = targetMin >= 60
+    ? (targetMin % 60 === 0 ? `${targetMin/60}h` : `${Math.floor(targetMin/60)}h ${targetMin%60}m`)
+    : `${targetMin}m`;
+  const fmtAchieved = achievedMin >= 60
+    ? `${Math.floor(achievedMin/60)}h ${achievedMin%60}m`
+    : `${achievedMin}m`;
+
+  el.innerHTML = `
+    <div class="goal-subject">${escHtml(goal.subjectName)}</div>
+    ${goal.note ? `<div class="goal-target">${escHtml(goal.note)}</div>` : `<div class="goal-target">Target: ${fmtTarget} of focused study</div>`}
+    <div class="goal-progress-wrap">
+      <div class="goal-progress-fill" style="width:${pct}%;"></div>
+    </div>
+    <div class="goal-progress-label">
+      <span>${fmtAchieved} studied</span>
+      <span style="color:${isComplete ? '#22c55e' : 'var(--muted)'};">${pct}% / ${fmtTarget}</span>
+    </div>
+    ${isComplete
+      ? `<div class="goal-complete-badge">🎉 Goal Achieved! Amazing work today!</div>`
+      : `<button onclick="startFocusMode()" style="margin-top:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:8px 18px;color:#fff;font-size:0.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          ⚡ Start Focus Session
+        </button>`
+    }`;
+
+  // Award XP when goal is completed (only once per day)
+  if (isComplete && !goal.xpAwarded) {
+    goal.xpAwarded = true;
+    _saveGoal(goal);
+    try { _gamAwardXP('Daily goal achieved!', 30); } catch(e){}
+    try { showToast('🎯 Daily goal achieved! +30 XP', 'success'); } catch(e){}
+  }
+}
+
+// ── Focus Mode ────────────────────────────────────────────────────
+function startFocusMode() {
+  const goal = _getGoal();
+  if (!goal) return;
+
+  const overlay = document.getElementById('focus-mode-overlay');
+  if (!overlay) return;
+
+  // Set display info
+  const sn = document.getElementById('focus-subject-name');
+  if (sn) sn.textContent = goal.subjectName;
+  const nd = document.getElementById('focus-note-display');
+  if (nd) nd.textContent = goal.note || '';
+  const gt = document.getElementById('focus-goal-target');
+  const fmtTarget = goal.targetMins >= 60
+    ? `${Math.floor(goal.targetMins/60)}h ${goal.targetMins%60 ? goal.targetMins%60+'m' : ''}`.trim()
+    : `${goal.targetMins}m`;
+  if (gt) gt.textContent = fmtTarget;
+
+  _focusStartTime = Date.now();
+  _focusElapsedMs = (goal.achievedMins || 0) * 60000;
+
+  overlay.classList.add('active');
+
+  // Update timer every second
+  _focusInterval = setInterval(() => {
+    const elapsed = _focusElapsedMs + (Date.now() - _focusStartTime);
+    const totalSec = Math.floor(elapsed / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    const display = h > 0
+      ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+      : `${m}:${String(s).padStart(2,'0')}`;
+
+    const td = document.getElementById('focus-time-display');
+    if (td) td.textContent = display;
+
+    // Update progress bar
+    const pct = Math.min(100, (elapsed / (goal.targetMins * 60000)) * 100);
+    const bar = document.getElementById('focus-goal-bar');
+    if (bar) bar.style.width = pct + '%';
+
+    // Flash complete when goal hit
+    if (pct >= 100 && !goal._focusCompleteShown) {
+      goal._focusCompleteShown = true;
+      showToast('🎯 You hit your goal! Great work!', 'success');
+    }
+  }, 1000);
+}
+
+function exitFocusMode(addSession = true) {
+  clearInterval(_focusInterval);
+  _focusInterval = null;
+
+  const overlay = document.getElementById('focus-mode-overlay');
+  if (overlay) overlay.classList.remove('active');
+
+  if (addSession && _focusStartTime) {
+    const sessionMs = Date.now() - _focusStartTime;
+    const goal = _getGoal();
+    if (goal && sessionMs > 30000) { // only save if > 30 seconds
+      // Add to sessions automatically
+      const subject = state.subjects.find(s => s.id === goal.subjectId);
+      const newSession = {
+        id: 'ses_focus_' + Date.now(),
+        name: goal.note || ('Focus: ' + goal.subjectName),
+        subjectId: goal.subjectId,
+        subject: goal.subjectName,
+        color: subject ? subject.color : '#7c3aed',
+        duration: sessionMs,
+        date: toDateKey(new Date()),
+        status: 'done',
+        createdAt: new Date().toISOString()
+      };
+      state.sessions.unshift(newSession);
+      saveData('sessions');
+      try { gamOnSessionDone(); } catch(e){}
+      showToast(`✅ Session saved: ${formatHM(sessionMs)}`, 'success');
+    }
+  }
+
+  _focusStartTime = null;
+  renderDailyGoal();
+  renderDashboard();
+}
+
+// ── Morning popup — show goal prompt if no goal set yet today ─────
+function checkMorningGoalPrompt() {
+  if (!state.user) return;
+  if (state.subjects.length === 0) return;
+  const goal = _getGoal();
+  if (!goal) {
+    // Show subtle prompt after 3 seconds
+    setTimeout(() => {
+      showToast("🎯 Set today's focus goal! Tap the Goal card on Dashboard.", '');
+    }, 3000);
+  }
+}
+
 // ===================== PROFILE PAGE =====================
 function renderProfile() {
   if (!state.user) return;
@@ -4042,6 +4490,8 @@ async function showApp(isRealLogin = false) {
   setTimeout(checkFriendRequestsOnLogin, 2000);
   // Auto-delete completed tasks older than 24h
   scheduleTaskAutoClean();
+  // Morning goal prompt
+  setTimeout(checkMorningGoalPrompt, 3500);
 
   const now     = new Date();
   const dateKey = toDateKey(now);
@@ -4535,6 +4985,8 @@ function renderDashboard() {
   // streak
   const streakEl = document.getElementById('dash-streak');
   if (streakEl) streakEl.textContent = '🔥 ' + calcStreak();
+  // Daily goal card
+  try { renderDailyGoal(); } catch(e) {}
 }
 
 function calcStreak() {
@@ -4977,6 +5429,8 @@ function finishTimer(id, status = 'done') {
   renderDashboard();
   if (status === 'done') gamOnSessionDone();
   showToast(status === 'done' ? `Session saved: ${formatHM(finalElapsed)}` : 'Session cancelled', status === 'done' ? 'success' : '');
+  // Update daily goal progress
+  try { renderDailyGoal(); } catch(e) {}
 }
 
 function cancelTimer(id) {
@@ -6688,6 +7142,74 @@ document.addEventListener('DOMContentLoaded', () => {
     lastTap = now;
   });
 })();
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DAILY GOAL SETUP MODAL                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-daily-goal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">🎯 Set Today's Focus Goal</div>
+      <button class="modal-close" onclick="closeModal('modal-daily-goal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Which subject will you focus on today?</label>
+        <select id="goal-subject-select" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.88rem;">
+          <option value="">— Pick a subject —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Study time goal</label>
+        <div class="goal-time-grid" id="goal-time-grid">
+          <button class="goal-time-btn" data-mins="30" onclick="selectGoalTime(30)">30m</button>
+          <button class="goal-time-btn" data-mins="60" onclick="selectGoalTime(60)">1h</button>
+          <button class="goal-time-btn" data-mins="90" onclick="selectGoalTime(90)">1.5h</button>
+          <button class="goal-time-btn" data-mins="120" onclick="selectGoalTime(120)">2h</button>
+          <button class="goal-time-btn" data-mins="180" onclick="selectGoalTime(180)">3h</button>
+          <button class="goal-time-btn" data-mins="240" onclick="selectGoalTime(240)">4h</button>
+          <button class="goal-time-btn" data-mins="300" onclick="selectGoalTime(300)">5h</button>
+          <button class="goal-time-btn" data-mins="360" onclick="selectGoalTime(360)">6h</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Optional: What specifically will you study?</label>
+        <input type="text" id="goal-note-input" placeholder="e.g. RAG pipeline, Supervised Learning..." style="width:100%;box-sizing:border-box;">
+      </div>
+      <div id="goal-modal-msg" style="font-size:0.8rem;min-height:18px;color:#22c55e;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-daily-goal')">Cancel</button>
+      <button class="btn-primary" onclick="saveGoal()">Set Goal 🎯</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- FOCUS MODE OVERLAY                          -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="focus-mode-overlay">
+  <div style="font-size:0.78rem;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-bottom:16px;text-transform:uppercase;">Focus Mode</div>
+  <div class="focus-subject-name" id="focus-subject-name">Subject</div>
+  <div style="font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:8px;" id="focus-note-display"></div>
+  <div class="focus-time-display" id="focus-time-display">0:00</div>
+  <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);margin-bottom:12px;">
+    Goal: <span id="focus-goal-target">—</span>
+  </div>
+  <div class="focus-goal-bar-wrap">
+    <div class="focus-goal-bar-fill" id="focus-goal-bar" style="width:0%;"></div>
+  </div>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <button onclick="exitFocusMode()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:12px;padding:12px 28px;font-size:0.9rem;font-weight:600;cursor:pointer;">
+      ✅ Done
+    </button>
+    <button onclick="exitFocusMode(false)" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);border-radius:12px;padding:12px 24px;font-size:0.85rem;cursor:pointer;">
+      Exit
+    </button>
+  </div>
+  <div style="margin-top:28px;font-size:0.72rem;color:rgba(255,255,255,0.15);">Tap Done when you finish your session</div>
+</div>
 
 </script>
 </body>
