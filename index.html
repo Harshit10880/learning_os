@@ -780,6 +780,7 @@ input, textarea, select { font-family: inherit; outline: none; }
 .session-dur { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-left: auto; }
 
 /* ===================== ATTENDANCE PAGE ===================== */
+/* Shared calendar cells (also used by owner view) */
 .attendance-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .att-day {
   aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center;
@@ -803,6 +804,469 @@ input, textarea, select { font-family: inherit; outline: none; }
 .leave-dates { font-size: 0.85rem; font-weight: 600; }
 .leave-reason { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 .leave-badge { margin-left: auto; padding: 3px 10px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; background: rgba(245,158,11,0.15); color: var(--warn); }
+
+/* ── Presence Ledger — attendance page only ── */
+#page-attendance {
+  --att-ink: #e8f4f1;
+  --att-mint: #2dd4a8;
+  --att-mint-dim: rgba(45,212,168,0.14);
+  --att-coral: #ff6b6b;
+  --att-coral-dim: rgba(255,107,107,0.14);
+  --att-amber: #f0b429;
+  --att-amber-dim: rgba(240,180,41,0.14);
+  --att-slate: #1a2430;
+  --att-panel: rgba(18, 28, 38, 0.88);
+  --att-line: rgba(120, 160, 150, 0.18);
+  position: relative;
+}
+#page-attendance::before {
+  content: '';
+  position: absolute;
+  inset: -24px -12px auto -12px;
+  height: 280px;
+  background:
+    radial-gradient(ellipse 80% 70% at 12% 20%, rgba(45,212,168,0.16), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 88% 10%, rgba(56,189,248,0.1), transparent 50%),
+    linear-gradient(180deg, rgba(16,24,34,0.5), transparent);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 0 0 40% 40% / 0 0 28px 28px;
+}
+#page-attendance > * { position: relative; z-index: 1; }
+
+#page-attendance .page-header {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#page-attendance .page-title {
+  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  letter-spacing: -0.04em;
+  background: linear-gradient(120deg, #f0fff9 20%, #2dd4a8 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#page-attendance .page-sub { color: rgba(180, 210, 200, 0.65); max-width: 36ch; }
+
+.att-hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 22px;
+  align-items: center;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(26,42,52,0.95), rgba(14,22,30,0.92)),
+    var(--att-panel);
+  border: 1px solid var(--att-line);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04);
+  overflow: hidden;
+  position: relative;
+}
+.att-hero::after {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(45,212,168,0.2), transparent 70%);
+  pointer-events: none;
+}
+.att-ring-wrap {
+  position: relative;
+  width: 118px; height: 118px;
+  flex-shrink: 0;
+}
+.att-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.att-ring-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 9; }
+.att-ring-progress {
+  fill: none;
+  stroke: url(#attRingGrad);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 0 8px rgba(45,212,168,0.45));
+}
+.att-ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.att-ring-pct {
+  font-family: var(--font-display);
+  font-size: 1.55rem; font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--att-ink);
+  line-height: 1;
+}
+.att-ring-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(180,210,200,0.55);
+  margin-top: 4px;
+}
+.att-hero-copy { min-width: 0; }
+.att-hero-kicker {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--att-mint);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.att-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--att-ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.att-hero-sub { font-size: 0.8rem; color: rgba(180,210,200,0.6); line-height: 1.45; }
+.att-metric-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px;
+}
+.att-metric {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 8px 14px 8px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  min-width: 72px;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.att-metric:hover { transform: translateY(-2px); }
+.att-metric.present { background: var(--att-mint-dim); border-color: rgba(45,212,168,0.25); }
+.att-metric.leave { background: var(--att-amber-dim); border-color: rgba(240,180,41,0.25); }
+.att-metric.absent { background: var(--att-coral-dim); border-color: rgba(255,107,107,0.25); }
+.att-metric-val {
+  font-family: var(--font-display);
+  font-size: 1.35rem; font-weight: 800;
+  line-height: 1; letter-spacing: -0.03em;
+}
+.att-metric.present .att-metric-val { color: var(--att-mint); }
+.att-metric.leave .att-metric-val { color: var(--att-amber); }
+.att-metric.absent .att-metric-val { color: var(--att-coral); }
+.att-metric-lbl { font-size: 0.68rem; color: rgba(180,210,200,0.55); font-weight: 500; }
+
+.att-hero-actions {
+  display: flex; flex-direction: column; gap: 10px;
+  align-items: stretch;
+  min-width: 160px;
+}
+.att-leave-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700; font-size: 0.84rem;
+  color: #06241c;
+  background: linear-gradient(135deg, #3ee0b4, #2dd4a8 50%, #1fb890);
+  box-shadow: 0 8px 24px rgba(45,212,168,0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.att-leave-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 28px rgba(45,212,168,0.38);
+}
+.att-next-leave {
+  font-size: 0.72rem;
+  color: rgba(180,210,200,0.55);
+  text-align: center;
+  line-height: 1.35;
+  padding: 0 4px;
+}
+
+.att-cal-shell {
+  margin-bottom: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--att-line);
+  background:
+    linear-gradient(180deg, rgba(22,34,44,0.95), rgba(14,22,30,0.9));
+  padding: 18px 18px 16px;
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+.att-cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 10px;
+}
+.att-cal-nav .btn-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: rgba(45,212,168,0.08);
+  border: 1px solid rgba(45,212,168,0.18);
+  color: var(--att-mint);
+  font-size: 1.1rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.att-cal-nav .btn-icon:hover {
+  background: rgba(45,212,168,0.16);
+  transform: scale(1.04);
+}
+.att-cal-month {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--att-ink);
+  margin: 0;
+}
+#page-attendance .days-header {
+  margin-bottom: 8px;
+  gap: 5px;
+}
+#page-attendance .days-header span {
+  color: rgba(140,180,170,0.45);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+#page-attendance .attendance-grid {
+  gap: 5px;
+}
+#page-attendance .att-day {
+  border-radius: 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  position: relative;
+}
+#page-attendance .att-day:not([style*="transparent"]):hover {
+  transform: scale(1.06);
+  z-index: 2;
+}
+#page-attendance .att-day.present {
+  background: linear-gradient(145deg, rgba(45,212,168,0.32), rgba(45,212,168,0.12));
+  color: #7dffd0;
+  border-color: rgba(45,212,168,0.35);
+  box-shadow: inset 0 0 0 1px rgba(45,212,168,0.1);
+}
+#page-attendance .att-day.absent {
+  background: linear-gradient(145deg, rgba(255,107,107,0.22), rgba(255,107,107,0.08));
+  color: #ff9a9a;
+  border-color: rgba(255,107,107,0.28);
+}
+#page-attendance .att-day.leave {
+  background: linear-gradient(145deg, rgba(240,180,41,0.28), rgba(240,180,41,0.1));
+  color: #ffd56a;
+  border-color: rgba(240,180,41,0.3);
+}
+#page-attendance .att-day.future {
+  background: rgba(255,255,255,0.03);
+  color: rgba(140,160,170,0.35);
+  border-color: transparent;
+}
+#page-attendance .att-day.today {
+  border-color: #5eead4;
+  box-shadow: 0 0 0 2px rgba(94,234,212,0.25), 0 0 18px rgba(45,212,168,0.2);
+  animation: attTodayPulse 2.4s ease-in-out infinite;
+}
+@keyframes attTodayPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(94,234,212,0.25), 0 0 14px rgba(45,212,168,0.15); }
+  50% { box-shadow: 0 0 0 3px rgba(94,234,212,0.4), 0 0 22px rgba(45,212,168,0.32); }
+}
+#page-attendance .att-legend {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--att-line);
+  gap: 14px 20px;
+}
+#page-attendance .att-leg-dot {
+  width: 11px; height: 11px;
+  border-radius: 4px;
+}
+#page-attendance .att-leg-item { color: rgba(180,210,200,0.55); }
+
+.att-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.att-panel {
+  border-radius: 18px;
+  border: 1px solid var(--att-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.95), rgba(12,20,28,0.9));
+  padding: 18px;
+  min-height: 160px;
+}
+.att-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; gap: 10px;
+}
+.att-panel-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(160,200,190,0.55);
+  font-weight: 700;
+}
+.att-panel-chip {
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(45,212,168,0.1);
+  color: var(--att-mint);
+  border: 1px solid rgba(45,212,168,0.2);
+  font-weight: 600;
+}
+
+/* Today timeline */
+.att-timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+.att-tl-item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  position: relative;
+}
+.att-tl-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 26px; bottom: -2px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(45,212,168,0.45), rgba(45,212,168,0.05));
+}
+.att-tl-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.att-tl-dot.login {
+  background: rgba(45,212,168,0.2);
+  box-shadow: 0 0 0 3px rgba(45,212,168,0.12);
+}
+.att-tl-dot.logout {
+  background: rgba(255,107,107,0.2);
+  box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
+}
+.att-tl-dot::after {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.att-tl-dot.login::after { background: var(--att-mint); }
+.att-tl-dot.logout::after { background: var(--att-coral); }
+.att-tl-label {
+  font-size: 0.84rem; font-weight: 600; color: var(--att-ink);
+}
+.att-tl-sub { font-size: 0.72rem; color: rgba(180,210,200,0.45); margin-top: 2px; }
+.att-tl-time {
+  font-family: var(--font-display);
+  font-size: 0.82rem; font-weight: 700;
+  color: rgba(200,230,220,0.75);
+  letter-spacing: -0.02em;
+}
+.att-empty {
+  color: rgba(180,210,200,0.4);
+  font-size: 0.8rem;
+  padding: 18px 8px;
+  text-align: center;
+  border: 1px dashed var(--att-line);
+  border-radius: 12px;
+}
+
+/* Monthly records */
+.att-record {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(120,160,150,0.1);
+}
+.att-record:last-child { border-bottom: none; }
+.att-record-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--att-ink);
+  font-variant-numeric: tabular-nums;
+}
+.att-record-pills {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.att-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.att-pill.in {
+  background: rgba(45,212,168,0.12);
+  color: #7dffd0;
+}
+.att-pill.out {
+  background: rgba(255,107,107,0.12);
+  color: #ff9a9a;
+}
+
+/* Leave tickets */
+.att-leaves-shell {
+  border-radius: 18px;
+  border: 1px solid var(--att-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.95), rgba(12,20,28,0.9));
+  padding: 18px;
+}
+#page-attendance .leave-list { gap: 12px; }
+#page-attendance .leave-item {
+  background:
+    linear-gradient(90deg, rgba(240,180,41,0.12) 0 4px, transparent 4px),
+    rgba(255,255,255,0.02);
+  border: 1px solid rgba(240,180,41,0.2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+#page-attendance .leave-item::before,
+#page-attendance .leave-item::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #0e161e;
+  border: 1px solid rgba(240,180,41,0.2);
+  top: 50%; transform: translateY(-50%);
+}
+#page-attendance .leave-item::before { left: -7px; }
+#page-attendance .leave-item::after { right: -7px; }
+#page-attendance .leave-dates { color: #ffe09a; font-size: 0.86rem; }
+#page-attendance .leave-reason { color: rgba(200,210,180,0.55); }
+#page-attendance .leave-badge {
+  background: rgba(240,180,41,0.18);
+  color: #ffd56a;
+  border-radius: 8px;
+}
+
+@media (max-width: 860px) {
+  .att-hero { grid-template-columns: 1fr; text-align: left; }
+  .att-ring-wrap { margin: 0 auto; }
+  .att-hero-actions { min-width: 0; width: 100%; }
+  .att-panels { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  #page-attendance::before { height: 200px; }
+  .att-hero { padding: 18px 16px; }
+  .att-ring-wrap { width: 100px; height: 100px; }
+  .att-ring-pct { font-size: 1.3rem; }
+  .att-cal-shell, .att-panel, .att-leaves-shell { padding: 14px; border-radius: 16px; }
+  #page-attendance .att-day { border-radius: 8px; font-size: 0.68rem; }
+  .att-record { grid-template-columns: 76px 1fr; }
+}
 
 /* ===================== COMMUNITY PAGE ===================== */
 .post-form-area {
@@ -2110,68 +2574,109 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       <!-- ======= ATTENDANCE ======= -->
       <div class="page" id="page-attendance">
         <div class="page-header">
-          <div class="page-title">Attendance</div>
-          <div class="page-sub">Login history and leave management</div>
-        </div>
-        <div class="grid-2" style="margin-bottom:20px;">
-          <div class="card">
-            <div class="card-title" id="att-stats-title">This Month</div>
-            <div id="att-month-stats" style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px;">
-              <div><div style="font-size:1.6rem;font-weight:800;color:var(--success);" id="att-present-count">0</div><div style="font-size:0.72rem;color:var(--muted);">Present</div></div>
-              <div><div style="font-size:1.6rem;font-weight:800;color:var(--warn);" id="att-leave-count">0</div><div style="font-size:0.72rem;color:var(--muted);">Leave</div></div>
-              <div><div style="font-size:1.6rem;font-weight:800;color:var(--danger);" id="att-absent-count">0</div><div style="font-size:0.72rem;color:var(--muted);">Absent</div></div>
-            </div>
-            <div style="font-size:0.8rem;color:var(--muted);">Attendance rate: <strong style="color:var(--text);" id="att-rate-text">—</strong></div>
-          </div>
-          <div class="card">
-            <div class="card-title">Quick Actions</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <button class="btn-accent" onclick="openLeaveModal()" style="padding:10px 16px;font-size:0.85rem;text-align:left;">📝 Apply for Leave</button>
-              <div id="next-leave-info" style="font-size:0.78rem;color:var(--muted);">No upcoming leaves</div>
-            </div>
+          <div>
+            <div class="page-title">Attendance</div>
+            <div class="page-sub">Your presence ledger — check-ins, absences, and leave in one view</div>
           </div>
         </div>
-        <!-- Calendar -->
-        <div class="card" style="margin-bottom:20px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <button class="btn-icon" onclick="changeAttMonth(-1)" style="font-size:1rem;padding:6px 12px;">‹</button>
-            <div class="month-header" id="att-month-title" style="margin-bottom:0;">June 2026</div>
-            <button class="btn-icon" id="att-next-btn" onclick="changeAttMonth(1)" style="font-size:1rem;padding:6px 12px;">›</button>
+
+        <!-- Hero: rate ring + metrics + leave action -->
+        <section class="att-hero" aria-label="Attendance overview">
+          <div class="att-ring-wrap" aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="attRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#5eead4"/>
+                  <stop offset="55%" stop-color="#2dd4a8"/>
+                  <stop offset="100%" stop-color="#38bdf8"/>
+                </linearGradient>
+              </defs>
+              <circle class="att-ring-track" cx="50" cy="50" r="45"/>
+              <circle class="att-ring-progress" id="att-ring-progress" cx="50" cy="50" r="45"/>
+            </svg>
+            <div class="att-ring-center">
+              <div class="att-ring-pct" id="att-rate-text">—</div>
+              <div class="att-ring-label">Rate</div>
+            </div>
+          </div>
+
+          <div class="att-hero-copy">
+            <div class="att-hero-kicker" id="att-stats-title">This Month</div>
+            <div class="att-hero-title">Presence snapshot</div>
+            <div class="att-hero-sub">Logged days, leave windows, and gaps for the month you are viewing.</div>
+            <div class="att-metric-row" id="att-month-stats">
+              <div class="att-metric present">
+                <span class="att-metric-val" id="att-present-count">0</span>
+                <span class="att-metric-lbl">Present</span>
+              </div>
+              <div class="att-metric leave">
+                <span class="att-metric-val" id="att-leave-count">0</span>
+                <span class="att-metric-lbl">Leave</span>
+              </div>
+              <div class="att-metric absent">
+                <span class="att-metric-val" id="att-absent-count">0</span>
+                <span class="att-metric-lbl">Absent</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="att-hero-actions">
+            <button class="att-leave-btn" onclick="openLeaveModal()" type="button">Apply for Leave</button>
+            <div class="att-next-leave" id="next-leave-info">No upcoming leaves</div>
+          </div>
+        </section>
+
+        <!-- Calendar mosaic -->
+        <section class="att-cal-shell" aria-label="Attendance calendar">
+          <div class="att-cal-nav">
+            <button class="btn-icon" onclick="changeAttMonth(-1)" type="button" aria-label="Previous month">‹</button>
+            <div class="att-cal-month month-header" id="att-month-title">June 2026</div>
+            <button class="btn-icon" id="att-next-btn" onclick="changeAttMonth(1)" type="button" aria-label="Next month">›</button>
           </div>
           <div class="days-header">
             <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
           </div>
           <div class="attendance-grid" id="att-calendar"></div>
           <div class="att-legend">
-            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(34,197,94,0.5);"></div>Present</div>
-            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(245,158,11,0.5);"></div>Leave</div>
-            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(239,68,68,0.4);"></div>Absent</div>
-            <div class="att-leg-item"><div class="att-leg-dot" style="background:var(--bg3);border:1px solid var(--border);"></div>Future</div>
+            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(45,212,168,0.7);"></div>Present</div>
+            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(240,180,41,0.7);"></div>Leave</div>
+            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(255,107,107,0.65);"></div>Absent</div>
+            <div class="att-leg-item"><div class="att-leg-dot" style="background:rgba(255,255,255,0.06);border:1px solid rgba(120,160,150,0.25);"></div>Future</div>
           </div>
-        </div>
-        <!-- Today's Login/Logout History -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">📋 Today's Login History</div>
-          <div id="att-login-history">
-            <div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No history yet today</div>
-          </div>
+        </section>
+
+        <!-- Today + monthly records -->
+        <div class="att-panels">
+          <section class="att-panel" aria-label="Today login history">
+            <div class="att-panel-head">
+              <div class="att-panel-title">Today’s Timeline</div>
+              <div class="att-panel-chip">Live</div>
+            </div>
+            <div id="att-login-history">
+              <div class="att-empty">No check-ins yet today</div>
+            </div>
+          </section>
+
+          <section class="att-panel" aria-label="Monthly login records">
+            <div class="att-panel-head">
+              <div class="att-panel-title">Month Records</div>
+              <div class="att-panel-chip" id="att-records-chip">Recent</div>
+            </div>
+            <div id="att-recent-list">
+              <div class="att-empty">No records this month</div>
+            </div>
+          </section>
         </div>
 
-        <!-- Monthly Attendance List -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">📅 Monthly Login Records</div>
-          <div id="att-recent-list">
-            <div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No records this month</div>
+        <!-- Leave tickets -->
+        <section class="att-leaves-shell" aria-label="Leave records">
+          <div class="att-panel-head">
+            <div class="att-panel-title">Leave Tickets</div>
           </div>
-        </div>
-
-        <!-- Leaves list -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">Leave Records</div>
           <div class="leave-list" id="leave-list">
             <div class="empty-state"><div class="empty-icon">🏖</div><div class="empty-text">No leaves applied</div></div>
           </div>
-        </div>
+        </section>
       </div>
 
       <!-- ======= NOTES ======= -->
@@ -5837,6 +6342,7 @@ function renderAttendance() {
   const todayKey = toDateKey(now);
   const monthStr = `${year}-${String(month+1).padStart(2,'0')}`;
   const isCurrentMonthView = attMonthOffset === 0;
+  const monthLabel = viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   // Build leave date set
   const leaveDates = new Set();
@@ -5875,8 +6381,16 @@ function renderAttendance() {
   const total = presentCount + leaveCount + absentCount;
   const rate = total > 0 ? Math.round(((presentCount + leaveCount) / total) * 100) : 0;
   document.getElementById('att-rate-text').textContent = rate + '%';
+
+  // Animate presence ring
+  const ring = document.getElementById('att-ring-progress');
+  if (ring) {
+    const circ = 283;
+    ring.style.strokeDashoffset = String(circ - (circ * rate) / 100);
+  }
+
   const statsTitle = document.getElementById('att-stats-title');
-  if (statsTitle) statsTitle.textContent = isCurrentMonthView ? 'This Month' : viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  if (statsTitle) statsTitle.textContent = isCurrentMonthView ? 'This Month' : monthLabel;
 
   // ── Login/Logout History for today ──────────────────────────────────────
   const historyEl = document.getElementById('att-login-history');
@@ -5884,35 +6398,44 @@ function renderAttendance() {
     const todayAtt = state.attendance.find(a => a.date === todayKey);
     const hist = todayAtt && todayAtt.history ? todayAtt.history : [];
     if (hist.length === 0) {
-      historyEl.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No history yet today</div>';
+      historyEl.innerHTML = '<div class="att-empty">No check-ins yet today</div>';
     } else {
-      historyEl.innerHTML = hist.map(h => `
-        <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
-          <span style="font-size:1rem;">${h.type === 'login' ? '🟢' : '🔴'}</span>
-          <span style="font-weight:600;font-size:0.82rem;color:${h.type === 'login' ? 'var(--success)' : 'var(--danger)'};">${h.type === 'login' ? 'Login' : 'Logout'}</span>
-          <span style="font-size:0.82rem;color:var(--muted);margin-left:auto;">${h.time}</span>
-        </div>`).join('');
+      historyEl.innerHTML = `<div class="att-timeline">${hist.map(h => {
+        const isLogin = h.type === 'login';
+        return `
+        <div class="att-tl-item">
+          <div class="att-tl-dot ${isLogin ? 'login' : 'logout'}"></div>
+          <div>
+            <div class="att-tl-label">${isLogin ? 'Checked in' : 'Checked out'}</div>
+            <div class="att-tl-sub">${isLogin ? 'Session started' : 'Session ended'}</div>
+          </div>
+          <div class="att-tl-time">${h.time}</div>
+        </div>`;
+      }).join('')}</div>`;
     }
   }
 
-  // ── Monthly attendance list (last 10 present days) ───────────────────────
+  // ── Monthly attendance list (last 15 present days) ───────────────────────
   const attListEl = document.getElementById('att-recent-list');
   if (attListEl) {
     const monthAtts = state.attendance
       .filter(a => a.date.startsWith(monthStr) && a.status === 'present')
       .sort((a,b) => b.date.localeCompare(a.date))
       .slice(0, 15);
+    const chip = document.getElementById('att-records-chip');
+    if (chip) chip.textContent = monthAtts.length ? `${monthAtts.length} days` : 'Recent';
     if (monthAtts.length === 0) {
-      attListEl.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:8px 0;">No records this month</div>';
+      attListEl.innerHTML = '<div class="att-empty">No records this month</div>';
     } else {
       attListEl.innerHTML = monthAtts.map(a => {
         const hist = a.history || [];
-        const histStr = hist.length > 0
-          ? hist.map(h => `<span style="color:${h.type==='login'?'var(--success)':'var(--danger)'};">${h.type==='login'?'↑':'↓'}${h.time}</span>`).join(' ')
-          : `<span style="color:var(--success);">↑${a.loginTime||'—'}</span>${a.logoutTime ? ` <span style="color:var(--danger);">↓${a.logoutTime}</span>` : ''}`;
-        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
-          <span style="font-size:0.82rem;font-weight:600;min-width:90px;">${a.date}</span>
-          <span style="font-size:0.75rem;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;">${histStr}</span>
+        const pills = hist.length > 0
+          ? hist.map(h => `<span class="att-pill ${h.type==='login'?'in':'out'}">${h.type==='login'?'IN':'OUT'} ${h.time}</span>`).join('')
+          : `<span class="att-pill in">IN ${a.loginTime||'—'}</span>${a.logoutTime ? `<span class="att-pill out">OUT ${a.logoutTime}</span>` : ''}`;
+        const pretty = new Date(a.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        return `<div class="att-record">
+          <div class="att-record-date">${pretty}</div>
+          <div class="att-record-pills">${pills}</div>
         </div>`;
       }).join('');
     }
@@ -5924,14 +6447,14 @@ function renderAttendance() {
   const monthEnd = `${monthStr}-${String(daysInMonth).padStart(2,'0')}`;
   const monthLeaves = state.leaves.filter(l => l.startDate <= monthEnd && l.endDate >= monthStart);
   if (monthLeaves.length === 0) {
-    leaveList.innerHTML = `<div class="empty-state"><div class="empty-icon">🏖</div><div class="empty-text">No leaves in ${viewDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div></div>`;
+    leaveList.innerHTML = `<div class="empty-state"><div class="empty-icon">🏖</div><div class="empty-text">No leaves in ${monthLabel}</div></div>`;
   } else {
     leaveList.innerHTML = [...monthLeaves].reverse().map(l => {
       const realIdx = state.leaves.indexOf(l);
       return `
       <div class="leave-item">
         <div>
-          <div class="leave-dates">📅 ${l.startDate} → ${l.endDate}</div>
+          <div class="leave-dates">${l.startDate} → ${l.endDate}</div>
           <div class="leave-reason">${escHtml(l.reason)}</div>
         </div>
         <div class="leave-badge">Leave</div>
