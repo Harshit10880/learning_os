@@ -1339,6 +1339,349 @@ input, textarea, select { font-family: inherit; outline: none; }
   padding: 20px 24px; box-shadow: var(--shadow-accent);
 }
 
+/* ── Insight Board — analytics page only ── */
+#page-analytics {
+  --an-ink: #f3f0ff;
+  --an-amber: #fbbf24;
+  --an-amber-dim: rgba(251,191,36,0.14);
+  --an-sky: #38bdf8;
+  --an-sky-dim: rgba(56,189,248,0.14);
+  --an-violet: #a78bfa;
+  --an-violet-dim: rgba(167,139,250,0.14);
+  --an-rose: #fb7185;
+  --an-line: rgba(180, 160, 220, 0.16);
+  --an-panel: rgba(22, 16, 40, 0.9);
+  position: relative;
+}
+#page-analytics::before {
+  content: '';
+  position: absolute;
+  inset: -24px -12px auto -12px;
+  height: 280px;
+  background:
+    radial-gradient(ellipse 70% 65% at 18% 18%, rgba(251,191,36,0.14), transparent 55%),
+    radial-gradient(ellipse 55% 50% at 90% 8%, rgba(56,189,248,0.12), transparent 52%),
+    radial-gradient(ellipse 40% 40% at 55% 0%, rgba(167,139,250,0.1), transparent 50%),
+    linear-gradient(180deg, rgba(22,14,40,0.55), transparent);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 0 0 42% 42% / 0 0 30px 30px;
+}
+#page-analytics > * { position: relative; z-index: 1; }
+
+#page-analytics .page-header {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#page-analytics .page-title {
+  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  letter-spacing: -0.04em;
+  background: linear-gradient(120deg, #fff8e8 15%, #fbbf24 55%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#page-analytics .page-sub { color: rgba(210, 200, 240, 0.6); max-width: 40ch; }
+
+.an-export-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px;
+  border-radius: 12px;
+  font-weight: 700; font-size: 0.82rem;
+  color: #1a1208;
+  background: linear-gradient(135deg, #fde68a, #fbbf24 55%, #f59e0b);
+  box-shadow: 0 8px 24px rgba(251,191,36,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.an-export-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 28px rgba(251,191,36,0.35);
+}
+
+.an-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.an-hero-main {
+  padding: 22px 24px;
+  border-radius: 20px;
+  background:
+    linear-gradient(145deg, rgba(36,26,58,0.96), rgba(18,12,34,0.94)),
+    var(--an-panel);
+  border: 1px solid var(--an-line);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+}
+.an-hero-main::after {
+  content: '';
+  position: absolute;
+  right: -50px; top: -50px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(251,191,36,0.18), transparent 70%);
+  pointer-events: none;
+}
+.an-hero-kicker {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--an-amber);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.an-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--an-ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.an-hero-sub {
+  font-size: 0.8rem;
+  color: rgba(210,200,240,0.55);
+  line-height: 1.45;
+  margin-bottom: 16px;
+  max-width: 42ch;
+}
+.an-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.an-kpi {
+  padding: 12px 12px 11px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: rgba(255,255,255,0.03);
+  transition: transform 0.22s ease, border-color 0.22s ease;
+}
+.an-kpi:hover { transform: translateY(-2px); }
+.an-kpi.hours { background: var(--an-amber-dim); border-color: rgba(251,191,36,0.22); }
+.an-kpi.sessions { background: var(--an-sky-dim); border-color: rgba(56,189,248,0.22); }
+.an-kpi.progress { background: var(--an-violet-dim); border-color: rgba(167,139,250,0.22); }
+.an-kpi.tasks { background: rgba(251,113,133,0.12); border-color: rgba(251,113,133,0.22); }
+.an-kpi-val {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--an-ink);
+}
+.an-kpi.hours .an-kpi-val { color: #fcd34d; }
+.an-kpi.sessions .an-kpi-val { color: #7dd3fc; }
+.an-kpi.progress .an-kpi-val { color: #c4b5fd; }
+.an-kpi.tasks .an-kpi-val { color: #fda4af; }
+.an-kpi-lbl {
+  font-size: 0.65rem;
+  color: rgba(210,200,240,0.5);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.an-control-panel {
+  padding: 18px 18px 16px;
+  border-radius: 20px;
+  background: linear-gradient(165deg, rgba(30,22,52,0.95), rgba(14,10,28,0.92));
+  border: 1px solid var(--an-line);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.an-control-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(200,190,230,0.5);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+#page-analytics #range-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+#page-analytics .range-btn {
+  padding: 7px 13px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(180,160,220,0.14);
+  color: rgba(210,200,240,0.55);
+  font-size: 0.74rem;
+}
+#page-analytics .range-btn:hover {
+  border-color: rgba(251,191,36,0.35);
+  color: var(--an-ink);
+  background: rgba(251,191,36,0.08);
+}
+#page-analytics .range-btn.active {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-color: transparent;
+  color: #1a1208;
+  box-shadow: 0 4px 16px rgba(251,191,36,0.3);
+}
+.an-day-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px dashed var(--an-line);
+  padding-top: 14px;
+}
+#page-analytics #analytics-day-picker {
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(180,160,220,0.2);
+  border-radius: 10px;
+  color: var(--an-ink);
+  font-size: 0.82rem;
+  color-scheme: dark;
+}
+#page-analytics #analytics-day-picker:focus {
+  border-color: rgba(56,189,248,0.5);
+  box-shadow: 0 0 0 2px rgba(56,189,248,0.15);
+  outline: none;
+}
+.an-day-hint {
+  font-size: 0.72rem;
+  color: rgba(210,200,240,0.45);
+}
+
+#page-analytics #day-lookup-result {
+  margin-bottom: 18px;
+}
+#page-analytics .day-lookup-card {
+  background: linear-gradient(145deg, rgba(36,28,58,0.98), rgba(18,14,34,0.95));
+  border: 1px solid rgba(56,189,248,0.28);
+  border-radius: 18px;
+  padding: 20px 22px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(56,189,248,0.06);
+}
+.an-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.an-day-date {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--an-ink);
+  letter-spacing: -0.02em;
+}
+.an-day-status {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+.an-day-status.present { background: rgba(45,212,168,0.14); color: #5eead4; }
+.an-day-status.leave { background: rgba(251,191,36,0.14); color: #fcd34d; }
+.an-day-status.absent { background: rgba(251,113,133,0.14); color: #fda4af; }
+.an-day-metrics {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.an-day-metric-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  color: #7dd3fc;
+}
+.an-day-metric-lbl {
+  font-size: 0.68rem;
+  color: rgba(210,200,240,0.5);
+  margin-top: 2px;
+}
+.an-day-session {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) 1.4fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(180,160,220,0.1);
+}
+.an-day-session:last-child { border-bottom: none; }
+.an-day-subj { font-weight: 600; font-size: 0.84rem; }
+.an-day-task { color: rgba(210,200,240,0.5); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.an-day-dur { font-weight: 700; font-size: 0.8rem; color: var(--an-ink); font-variant-numeric: tabular-nums; }
+.an-day-empty {
+  font-size: 0.82rem;
+  color: rgba(210,200,240,0.45);
+  padding: 8px 0 2px;
+}
+
+.an-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+#page-analytics .chart-card {
+  background: linear-gradient(165deg, rgba(28,20,50,0.96), rgba(14,10,28,0.92));
+  border: 1px solid var(--an-line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+#page-analytics .chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--an-card-accent, #fbbf24), transparent);
+  opacity: 0.7;
+}
+#page-analytics .chart-card.accent-amber { --an-card-accent: #fbbf24; }
+#page-analytics .chart-card.accent-sky { --an-card-accent: #38bdf8; }
+#page-analytics .chart-card.accent-violet { --an-card-accent: #a78bfa; }
+#page-analytics .chart-card.accent-rose { --an-card-accent: #fb7185; }
+#page-analytics .chart-card .card-title,
+#page-analytics .an-chart-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(200,190,230,0.5);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+#page-analytics .chart-wrap {
+  height: 210px;
+}
+
+@media (max-width: 900px) {
+  .an-hero { grid-template-columns: 1fr; }
+  .an-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  #page-analytics::before { height: 200px; }
+  .an-hero-main, .an-control-panel { padding: 16px; border-radius: 16px; }
+  .an-charts { grid-template-columns: 1fr; }
+  #page-analytics .chart-card { border-radius: 16px; padding: 14px; }
+  #page-analytics .chart-wrap { height: 190px; }
+  .an-kpi-val { font-size: 1.1rem; }
+  .an-day-session { grid-template-columns: 1fr auto; }
+  .an-day-task { grid-column: 1 / -1; }
+}
+
 /* ===================== MODALS ===================== */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
@@ -2731,46 +3074,77 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 
       <!-- ======= ANALYTICS ======= -->
       <div class="page" id="page-analytics">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div class="page-header">
           <div>
             <div class="page-title">Analytics</div>
-            <div class="page-sub">Insights into your learning</div>
+            <div class="page-sub">Insight board — study hours, progress signals, and day-level lookup</div>
           </div>
-          <button class="btn-accent" onclick="exportData()">⬇ Export Data (JSON)</button>
+          <button class="an-export-btn" onclick="exportData()" type="button">Export JSON</button>
         </div>
 
-        <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="range-selector">
-            <button class="range-btn" data-range="1" onclick="setAnalyticsRange(1)">1 Month</button>
-            <button class="range-btn" data-range="3" onclick="setAnalyticsRange(3)">3 Months</button>
-            <button class="range-btn active" data-range="6" onclick="setAnalyticsRange(6)">6 Months</button>
-            <button class="range-btn" data-range="12" onclick="setAnalyticsRange(12)">1 Year</button>
-            <button class="range-btn" data-range="all" onclick="setAnalyticsRange('all')">All Time</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <input type="date" id="analytics-day-picker" onchange="lookupSpecificDay()" style="padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:0.82rem;">
-            <span style="font-size:0.78rem;color:var(--muted);">check a specific day</span>
-          </div>
-        </div>
-        <div id="day-lookup-result" style="display:none;margin-bottom:18px;"></div>
+        <div class="an-hero">
+          <section class="an-hero-main" aria-label="Analytics overview">
+            <div class="an-hero-kicker" id="an-range-label">Last 6 Months</div>
+            <div class="an-hero-title">Performance snapshot</div>
+            <div class="an-hero-sub">Totals and averages for the window you select — charts below follow the same range.</div>
+            <div class="an-kpi-row">
+              <div class="an-kpi hours">
+                <div class="an-kpi-val" id="an-kpi-hours">0h</div>
+                <div class="an-kpi-lbl">Study time</div>
+              </div>
+              <div class="an-kpi sessions">
+                <div class="an-kpi-val" id="an-kpi-sessions">0</div>
+                <div class="an-kpi-lbl">Sessions</div>
+              </div>
+              <div class="an-kpi progress">
+                <div class="an-kpi-val" id="an-kpi-progress">0%</div>
+                <div class="an-kpi-lbl">Avg progress</div>
+              </div>
+              <div class="an-kpi tasks">
+                <div class="an-kpi-val" id="an-kpi-tasks">0%</div>
+                <div class="an-kpi-lbl">Tasks done</div>
+              </div>
+            </div>
+          </section>
 
-        <div class="grid-2" style="margin-bottom:18px;">
-          <div class="chart-card">
-            <div class="card-title">Subject Performance</div>
+          <section class="an-control-panel" aria-label="Range and day lookup">
+            <div>
+              <div class="an-control-label">Time window</div>
+              <div id="range-selector">
+                <button class="range-btn" data-range="1" onclick="setAnalyticsRange(1)" type="button">1 Mo</button>
+                <button class="range-btn" data-range="3" onclick="setAnalyticsRange(3)" type="button">3 Mo</button>
+                <button class="range-btn active" data-range="6" onclick="setAnalyticsRange(6)" type="button">6 Mo</button>
+                <button class="range-btn" data-range="12" onclick="setAnalyticsRange(12)" type="button">1 Yr</button>
+                <button class="range-btn" data-range="all" onclick="setAnalyticsRange('all')" type="button">All</button>
+              </div>
+            </div>
+            <div>
+              <div class="an-control-label">Day lookup</div>
+              <div class="an-day-row">
+                <input type="date" id="analytics-day-picker" onchange="lookupSpecificDay()" aria-label="Pick a day">
+                <span class="an-day-hint">Inspect one day</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div id="day-lookup-result" style="display:none;"></div>
+
+        <div class="an-charts">
+          <div class="chart-card accent-amber">
+            <div class="an-chart-title">Subject Performance</div>
             <div class="chart-wrap"><canvas id="analytics-subjects-chart"></canvas></div>
           </div>
-          <div class="chart-card">
-            <div class="card-title" id="weekly-chart-title">Study Hours Trend</div>
+          <div class="chart-card accent-sky">
+            <div class="an-chart-title" id="weekly-chart-title">Study Hours Trend</div>
             <div class="chart-wrap"><canvas id="analytics-weekly-chart"></canvas></div>
           </div>
-        </div>
-        <div class="grid-2">
-          <div class="chart-card">
-            <div class="card-title">Task Status Breakdown</div>
+          <div class="chart-card accent-rose">
+            <div class="an-chart-title">Task Status Breakdown</div>
             <div class="chart-wrap"><canvas id="analytics-tasks-chart"></canvas></div>
           </div>
-          <div class="chart-card">
-            <div class="card-title">Monthly Study Hours</div>
+          <div class="chart-card accent-violet">
+            <div class="an-chart-title">Monthly Study Hours</div>
             <div class="chart-wrap"><canvas id="analytics-monthly-chart"></canvas></div>
           </div>
         </div>
@@ -6843,31 +7217,40 @@ function lookupSpecificDay() {
   const friendlyDate = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   let attendanceText = 'Absent';
-  let attendanceColor = 'var(--danger)';
-  if (onLeave) { attendanceText = 'On Leave'; attendanceColor = 'var(--warn)'; }
-  else if (att && att.status === 'present') { attendanceText = `Present (${att.loginTime || '—'} → ${att.logoutTime || 'still logged in'})`; attendanceColor = 'var(--success)'; }
+  let statusClass = 'absent';
+  if (onLeave) { attendanceText = 'On Leave'; statusClass = 'leave'; }
+  else if (att && att.status === 'present') {
+    attendanceText = `Present · ${att.loginTime || '—'} → ${att.logoutTime || 'still in'}`;
+    statusClass = 'present';
+  }
 
   const sessionRows = doneSessions.map(s => {
     const subj = state.subjects.find(x => x.id === s.subjectId);
-    const c = subj ? colorForSubject(subj) : '#8b80a8';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
-      <span style="color:${c};font-weight:600;font-size:0.85rem;">${escHtml(getSubjectName(s.subjectId))}</span>
-      <span style="color:var(--muted);font-size:0.8rem;">${escHtml(s.taskName)}</span>
-      <span style="margin-left:auto;font-weight:600;font-size:0.82rem;">${formatHM(s.duration)}</span>
+    const c = subj ? colorForSubject(subj) : '#a78bfa';
+    return `<div class="an-day-session">
+      <span class="an-day-subj" style="color:${c};">${escHtml(getSubjectName(s.subjectId))}</span>
+      <span class="an-day-task">${escHtml(s.taskName)}</span>
+      <span class="an-day-dur">${formatHM(s.duration)}</span>
     </div>`;
   }).join('');
 
   resultDiv.style.display = 'block';
   resultDiv.innerHTML = `<div class="day-lookup-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-      <div style="font-size:1rem;font-weight:700;font-family:var(--font-display);">${friendlyDate}</div>
-      <div style="font-size:0.8rem;font-weight:600;color:${attendanceColor};">● ${attendanceText}</div>
+    <div class="an-day-head">
+      <div class="an-day-date">${friendlyDate}</div>
+      <div class="an-day-status ${statusClass}">${attendanceText}</div>
     </div>
-    <div style="display:flex;gap:24px;margin-bottom:${sessionRows ? '14px' : '0'};flex-wrap:wrap;">
-      <div><div style="font-size:1.4rem;font-weight:800;color:var(--accent3);font-family:var(--font-display);">${formatHM(totalMs)}</div><div style="font-size:0.72rem;color:var(--muted);">Studied</div></div>
-      <div><div style="font-size:1.4rem;font-weight:800;font-family:var(--font-display);">${doneSessions.length}</div><div style="font-size:0.72rem;color:var(--muted);">Sessions</div></div>
+    <div class="an-day-metrics" style="margin-bottom:${sessionRows ? '12px' : '0'};">
+      <div>
+        <div class="an-day-metric-val">${formatHM(totalMs)}</div>
+        <div class="an-day-metric-lbl">Studied</div>
+      </div>
+      <div>
+        <div class="an-day-metric-val" style="color:#c4b5fd;">${doneSessions.length}</div>
+        <div class="an-day-metric-lbl">Sessions</div>
+      </div>
     </div>
-    ${sessionRows ? `<div>${sessionRows}</div>` : '<div style="font-size:0.82rem;color:var(--muted);">No study sessions recorded this day</div>'}
+    ${sessionRows ? `<div>${sessionRows}</div>` : '<div class="an-day-empty">No study sessions recorded this day</div>'}
   </div>`;
 }
 
@@ -6876,12 +7259,38 @@ function renderAnalytics() {
   Object.values(state.analyticsCharts).forEach(c => { try { c.destroy(); } catch {} });
   state.analyticsCharts = {};
 
+  const startDate = getRangeStartDate();
+  const startKey = toDateKey(startDate);
+  const rangeSessions = state.sessions.filter(s => s.status === 'done' && s.date >= startKey);
+  const rangeMs = rangeSessions.reduce((a, s) => a + s.duration, 0);
+  const avgProgress = state.subjects.length
+    ? Math.round(state.subjects.reduce((a, s) => a + calcSubjectProgress(s), 0) / state.subjects.length)
+    : 0;
+  const taskTotal = state.tasks.length;
+  const taskDone = state.tasks.filter(t => t.status === 'completed').length;
+  const taskPct = taskTotal > 0 ? Math.round((taskDone / taskTotal) * 100) : 0;
+
+  const rangeLabels = { 1: 'Last 1 Month', 3: 'Last 3 Months', 6: 'Last 6 Months', 12: 'Last 1 Year', all: 'All Time' };
+  const rangeLabelEl = document.getElementById('an-range-label');
+  if (rangeLabelEl) rangeLabelEl.textContent = rangeLabels[analyticsRange] || 'Selected Range';
+
+  const kpiHours = document.getElementById('an-kpi-hours');
+  const kpiSessions = document.getElementById('an-kpi-sessions');
+  const kpiProgress = document.getElementById('an-kpi-progress');
+  const kpiTasks = document.getElementById('an-kpi-tasks');
+  if (kpiHours) kpiHours.textContent = formatHM(rangeMs);
+  if (kpiSessions) kpiSessions.textContent = String(rangeSessions.length);
+  if (kpiProgress) kpiProgress.textContent = avgProgress + '%';
+  if (kpiTasks) kpiTasks.textContent = taskPct + '%';
+
+  const tick = '#9b8fc4';
+  const grid = 'rgba(180,160,220,0.08)';
   const cOpts = {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#8b80a8', font: { size: 11 } } } },
+    plugins: { legend: { labels: { color: tick, font: { size: 11 } } } },
     scales: {
-      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b80a8', font: { size: 10 } } },
-      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b80a8', font: { size: 10 } }, beginAtZero: true }
+      x: { grid: { color: grid }, ticks: { color: tick, font: { size: 10 } } },
+      y: { grid: { color: grid }, ticks: { color: tick, font: { size: 10 } }, beginAtZero: true }
     }
   };
 
@@ -6893,7 +7302,7 @@ function renderAnalytics() {
       type: 'bar',
       data: {
         labels: state.subjects.map(s => s.name),
-        datasets: [{ label: 'Progress %', data: state.subjects.map(s => calcSubjectProgress(s)), backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 1, borderRadius: 5 }]
+        datasets: [{ label: 'Progress %', data: state.subjects.map(s => calcSubjectProgress(s)), backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 1, borderRadius: 6 }]
       },
       options: { ...cOpts, plugins: { ...cOpts.plugins }, scales: { ...cOpts.scales, y: { ...cOpts.scales.y, max: 100 } } }
     });
@@ -6903,7 +7312,6 @@ function renderAnalytics() {
   const weekCtx = document.getElementById('analytics-weekly-chart');
   const titleEl = document.getElementById('weekly-chart-title');
   if (weekCtx) {
-    const startDate = getRangeStartDate();
     const now = new Date();
     const totalDays = Math.max(1, Math.round((now - startDate) / 86400000));
     let labels = [], data = [];
@@ -6950,7 +7358,14 @@ function renderAnalytics() {
       type: 'line',
       data: {
         labels,
-        datasets: [{ label: 'Hours', data, borderColor: '#9d5cf6', backgroundColor: 'rgba(124,58,237,0.15)', fill: true, tension: 0.3, pointBackgroundColor: '#c084fc', pointRadius: labels.length > 20 ? 0 : 3 }]
+        datasets: [{
+          label: 'Hours', data,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56,189,248,0.14)',
+          fill: true, tension: 0.35,
+          pointBackgroundColor: '#7dd3fc',
+          pointRadius: labels.length > 20 ? 0 : 3
+        }]
       },
       options: cOpts
     });
@@ -6966,9 +7381,14 @@ function renderAnalytics() {
       type: 'doughnut',
       data: {
         labels: ['Completed', 'Pending', 'Cancelled'],
-        datasets: [{ data: [done, pend, can], backgroundColor: ['rgba(34,197,94,0.7)', 'rgba(245,158,11,0.7)', 'rgba(239,68,68,0.7)'], borderColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 1 }]
+        datasets: [{
+          data: [done, pend, can],
+          backgroundColor: ['rgba(52,211,153,0.75)', 'rgba(251,191,36,0.75)', 'rgba(251,113,133,0.75)'],
+          borderColor: ['#34d399', '#fbbf24', '#fb7185'],
+          borderWidth: 1
+        }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8b80a8', font: { size: 11 } } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: tick, font: { size: 11 } } } } }
     });
   }
 
@@ -6990,7 +7410,13 @@ function renderAnalytics() {
       type: 'bar',
       data: {
         labels: months,
-        datasets: [{ label: 'Hours', data, backgroundColor: 'rgba(56,189,248,0.5)', borderColor: '#38bdf8', borderWidth: 1, borderRadius: 5 }]
+        datasets: [{
+          label: 'Hours', data,
+          backgroundColor: 'rgba(167,139,250,0.55)',
+          borderColor: '#a78bfa',
+          borderWidth: 1,
+          borderRadius: 6
+        }]
       },
       options: cOpts
     });
