@@ -171,6 +171,18 @@
   --radius-sm: 8px;
   --shadow:    0 4px 24px rgba(0,0,0,0.4);
   --shadow-accent: 0 0 24px rgba(124,58,237,0.3);
+  /* Mint theme — Presence Ledger palette (Attendance) */
+  --mint-ink: #e8f4f1;
+  --mint: #2dd4a8;
+  --mint-dim: rgba(45,212,168,0.14);
+  --mint-coral: #ff6b6b;
+  --mint-coral-dim: rgba(255,107,107,0.14);
+  --mint-amber: #f0b429;
+  --mint-amber-dim: rgba(240,180,41,0.14);
+  --mint-panel: rgba(18, 28, 38, 0.88);
+  --mint-line: rgba(120, 160, 150, 0.18);
+  --mint-sub: rgba(180, 210, 200, 0.65);
+  --mint-muted: rgba(180, 210, 200, 0.55);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 15px; }
@@ -807,16 +819,16 @@ input, textarea, select { font-family: inherit; outline: none; }
 
 /* ── Presence Ledger — attendance page only ── */
 #page-attendance {
-  --att-ink: #e8f4f1;
-  --att-mint: #2dd4a8;
-  --att-mint-dim: rgba(45,212,168,0.14);
-  --att-coral: #ff6b6b;
-  --att-coral-dim: rgba(255,107,107,0.14);
-  --att-amber: #f0b429;
-  --att-amber-dim: rgba(240,180,41,0.14);
+  --att-ink: var(--mint-ink);
+  --att-mint: var(--mint);
+  --att-mint-dim: var(--mint-dim);
+  --att-coral: var(--mint-coral);
+  --att-coral-dim: var(--mint-coral-dim);
+  --att-amber: var(--mint-amber);
+  --att-amber-dim: var(--mint-amber-dim);
   --att-slate: #1a2430;
-  --att-panel: rgba(18, 28, 38, 0.88);
-  --att-line: rgba(120, 160, 150, 0.18);
+  --att-panel: var(--mint-panel);
+  --att-line: var(--mint-line);
   position: relative;
 }
 #page-attendance::before {
@@ -1266,6 +1278,291 @@ input, textarea, select { font-family: inherit; outline: none; }
   .att-cal-shell, .att-panel, .att-leaves-shell { padding: 14px; border-radius: 16px; }
   #page-attendance .att-day { border-radius: 8px; font-size: 0.68rem; }
   .att-record { grid-template-columns: 76px 1fr; }
+}
+
+/* ===================== MINT THEME — Dashboard, Subjects, Tasks, Timer, Notes ===================== */
+#page-dashboard,
+#page-subjects,
+#page-tasks,
+#page-timer,
+#page-notes {
+  position: relative;
+}
+#page-dashboard::before,
+#page-subjects::before,
+#page-tasks::before,
+#page-timer::before,
+#page-notes::before {
+  content: '';
+  position: absolute;
+  inset: -24px -12px auto -12px;
+  height: 280px;
+  background:
+    radial-gradient(ellipse 80% 70% at 12% 20%, rgba(45,212,168,0.16), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 88% 10%, rgba(56,189,248,0.1), transparent 50%),
+    linear-gradient(180deg, rgba(16,24,34,0.5), transparent);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 0 0 40% 40% / 0 0 28px 28px;
+}
+#page-dashboard > *,
+#page-subjects > *,
+#page-tasks > *,
+#page-timer > *,
+#page-notes > * { position: relative; z-index: 1; }
+
+#page-subjects .page-header,
+#page-tasks .page-header,
+#page-timer .page-header,
+#page-notes .page-header {
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+#page-subjects .page-title,
+#page-tasks .page-title,
+#page-timer .page-title,
+#page-notes .page-title {
+  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  letter-spacing: -0.04em;
+  background: linear-gradient(120deg, #f0fff9 20%, var(--mint) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#page-subjects .page-sub,
+#page-tasks .page-sub,
+#page-timer .page-sub,
+#page-notes .page-sub { color: var(--mint-sub); max-width: 40ch; }
+
+#page-dashboard .card,
+#page-subjects .card,
+#page-tasks .card,
+#page-timer .card,
+#page-notes .card {
+  border-radius: 18px;
+  border: 1px solid var(--mint-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.95), rgba(12,20,28,0.9));
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+#page-dashboard .card-title,
+#page-subjects .card-title,
+#page-tasks .card-title,
+#page-timer .card-title,
+#page-notes .card-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--mint-muted);
+  font-weight: 700;
+}
+
+#page-dashboard .btn-accent,
+#page-subjects .btn-accent,
+#page-subjects .btn-add-subject,
+#page-tasks .btn-accent,
+#page-timer .btn-accent,
+#page-notes .btn-accent {
+  color: #06241c;
+  background: linear-gradient(135deg, #3ee0b4, var(--mint) 50%, #1fb890);
+  box-shadow: 0 8px 24px rgba(45,212,168,0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+#page-dashboard .btn-accent:hover,
+#page-subjects .btn-accent:hover,
+#page-subjects .btn-add-subject:hover,
+#page-tasks .btn-accent:hover,
+#page-timer .btn-accent:hover,
+#page-notes .btn-accent:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 28px rgba(45,212,168,0.38);
+}
+
+/* Dashboard */
+#page-dashboard #dash-meta {
+  border-radius: 20px;
+  border: 1px solid var(--mint-line);
+  background: linear-gradient(145deg, rgba(26,42,52,0.95), rgba(14,22,30,0.92));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04);
+  padding: 18px 24px;
+}
+#page-dashboard .meta-val { color: var(--mint-ink); }
+#page-dashboard .meta-lbl { color: var(--mint-muted); }
+#page-dashboard .meta-divider { background: var(--mint-line); }
+#page-dashboard #dash-streak { color: var(--mint-amber) !important; }
+
+#page-dashboard #daily-goal-card {
+  border-radius: 20px;
+  border: 1px solid rgba(45,212,168,0.22);
+  background: linear-gradient(145deg, rgba(26,42,52,0.95), rgba(14,22,30,0.92));
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+#page-dashboard #daily-goal-card::before {
+  background: linear-gradient(90deg, var(--mint), #38bdf8);
+}
+#page-dashboard .goal-title { color: var(--mint-muted); letter-spacing: 0.14em; }
+#page-dashboard .goal-edit-btn {
+  border-color: rgba(45,212,168,0.28);
+  color: var(--mint);
+}
+#page-dashboard .goal-subject { color: var(--mint-ink); }
+#page-dashboard .goal-target,
+#page-dashboard .goal-progress-label { color: var(--mint-muted); }
+#page-dashboard .goal-progress-wrap { background: rgba(255,255,255,0.06); }
+#page-dashboard .goal-progress-fill { background: linear-gradient(90deg, var(--mint), #5eead4); }
+#page-dashboard .goal-empty-btn:hover { color: var(--mint); }
+
+#page-dashboard .stat-pill,
+#page-dashboard .task-pill {
+  border-radius: 14px;
+  border: 1px solid var(--mint-line);
+  background: rgba(255,255,255,0.03);
+}
+#page-dashboard .task-pill.total .val { color: var(--mint); }
+#page-dashboard .stat-value { color: var(--mint-ink); }
+#page-dashboard .stat-label { color: var(--mint-muted); }
+
+#page-dashboard .round-progress .track { stroke: rgba(255,255,255,0.06); }
+#page-dashboard .round-progress .pct { color: var(--mint-ink); }
+#page-dashboard .round-progress .sub { color: var(--mint-muted); }
+
+#page-dashboard .subject-bar-fill {
+  background: linear-gradient(90deg, var(--mint), #5eead4);
+}
+#page-dashboard .subject-bar-track { background: rgba(255,255,255,0.06); }
+#page-dashboard .subject-bar-name { color: var(--mint-ink); }
+#page-dashboard .subject-bar-pct { color: var(--mint-muted); }
+
+#page-dashboard .study-hero-card {
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(26,42,52,0.95), rgba(14,22,30,0.92));
+  border: 1px solid var(--mint-line);
+}
+#page-dashboard .study-hero-card::before {
+  background: radial-gradient(circle, rgba(45,212,168,0.2), transparent 70%);
+}
+#page-dashboard .study-hero-badge {
+  background: var(--mint-dim);
+  color: var(--mint);
+  border-color: rgba(45,212,168,0.25);
+}
+#page-dashboard .study-big-number {
+  background: linear-gradient(135deg, #7dffd0, var(--mint));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+#page-dashboard .study-hero-sub,
+#page-dashboard .study-mini-lbl { color: var(--mint-muted); }
+#page-dashboard .study-mini-val { color: var(--mint-ink); }
+#page-dashboard .empty-state { color: var(--mint-muted); }
+
+/* Subjects */
+#page-subjects .inline-form input {
+  border-radius: 12px;
+  border: 1px solid var(--mint-line);
+  background: rgba(14,22,30,0.85);
+  color: var(--mint-ink);
+}
+#page-subjects .inline-form input:focus { border-color: rgba(45,212,168,0.45); }
+#page-subjects .subject-card {
+  border-radius: 18px;
+  border: 1px solid var(--mint-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.95), rgba(12,20,28,0.9));
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+}
+#page-subjects .subject-card::before {
+  background: linear-gradient(90deg, var(--mint), #5eead4);
+}
+#page-subjects .subject-card:hover {
+  border-color: rgba(45,212,168,0.35);
+  box-shadow: 0 0 24px rgba(45,212,168,0.15);
+}
+#page-subjects .sc-name { color: var(--mint-ink); }
+#page-subjects .sc-meta { color: var(--mint-muted); }
+#page-subjects .sc-bar-track { background: rgba(255,255,255,0.06); }
+#page-subjects .sc-bar-fill { background: linear-gradient(90deg, var(--mint), #5eead4); }
+#page-subjects .sc-pct { color: var(--mint); }
+
+/* Tasks & Notes */
+#page-tasks .tasks-controls input,
+#page-tasks .tasks-controls select,
+#page-notes .tasks-controls input,
+#page-notes .tasks-controls select {
+  border-radius: 12px;
+  border: 1px solid var(--mint-line);
+  background: rgba(14,22,30,0.85);
+  color: var(--mint-ink);
+}
+#page-tasks .tasks-controls input:focus,
+#page-tasks .tasks-controls select:focus,
+#page-notes .tasks-controls input:focus,
+#page-notes .tasks-controls select:focus {
+  border-color: rgba(45,212,168,0.45);
+}
+#page-tasks .task-item,
+#page-notes .task-item {
+  border-radius: 14px;
+  border: 1px solid var(--mint-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.92), rgba(12,20,28,0.88));
+}
+#page-tasks .task-item:hover,
+#page-notes .task-item:hover { border-color: rgba(45,212,168,0.28); }
+#page-tasks .task-name,
+#page-notes .task-name { color: var(--mint-ink); }
+#page-tasks .tag.subject,
+#page-notes .tag.subject {
+  background: var(--mint-dim);
+  color: #7dffd0;
+}
+#page-tasks .btn-icon,
+#page-notes .btn-icon {
+  border-color: var(--mint-line);
+  color: var(--mint-muted);
+}
+#page-tasks .btn-icon:hover,
+#page-notes .btn-icon:hover {
+  border-color: rgba(45,212,168,0.35);
+  color: var(--mint);
+}
+
+/* Timer */
+#page-timer .timer-card {
+  border-radius: 18px;
+  border: 1px solid var(--mint-line);
+  background: linear-gradient(165deg, rgba(20,32,42,0.95), rgba(12,20,28,0.9));
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+}
+#page-timer .timer-card::before { background: var(--mint); }
+#page-timer .timer-card-subject { color: var(--mint-ink); }
+#page-timer .timer-card-status { color: var(--mint-muted); letter-spacing: 0.14em; }
+#page-timer .timer-card-display.running { color: var(--mint); }
+#page-timer .btn-start {
+  background: linear-gradient(135deg, #3ee0b4, var(--mint) 50%, #1fb890);
+  color: #06241c;
+  box-shadow: 0 6px 20px rgba(45,212,168,0.25);
+}
+#page-timer .pending-session-item {
+  border-radius: 12px;
+  border: 1px solid var(--mint-line);
+  background: rgba(255,255,255,0.03);
+}
+#page-timer .session-dot { background: var(--mint); }
+#page-timer .session-sub { color: var(--mint); }
+#page-timer .session-item {
+  border-color: var(--mint-line);
+  background: rgba(255,255,255,0.02);
+}
+
+@media (max-width: 700px) {
+  #page-dashboard::before,
+  #page-subjects::before,
+  #page-tasks::before,
+  #page-timer::before,
+  #page-notes::before { height: 200px; }
 }
 
 /* ===================== COMMUNITY PAGE ===================== */
@@ -2758,8 +3055,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
                     stroke-dashoffset="364.4"/>
                   <defs>
                     <linearGradient id="pgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style="stop-color:#7c3aed"/>
-                      <stop offset="100%" style="stop-color:#c084fc"/>
+                      <stop offset="0%" style="stop-color:#2dd4a8"/>
+                      <stop offset="100%" style="stop-color:#5eead4"/>
                     </linearGradient>
                   </defs>
                 </svg>
@@ -2783,8 +3080,8 @@ input, textarea { -webkit-user-select: text; user-select: text; }
                     stroke-dashoffset="364.4"/>
                   <defs>
                     <linearGradient id="attGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style="stop-color:#22c55e"/>
-                      <stop offset="100%" style="stop-color:#86efac"/>
+                      <stop offset="0%" style="stop-color:#2dd4a8"/>
+                      <stop offset="100%" style="stop-color:#38bdf8"/>
                     </linearGradient>
                   </defs>
                 </svg>
