@@ -2750,6 +2750,93 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 }
 .modal::-webkit-scrollbar { width: 4px; }
 .modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+/* ===================== DAILY SUBJECT STUDY MATRIX TABLE STYLES ===================== */
+.study-matrix-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+.matrix-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.matrix-badge-live { font-size: 0.68rem; background: rgba(45, 212, 168, 0.15); color: #2dd4a8; border: 1px solid rgba(45, 212, 168, 0.3); border-radius: 20px; padding: 2px 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.matrix-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.matrix-select-sm { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 6px 10px; font-size: 0.8rem; outline: none; }
+.btn-matrix-action { font-size: 0.78rem; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn-matrix-outline { background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+.btn-matrix-outline:hover { background: var(--border); color: var(--text-bright); }
+.btn-matrix-primary { background: linear-gradient(135deg, var(--accent), #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); }
+.btn-matrix-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+
+.matrix-stats-bar { display: flex; align-items: center; gap: 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.matrix-stat-item { display: flex; flex-direction: column; gap: 2px; }
+.matrix-stat-item .stat-lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.matrix-stat-item .stat-val { font-size: 0.95rem; font-weight: 700; color: var(--text); font-family: var(--font-display); }
+.matrix-stat-item .stat-val.highlight { color: #38bdf8; }
+.matrix-stat-divider { width: 1px; height: 24px; background: var(--border); }
+
+.matrix-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg1); max-height: 480px; overflow-y: auto; }
+.daily-matrix-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.83rem; white-space: nowrap; }
+.daily-matrix-table th { position: sticky; top: 0; background: var(--bg3); color: var(--text-bright); font-weight: 700; padding: 12px 14px; border-bottom: 2px solid var(--border); z-index: 2; font-family: var(--font-display); }
+.daily-matrix-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+.daily-matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+.daily-matrix-table tfoot td { position: sticky; bottom: 0; background: var(--bg3); font-weight: 700; border-top: 2px solid var(--border); color: var(--text-bright); z-index: 2; }
+
+.matrix-cell-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.78rem; font-family: var(--font-display); cursor: pointer; }
+.matrix-cell-empty { color: var(--muted); opacity: 0.5; }
+.matrix-date-cell { font-weight: 600; color: var(--text-bright); display: flex; align-items: center; gap: 6px; }
+.matrix-date-today { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+.matrix-row-total { font-weight: 700; color: var(--accent); font-family: var(--font-display); }
+
+.matrix-cols-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.matrix-col-checkbox-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s ease; }
+.matrix-col-checkbox-card:hover { border-color: var(--accent); }
+.matrix-col-checkbox-card input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+.matrix-col-name { font-size: 0.84rem; font-weight: 600; }
+.matrix-col-type { font-size: 0.7rem; color: var(--muted); margin-left: auto; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; }
+
+
+/* ===================== GREEN/TEAL DASHBOARD THEME OVERRIDES FOR COMMUNITY & FRIENDS ===================== */
+/* ── Community Page ── */
+#page-community .page-title { background: linear-gradient(135deg, #2dd4a8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: 800; }
+#page-community .post-form-area { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.25); border-radius: var(--radius-lg); backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
+#page-community .post-form-area textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius); transition: all 0.2s ease; }
+#page-community .post-form-area textarea:focus { border-color: #2dd4a8; box-shadow: 0 0 12px rgba(45, 212, 168, 0.25); outline: none; }
+#page-community .attach-btn { background: rgba(45, 212, 168, 0.08); border: 1px dashed rgba(45, 212, 168, 0.4); color: #2dd4a8; font-weight: 600; font-size: 0.82rem; border-radius: var(--radius-sm); transition: all 0.2s ease; }
+#page-community .attach-btn:hover { background: rgba(45, 212, 168, 0.2); border-color: #2dd4a8; color: #5eead4; transform: translateY(-1px); }
+#post-submit-btn { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease !important; }
+#post-submit-btn:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(45, 212, 168, 0.45) !important; }
+
+.post-card { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.2); border-radius: var(--radius-lg); backdrop-filter: blur(10px); transition: all 0.2s ease; }
+.post-card:hover { border-color: rgba(45, 212, 168, 0.4); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+.post-avatar { background: linear-gradient(135deg, #2dd4a8, #38bdf8) !important; color: #022c22 !important; font-weight: 800 !important; box-shadow: 0 2px 8px rgba(45, 212, 168, 0.3); }
+.post-username { color: #2dd4a8 !important; font-weight: 700 !important; }
+.post-attach-chip { background: rgba(45, 212, 168, 0.12) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; border-radius: 6px !important; font-weight: 600 !important; }
+.post-attach-chip:hover { background: rgba(45, 212, 168, 0.22) !important; border-color: #2dd4a8 !important; }
+
+/* ── Friends Page ── */
+#page-friends .page-title { background: linear-gradient(135deg, #2dd4a8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: 800; }
+#friends-count-pill { background: rgba(45, 212, 168, 0.12) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 700 !important; }
+.btn-friends-list { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 600 !important; border-radius: 99px !important; padding: 7px 14px !important; cursor: pointer; transition: all 0.2s ease; }
+.btn-friends-list:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; }
+.btn-friends-add { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; padding: 7px 16px !important; cursor: pointer; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
+.btn-friends-add:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(45, 212, 168, 0.45) !important; }
+.btn-friends-req { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: var(--text) !important; font-weight: 600 !important; border-radius: 99px !important; padding: 7px 14px !important; cursor: pointer; transition: all 0.2s ease; }
+.btn-friends-req:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; }
+
+#page-friends .card { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.25); border-radius: var(--radius-lg); backdrop-filter: blur(12px); }
+#page-friends .card-title { color: #2dd4a8; font-weight: 700; }
+#share-friend-select:focus, #share-prompt-text:focus { border-color: #2dd4a8 !important; box-shadow: 0 0 12px rgba(45, 212, 168, 0.25) !important; outline: none; }
+.label-attach-file { background: rgba(45, 212, 168, 0.08) !important; border: 1px dashed rgba(45, 212, 168, 0.4) !important; color: #2dd4a8 !important; transition: all 0.2s ease; }
+.label-attach-file:hover { background: rgba(45, 212, 168, 0.2) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; }
+.btn-send-friend { background: linear-gradient(135deg, #2dd4a8, #38bdf8) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
+.btn-send-friend:hover { opacity: 0.95; transform: translateY(-1px); }
+
+.share-msg-card { background: var(--bg3); border: 1px solid var(--border); border-left: 4px solid #2dd4a8; border-radius: var(--radius); padding: 10px 14px; transition: all 0.2s ease; cursor: pointer; }
+.share-msg-card:hover { border-color: #2dd4a8; background: rgba(45, 212, 168, 0.05); }
+.share-type-badge.badge-prompt { background: rgba(45, 212, 168, 0.15) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; }
+.share-type-badge.badge-image { background: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; }
+.share-type-badge.badge-pdf { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+
+/* Modals */
+#modal-add-friend .modal-title, #modal-friend-requests .modal-title, #modal-friends-list .modal-title { color: #2dd4a8; }
+#modal-add-friend .btn-primary { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; }
+
 </style>
 </head>
 <body>
@@ -3141,6 +3228,62 @@ input, textarea { -webkit-user-select: text; user-select: text; }
           </div>
           <div id="dash-sessions-today" class="study-sessions-list"></div>
         </div>
+
+        <!-- ── Daily Subject Study Matrix Dashboard Table ── -->
+        <div class="card study-matrix-card" style="margin-top:18px;">
+          <div class="matrix-card-header">
+            <div>
+              <div class="card-title" style="margin-bottom:2px;display:flex;align-items:center;gap:8px;">
+                <span>📊 Daily Subject Study Matrix</span>
+                <span class="matrix-badge-live">Live Log</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--muted);">Track & log daily study time across your active college & custom subjects</div>
+            </div>
+            <div class="matrix-controls">
+              <select id="matrix-range-select" class="matrix-select-sm" onchange="renderDailyStudyMatrix()">
+                <option value="1">Today</option>
+                <option value="7" selected>Last 7 Days</option>
+                <option value="14">Last 14 Days</option>
+                <option value="30">Last 30 Days</option>
+                <option value="all">All Dates</option>
+              </select>
+              <button class="btn-matrix-action btn-matrix-outline" onclick="addSubject()">➕ Add Subject</button>
+              <button class="btn-matrix-action btn-matrix-outline" onclick="openSubjectColumnModal()">⚙️ Manage Columns</button>
+              <button class="btn-matrix-action btn-matrix-primary" onclick="openQuickLogModal()">+ Log Time</button>
+              <button class="btn-matrix-action btn-matrix-outline" onclick="exportMatrixCSV()">📥 Export CSV</button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Bar -->
+          <div class="matrix-stats-bar">
+            <div class="matrix-stat-item">
+              <span class="stat-lbl">Today's Total</span>
+              <span class="stat-val" id="matrix-stat-today">0h 0m</span>
+            </div>
+            <div class="matrix-stat-divider"></div>
+            <div class="matrix-stat-item">
+              <span class="stat-lbl">Top Subject Today</span>
+              <span class="stat-val highlight" id="matrix-stat-top">—</span>
+            </div>
+            <div class="matrix-stat-divider"></div>
+            <div class="matrix-stat-item">
+              <span class="stat-lbl">Active Columns</span>
+              <span class="stat-val" id="matrix-stat-cols">0 Subjects</span>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="matrix-table-wrapper">
+            <table class="daily-matrix-table" id="daily-matrix-table">
+              <thead>
+                <tr id="matrix-table-head"></tr>
+              </thead>
+              <tbody id="matrix-table-body"></tbody>
+              <tfoot id="matrix-table-foot"></tfoot>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- ======= SUBJECTS ======= -->
@@ -3538,13 +3681,13 @@ input, textarea { -webkit-user-select: text; user-select: text; }
           <div id="friends-count-pill" style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;">
             👥 <span id="friends-total-count">0</span> Friends
           </div>
-          <button onclick="openFriendsListPopup()" style="background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;color:var(--accent3);cursor:pointer;">
+          <button onclick="openFriendsListPopup()" class="btn-friends-list">
             📋 View List
           </button>
-          <button onclick="openAddFriendModal()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:99px;padding:7px 16px;font-size:0.82rem;font-weight:700;color:#fff;cursor:pointer;margin-left:auto;">
+          <button onclick="openAddFriendModal()" class="btn-friends-add" style="margin-left:auto;">
             ➕ Add Friend
           </button>
-          <button onclick="openRequestsModal()" style="position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:0.82rem;font-weight:600;color:var(--text);cursor:pointer;">
+          <button onclick="openRequestsModal()" class="btn-friends-req" style="position:relative;">
             🔔 Requests <span id="requests-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.6rem;font-weight:700;"></span>
           </button>
         </div>
@@ -3558,12 +3701,12 @@ input, textarea { -webkit-user-select: text; user-select: text; }
             </select>
             <textarea id="share-prompt-text" placeholder="Type a prompt, note, or message to share privately…" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.85rem;width:100%;min-height:80px;resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-size:0.82rem;color:var(--muted);">
+              <label class="label-attach-file" style="display:flex;align-items:center;gap:8px;border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-size:0.82rem;">
                 📎 Attach File (Image/PDF)
                 <input type="file" id="share-file-input" accept="image/*,.pdf" style="display:none;" onchange="previewShareFile(this)">
               </label>
               <span id="share-file-preview" style="font-size:0.78rem;color:var(--accent3);"></span>
-              <button onclick="sendToFriend()" style="margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:9px 20px;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;">
+              <button onclick="sendToFriend()" class="btn-send-friend" style="margin-left:auto;padding:9px 20px;font-size:0.85rem;cursor:pointer;">
                 Send 🚀
               </button>
             </div>
@@ -4824,6 +4967,381 @@ const MLOPS_ENGINEER_TOPICS = [
   "Capstone Project — Cloud deployment & monitoring dashboard"
 ];
 
+// ===================== CORE COLLEGE SUBJECTS SEED DATA =====================
+const COMPUTER_NETWORKS_TOPICS = [
+  "Unit 1: Network Fundamentals & OSI vs TCP/IP Stack",
+  "Unit 1: Physical Layer, Media & Transmission Signals",
+  "Unit 1: Data Link Layer & Framing Protocols",
+  "Unit 2: IP Addressing, IPv4/IPv6 & Subnetting",
+  "Unit 2: Routing Algorithms (OSPF, BGP, RIP)",
+  "Unit 3: Transport Layer (TCP, UDP, Flow & Congestion Control)",
+  "Unit 4: Application Layer (HTTP/HTTPS, DNS, FTP, SMTP)",
+  "Unit 5: Network Security, Cryptography & Firewalls"
+];
+
+const DBMS_TOPICS = [
+  "Unit 1: ER Modeling, Entities, Attributes & Relational Model",
+  "Unit 1: Relational Algebra & Relational Calculus",
+  "Unit 2: SQL Queries, Aggregations, Joins & Views",
+  "Unit 2: Functional Dependencies & Normalization (1NF to BCNF)",
+  "Unit 3: Transaction Processing & ACID Properties",
+  "Unit 4: Concurrency Control (Locking, Timestamping & Deadlocks)",
+  "Unit 5: Indexing Techniques, B-Trees & NoSQL Databases"
+];
+
+const OPERATING_SYSTEMS_TOPICS = [
+  "Unit 1: OS Architecture, Kernel Modes & System Calls",
+  "Unit 1: Process Concept, PCB & Process State Transitions",
+  "Unit 2: CPU Scheduling Algorithms (FCFS, SJF, Priority, RR)",
+  "Unit 2: Process Synchronization, Semaphores & Mutex Locks",
+  "Unit 3: Deadlocks Characterization, Prevention & Avoidance",
+  "Unit 4: Memory Management, Paging, Segmentation & Virtual Memory",
+  "Unit 5: File System Structure, Disk Scheduling (SCAN, C-LOOK)"
+];
+
+const SOFTWARE_ENG_TOPICS = [
+  "Unit 1: Software Development Life Cycle (Waterfall, Agile, Scrum)",
+  "Unit 1: Requirements Engineering & Use Case Modeling",
+  "Unit 2: Object-Oriented Analysis & Design Patterns (SOLID)",
+  "Unit 3: Software Architecture & Modular System Design",
+  "Unit 4: Software Testing (Unit, Integration, System & Automation)",
+  "Unit 5: CI/CD Pipelines, DevOps Basics & Software Maintenance"
+];
+
+function seedComputerNetworksSubject() {
+  const alreadyExists = state.subjects.some(s => s.name === 'Computer Networks');
+  if (alreadyExists) return;
+  const id = 'subj_cn_' + Date.now();
+  const color = '#38bdf8'; // Sky blue
+  const topics = COMPUTER_NETWORKS_TOPICS.map(name => ({ name, done: false }));
+  state.subjects.push({ id, name: 'Computer Networks', color, topics, isCollege: true });
+  saveData('subjects');
+}
+
+function seedDBMSSubject() {
+  const alreadyExists = state.subjects.some(s => s.name === 'Database Management Systems (DBMS)');
+  if (alreadyExists) return;
+  const id = 'subj_dbms_' + Date.now();
+  const color = '#a855f7'; // Purple
+  const topics = DBMS_TOPICS.map(name => ({ name, done: false }));
+  state.subjects.push({ id, name: 'Database Management Systems (DBMS)', color, topics, isCollege: true });
+  saveData('subjects');
+}
+
+function seedOSSubject() {
+  const alreadyExists = state.subjects.some(s => s.name === 'Operating Systems');
+  if (alreadyExists) return;
+  const id = 'subj_os_' + Date.now();
+  const color = '#2dd4a8'; // Emerald/Teal
+  const topics = OPERATING_SYSTEMS_TOPICS.map(name => ({ name, done: false }));
+  state.subjects.push({ id, name: 'Operating Systems', color, topics, isCollege: true });
+  saveData('subjects');
+}
+
+function seedSoftwareEngSubject() {
+  const alreadyExists = state.subjects.some(s => s.name === 'Software Engineering & OO Design');
+  if (alreadyExists) return;
+  const id = 'subj_se_' + Date.now();
+  const color = '#f59e0b'; // Amber/Gold
+  const topics = SOFTWARE_ENG_TOPICS.map(name => ({ name, done: false }));
+  state.subjects.push({ id, name: 'Software Engineering & OO Design', color, topics, isCollege: true });
+  saveData('subjects');
+}
+
+function seedCollegeSubjects() {
+  seedComputerNetworksSubject();
+  seedDBMSSubject();
+  seedOSSubject();
+  seedSoftwareEngSubject();
+}
+
+// ===================== DAILY SUBJECT STUDY MATRIX TABLE JS =====================
+
+// ===================== DYNAMIC SUBJECT & MATRIX HANDLERS =====================
+
+// ===================== DYNAMIC SUBJECT & MATRIX HANDLERS (V3 FIXED) =====================
+function getMatrixVisibleSubjects() {
+  // 1. Auto-register any missing subjects from completed sessions
+  if (state.sessions && Array.isArray(state.sessions)) {
+    state.sessions.filter(s => s.status === 'done').forEach(s => {
+      const rawSubj = s.subjectId;
+      if (!rawSubj) return;
+      const exists = state.subjects.some(sub => sub.id === rawSubj || sub.name.toLowerCase() === String(rawSubj).toLowerCase());
+      if (!exists) {
+        const newId = 'subj_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+        const name = String(rawSubj).startsWith('subj_') ? 'General Subject' : String(rawSubj);
+        const color = SUBJECT_COLORS[state.subjects.length % SUBJECT_COLORS.length];
+        state.subjects.push({ id: newId, name, color, topics: [] });
+        saveData('subjects');
+        s.subjectId = newId;
+        saveData('sessions');
+      }
+    });
+  }
+
+  // 2. Get user explicitly hidden subjects set
+  const hiddenList = S.get('los_matrix_hidden_cache') || [];
+  const hiddenSet = new Set(hiddenList);
+
+  // Return all subject IDs that are not explicitly hidden
+  const visible = state.subjects.filter(s => {
+    if (hiddenSet.has(s.id)) return false;
+    // Default optional for tech AI/MLOps subjects if user hasn't saved custom selection
+    if (!S.get('los_matrix_cols_cache') && !S.get('los_matrix_hidden_cache')) {
+      const name = s.name.toLowerCase();
+      if (name.includes('agentic') || name.includes('mlops') || name.includes('ai engineer') || name.includes('automation agent')) {
+        return false;
+      }
+    }
+    return true;
+  }).map(s => s.id);
+
+  return visible.length > 0 ? visible : state.subjects.map(s => s.id);
+}
+
+function matchSessionToSubject(sess, subj) {
+  if (!sess || !subj) return false;
+  const sid = String(sess.subjectId || '').trim().toLowerCase();
+  const subId = String(subj.id || '').trim().toLowerCase();
+  const subName = String(subj.name || '').trim().toLowerCase();
+  return sid === subId || sid === subName;
+}
+
+function normalizeDateKey(rawDate) {
+  if (!rawDate) return '';
+  if (typeof rawDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawDate)) return rawDate;
+  try {
+    const d = new Date(rawDate);
+    if (isNaN(d.getTime())) return String(rawDate).substring(0, 10);
+    return toDateKey(d);
+  } catch(e) {
+    return String(rawDate).substring(0, 10);
+  }
+}
+
+function formatMatrixDuration(ms) {
+  if (!ms || ms <= 0) return '—';
+  if (ms < 60000) return '< 1m';
+  const totalMins = Math.floor(ms / 60000);
+  const h = Math.floor(totalMins / 60);
+  const m = totalMins % 60;
+  if (h > 0) return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  return `${m}m`;
+}
+
+function renderDailyStudyMatrix() {
+  const headEl = document.getElementById('matrix-table-head');
+  const bodyEl = document.getElementById('matrix-table-body');
+  const footEl = document.getElementById('matrix-table-foot');
+  if (!headEl || !bodyEl || !footEl) return;
+
+  const visibleIds = getMatrixVisibleSubjects();
+  const visibleSubjs = state.subjects.filter(s => visibleIds.includes(s.id));
+
+  // Update stat active column count
+  const statCols = document.getElementById('matrix-stat-cols');
+  if (statCols) statCols.textContent = `${visibleSubjs.length} Active Column${visibleSubjs.length !== 1 ? 's' : ''}`;
+
+  // 1. Render Table Headers
+  let headHtml = `<th>Date</th>`;
+  visibleSubjs.forEach(s => {
+    const c = colorForSubject(s);
+    headHtml += `<th style="color:${c};">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block;"></span>
+        <span>${escHtml(s.name)}</span>
+      </div>
+    </th>`;
+  });
+  headHtml += `<th>Total Time</th><th>Action</th>`;
+  headEl.innerHTML = headHtml;
+
+  // 2. Gather Dates Range
+  const rangeVal = document.getElementById('matrix-range-select') ? document.getElementById('matrix-range-select').value : '7';
+  let dates = [];
+  const todayKey = toDateKey(new Date());
+
+  if (rangeVal === '1') {
+    dates = [todayKey];
+  } else if (rangeVal === 'all') {
+    const sessionDates = state.sessions.filter(s => s.status === 'done').map(s => normalizeDateKey(s.date));
+    const dateSet = new Set([todayKey, ...sessionDates]);
+    dates = Array.from(dateSet).sort().reverse();
+  } else {
+    const numDays = parseInt(rangeVal, 10) || 7;
+    for (let i = 0; i < numDays; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      dates.push(toDateKey(d));
+    }
+  }
+
+  if (visibleSubjs.length === 0) {
+    bodyEl.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--muted);">No subjects visible. Click <strong>"⚙️ Manage Columns"</strong> above to enable subject columns.</td></tr>`;
+    footEl.innerHTML = '';
+    return;
+  }
+
+  // 3. Aggregate Study Data by Date & Subject ID
+  const dataByDate = {};
+  state.sessions.filter(s => s.status === 'done').forEach(s => {
+    const dKey = normalizeDateKey(s.date);
+    if (!dKey) return;
+    if (!dataByDate[dKey]) dataByDate[dKey] = {};
+    
+    visibleSubjs.forEach(subj => {
+      if (matchSessionToSubject(s, subj)) {
+        if (!dataByDate[dKey][subj.id]) dataByDate[dKey][subj.id] = 0;
+        dataByDate[dKey][subj.id] += (s.duration || 0);
+      }
+    });
+  });
+
+  const subjectTotals = {};
+  visibleSubjs.forEach(s => subjectTotals[s.id] = 0);
+  let grandTotalTodayMs = 0;
+  const todaySubjectMsMap = {};
+
+  // 4. Build Table Rows
+  let bodyHtml = '';
+  dates.forEach(dateStr => {
+    const isToday = (dateStr === todayKey);
+    let rowTotalMs = 0;
+    let rowCellsHtml = '';
+
+    visibleSubjs.forEach(s => {
+      const ms = (dataByDate[dateStr] && dataByDate[dateStr][s.id]) ? dataByDate[dateStr][s.id] : 0;
+      subjectTotals[s.id] += ms;
+      rowTotalMs += ms;
+
+      if (isToday) {
+        grandTotalTodayMs += ms;
+        todaySubjectMsMap[s.id] = (todaySubjectMsMap[s.id] || 0) + ms;
+      }
+
+      const c = colorForSubject(s);
+      if (ms > 0) {
+        rowCellsHtml += `<td>
+          <span class="matrix-cell-badge" style="background:${c}18;color:${c};border:1px solid ${c}33;" onclick="openQuickLogModal('${dateStr}', '${s.id}')" title="Click to edit or log time">
+            ⏱️ ${formatMatrixDuration(ms)}
+          </span>
+        </td>`;
+      } else {
+        rowCellsHtml += `<td><span class="matrix-cell-empty" onclick="openQuickLogModal('${dateStr}', '${s.id}')" style="cursor:pointer;" title="Click to log time">—</span></td>`;
+      }
+    });
+
+    bodyHtml += `<tr>
+      <td>
+        <div class="matrix-date-cell">
+          <span>${formatDateFriendly(dateStr)}</span>
+          ${isToday ? '<span class="matrix-date-today">TODAY</span>' : ''}
+        </div>
+      </td>
+      ${rowCellsHtml}
+      <td><span class="matrix-row-total">${formatMatrixDuration(rowTotalMs)}</span></td>
+      <td>
+        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.72rem;padding:3px 8px;" onclick="openQuickLogModal('${dateStr}')">✏️ Log</button>
+      </td>
+    </tr>`;
+  });
+
+  bodyEl.innerHTML = bodyHtml;
+
+  // 5. Build Footer Row
+  let footHtml = `<tr><td><strong>Total Study Time</strong></td>`;
+  let grandTotalRangeMs = 0;
+  visibleSubjs.forEach(s => {
+    const totMs = subjectTotals[s.id] || 0;
+    grandTotalRangeMs += totMs;
+    const c = colorForSubject(s);
+    footHtml += `<td style="color:${c};font-weight:700;">${totMs > 0 ? formatMatrixDuration(totMs) : '0m'}</td>`;
+  });
+  footHtml += `<td style="color:var(--accent);font-weight:800;">${formatMatrixDuration(grandTotalRangeMs)}</td><td>—</td></tr>`;
+  footEl.innerHTML = footHtml;
+
+  // 6. Update Stats Bar
+  const statToday = document.getElementById('matrix-stat-today');
+  if (statToday) statToday.textContent = formatMatrixDuration(grandTotalTodayMs);
+
+  const statTop = document.getElementById('matrix-stat-top');
+  if (statTop) {
+    let topSubjId = null, maxMs = 0;
+    Object.entries(todaySubjectMsMap).forEach(([sId, ms]) => {
+      if (ms > maxMs) { maxMs = ms; topSubjId = sId; }
+    });
+    if (topSubjId && maxMs > 0) {
+      const topS = state.subjects.find(s => s.id === topSubjId);
+      statTop.textContent = `${topS ? topS.name : 'Subject'} (${formatMatrixDuration(maxMs)})`;
+    } else {
+      statTop.textContent = 'None yet today';
+    }
+  }
+}
+
+function exportMatrixCSV() {
+  const visibleIds = getMatrixVisibleSubjects();
+  const visibleSubjs = state.subjects.filter(s => visibleIds.includes(s.id));
+  if (visibleSubjs.length === 0) { showToast('No visible subjects to export', 'warn'); return; }
+
+  const rangeVal = document.getElementById('matrix-range-select') ? document.getElementById('matrix-range-select').value : '7';
+  let dates = [];
+  const todayKey = toDateKey(new Date());
+
+  if (rangeVal === '1') {
+    dates = [todayKey];
+  } else if (rangeVal === 'all') {
+    const sessionDates = state.sessions.filter(s => s.status === 'done').map(s => normalizeDateKey(s.date));
+    dates = Array.from(new Set([todayKey, ...sessionDates])).sort().reverse();
+  } else {
+    const numDays = parseInt(rangeVal, 10) || 7;
+    for (let i = 0; i < numDays; i++) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      dates.push(toDateKey(d));
+    }
+  }
+
+  const dataByDate = {};
+  state.sessions.filter(s => s.status === 'done').forEach(s => {
+    const dKey = normalizeDateKey(s.date);
+    if (!dKey) return;
+    if (!dataByDate[dKey]) dataByDate[dKey] = {};
+    visibleSubjs.forEach(subj => {
+      if (matchSessionToSubject(s, subj)) {
+        if (!dataByDate[dKey][subj.id]) dataByDate[dKey][subj.id] = 0;
+        dataByDate[dKey][subj.id] += (s.duration || 0);
+      }
+    });
+  });
+
+  const headers = ['Date', ...visibleSubjs.map(s => `"${s.name.replace(/"/g, '""')}"`), 'Total Study Time (Mins)'];
+  const csvRows = [headers.join(',')];
+
+  dates.forEach(dStr => {
+    let rowTotalMs = 0;
+    const rowCells = [dStr];
+    visibleSubjs.forEach(s => {
+      const ms = (dataByDate[dStr] && dataByDate[dStr][s.id]) ? dataByDate[dStr][s.id] : 0;
+      rowTotalMs += ms;
+      const mins = Math.round(ms / 60000);
+      rowCells.push(mins);
+    });
+    rowCells.push(Math.round(rowTotalMs / 60000));
+    csvRows.push(rowCells.join(','));
+  });
+
+  const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `daily_study_matrix_${todayKey}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('Daily Subject Matrix CSV exported!', 'success');
+}
+
+
 function seedMLOpsEngineerSubject() {
   const alreadyExists = state.subjects.some(s => s.name === 'MLOps Engineer');
   if (alreadyExists) return;
@@ -5848,6 +6366,7 @@ let state = {
   notes: [],
   currentSubjectId: null,
   activeTimers: [],
+  matrixVisibleSubjects: S.get("los_matrix_cols_cache") || null,
   pendingAttachments: [],
   pendingAttachType: null,
   analyticsCharts: {},
@@ -5937,6 +6456,8 @@ async function showApp(isRealLogin = false) {
   seedAgenticAISubject();
   seedAIAutoAgentSubject();
   seedMLOpsEngineerSubject();
+  seedCollegeSubjects();
+  renderDailyStudyMatrix();
   renderDashboard();
   renderTasks();
   renderActiveTimers();
@@ -6446,6 +6967,7 @@ function renderDashboard() {
   if (streakEl) streakEl.textContent = '🔥 ' + calcStreak();
   // Daily goal card
   try { renderDailyGoal(); } catch(e) {}
+  try { renderDailyStudyMatrix(); } catch(e) {}
 }
 
 function calcStreak() {
@@ -6544,19 +7066,7 @@ function renderSubjects() {
   }).join('');
 }
 
-function addSubject() {
-  const input = document.getElementById('new-subject-input');
-  const name = input.value.trim();
-  if (!name) return;
-  const id = 'subj_' + Date.now();
-  const color = SUBJECT_COLORS[state.subjects.length % SUBJECT_COLORS.length];
-  state.subjects.push({ id, name, color, topics: [] });
-  saveData('subjects');
-  input.value = '';
-  renderSubjects();
-  renderTaskSubjectFilter();
-  showToast(`Subject "${name}" added`, 'success');
-}
+// addSubject updated below
 
 function openRoadmap(id) {
   const s = state.subjects.find(s => s.id === id);
@@ -8739,6 +9249,71 @@ document.addEventListener('DOMContentLoaded', () => {
     </button>
   </div>
   <div style="margin-top:28px;font-size:0.72rem;color:rgba(255,255,255,0.15);">Tap Done when you finish your session</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MATRIX SUBJECT COLUMNS MANAGE MODAL        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-matrix-columns">
+  <div class="modal" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Manage Dashboard Subject Columns</div>
+      <button class="modal-close" onclick="closeModal('modal-matrix-columns')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;">Select which subjects appear as columns in your Daily Subject Study Matrix Table. Check your college subjects and toggle optional AI/MLOps subjects on or off as needed.</p>
+      
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.75rem;" onclick="selectColumnPreset('college')">🎓 College Subjects Only</button>
+        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.75rem;" onclick="selectColumnPreset('all')">Select All</button>
+        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.75rem;" onclick="selectColumnPreset('none')">Deselect All</button>
+      </div>
+
+      <div id="matrix-columns-list" class="matrix-cols-grid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-matrix-columns')">Cancel</button>
+      <button class="btn-primary" onclick="saveSubjectColumnSelection()">Save & Update Dashboard 💾</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- QUICK LOG / EDIT STUDY TIME MODAL          -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-matrix-log">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">⏱️ Log Study Time for Dashboard</div>
+      <button class="modal-close" onclick="closeModal('modal-matrix-log')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="matrix-log-date" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);">
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <select id="matrix-log-subject" onchange="handleLogSubjectChange()" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);"></select>
+      <div id="matrix-new-subject-group" style="display:none;margin-top:10px;"><label>New Subject Name</label><input type="text" id="matrix-new-subject-name" placeholder="e.g. Mathematics" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);"></div>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Study Duration (Minutes)</label>
+        <input type="number" id="matrix-log-minutes" placeholder="e.g. 43" min="1" max="1440" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);">
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">Example: enter 43 for Subject 1, 36 for Subject 2, 47 for Subject 3</div>
+      </div>
+      <div class="form-group">
+        <label>Topic / Note (Optional)</label>
+        <input type="text" id="matrix-log-note" placeholder="e.g. Unit 2 Study Session" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-matrix-log')">Cancel</button>
+      <button class="btn-primary" onclick="saveQuickLogSession()">Add Record to Dashboard 🚀</button>
+    </div>
+  </div>
 </div>
 
 </body>
