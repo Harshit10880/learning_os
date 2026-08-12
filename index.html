@@ -5341,6 +5341,148 @@ function exportMatrixCSV() {
   showToast('Daily Subject Matrix CSV exported!', 'success');
 }
 
+function addSubject(forcedName) {
+  let name = forcedName ? String(forcedName).trim() : '';
+  const input = document.getElementById('new-subject-input');
+  const matrixInput = document.getElementById('matrix-new-subject-name');
+  const grp = document.getElementById('matrix-new-subject-group');
+
+  if (!name && input) name = input.value.trim();
+  if (!name && matrixInput && grp && grp.style.display !== 'none') name = matrixInput.value.trim();
+  if (!name && !input) name = (window.prompt('Enter subject name:') || '').trim();
+  if (!name) return null;
+  if (state.subjects.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+    showToast('Subject already exists', 'warn');
+    return state.subjects.find(s => s.name.toLowerCase() === name.toLowerCase()) || null;
+  }
+  const id = 'subj_' + Date.now();
+  const color = SUBJECT_COLORS[state.subjects.length % SUBJECT_COLORS.length];
+  const subject = { id, name, color, topics: [] };
+  state.subjects.push(subject);
+  saveData('subjects');
+  if (input) input.value = '';
+  if (matrixInput) matrixInput.value = '';
+  renderSubjects();
+  renderTaskSubjectFilter();
+  try { renderDailyStudyMatrix(); } catch(e) {}
+  try { renderDashboard(); } catch(e) {}
+  showToast(`Subject "${name}" added`, 'success');
+  return subject;
+}
+
+function populateMatrixLogSubjects(selectedId) {
+  const sel = document.getElementById('matrix-log-subject');
+  if (!sel) return;
+  const opts = state.subjects.map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
+  sel.innerHTML = opts + '<option value="__new__">➕ Add New Subject…</option>';
+  if (selectedId && (selectedId === '__new__' || state.subjects.some(s => s.id === selectedId))) {
+    sel.value = selectedId;
+  }
+  handleLogSubjectChange();
+}
+
+function openQuickLogModal(dateStr, subjectId) {
+  const dateEl = document.getElementById('matrix-log-date');
+  const minsEl = document.getElementById('matrix-log-minutes');
+  const noteEl = document.getElementById('matrix-log-note');
+  if (dateEl) dateEl.value = dateStr || toDateKey(new Date());
+  if (minsEl) minsEl.value = '';
+  if (noteEl) noteEl.value = '';
+  populateMatrixLogSubjects(subjectId || '');
+  openModal('modal-matrix-log');
+}
+
+function handleLogSubjectChange() {
+  const sel = document.getElementById('matrix-log-subject');
+  const grp = document.getElementById('matrix-new-subject-group');
+  if (!sel || !grp) return;
+  grp.style.display = sel.value === '__new__' ? 'block' : 'none';
+}
+
+function saveQuickLogSession() {
+  const date = document.getElementById('matrix-log-date')?.value;
+  const mins = parseInt(document.getElementById('matrix-log-minutes')?.value, 10);
+  const note = (document.getElementById('matrix-log-note')?.value || '').trim();
+  const selVal = document.getElementById('matrix-log-subject')?.value;
+
+  if (!date) { showToast('Pick a date', 'error'); return; }
+  if (!mins || mins < 1) { showToast('Enter study duration in minutes', 'error'); return; }
+
+  let subjectId = selVal;
+  if (selVal === '__new__') {
+    const newName = (document.getElementById('matrix-new-subject-name')?.value || '').trim();
+    if (!newName) { showToast('Enter a name for the new subject', 'error'); return; }
+    const created = addSubject(newName);
+    if (!created) return;
+    subjectId = created.id;
+  } else if (!subjectId) {
+    showToast('Select a subject', 'error');
+    return;
+  }
+
+  state.sessions.push({
+    id: 'sess_' + Date.now(),
+    date,
+    subjectId,
+    taskName: note || 'Manual log',
+    duration: mins * 60000,
+    status: 'done'
+  });
+  saveData('sessions');
+  closeModal('modal-matrix-log');
+  renderDailyStudyMatrix();
+  try { renderDashboard(); } catch(e) {}
+  try { renderSessions(); } catch(e) {}
+  showToast('Study time logged!', 'success');
+}
+
+function openSubjectColumnModal() {
+  const list = document.getElementById('matrix-columns-list');
+  if (!list) return;
+  const visibleIds = getMatrixVisibleSubjects();
+  const visibleSet = new Set(visibleIds);
+  if (state.subjects.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0;">No subjects yet — add one first</div>';
+  } else {
+    list.innerHTML = state.subjects.map(s => {
+      const c = colorForSubject(s);
+      const checked = visibleSet.has(s.id) ? 'checked' : '';
+      const typeLabel = s.isCollege ? 'College' : 'Custom';
+      return `<label class="matrix-col-checkbox-card">
+        <input type="checkbox" data-subject-id="${s.id}" ${checked}>
+        <span class="matrix-col-name" style="color:${c};">${escHtml(s.name)}</span>
+        <span class="matrix-col-type">${typeLabel}</span>
+      </label>`;
+    }).join('');
+  }
+  openModal('modal-matrix-columns');
+}
+
+function selectColumnPreset(preset) {
+  const list = document.getElementById('matrix-columns-list');
+  if (!list) return;
+  list.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    const subj = state.subjects.find(s => s.id === cb.dataset.subjectId);
+    if (preset === 'all') cb.checked = true;
+    else if (preset === 'none') cb.checked = false;
+    else if (preset === 'college') cb.checked = !!(subj && subj.isCollege);
+  });
+}
+
+function saveSubjectColumnSelection() {
+  const list = document.getElementById('matrix-columns-list');
+  if (!list) return;
+  const hidden = [];
+  list.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    if (!cb.checked) hidden.push(cb.dataset.subjectId);
+  });
+  S.set('los_matrix_hidden_cache', hidden);
+  S.set('los_matrix_cols_cache', true);
+  state.matrixVisibleSubjects = state.subjects.filter(s => !hidden.includes(s.id)).map(s => s.id);
+  closeModal('modal-matrix-columns');
+  renderDailyStudyMatrix();
+  showToast('Dashboard columns updated', 'success');
+}
 
 function seedMLOpsEngineerSubject() {
   const alreadyExists = state.subjects.some(s => s.name === 'MLOps Engineer');
@@ -7065,8 +7207,6 @@ function renderSubjects() {
     </div>`;
   }).join('');
 }
-
-// addSubject updated below
 
 function openRoadmap(id) {
   const s = state.subjects.find(s => s.id === id);
@@ -9296,8 +9436,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="form-group">
         <label>Subject</label>
         <select id="matrix-log-subject" onchange="handleLogSubjectChange()" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);"></select>
-      <div id="matrix-new-subject-group" style="display:none;margin-top:10px;"><label>New Subject Name</label><input type="text" id="matrix-new-subject-name" placeholder="e.g. Mathematics" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);"></div>
-        </select>
+        <div id="matrix-new-subject-group" style="display:none;margin-top:10px;"><label>New Subject Name</label><input type="text" id="matrix-new-subject-name" placeholder="e.g. Mathematics" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text);"></div>
       </div>
       <div class="form-group">
         <label>Study Duration (Minutes)</label>
