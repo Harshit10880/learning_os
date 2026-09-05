@@ -2776,90 +2776,151 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .modal::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
 
 /* ===================== DAILY SUBJECT STUDY MATRIX TABLE STYLES ===================== */
-.study-matrix-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
-.matrix-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-.matrix-badge-live { font-size: 0.68rem; background: rgba(45, 212, 168, 0.15); color: #2dd4a8; border: 1px solid rgba(45, 212, 168, 0.3); border-radius: 20px; padding: 2px 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.matrix-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.matrix-select-sm { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 6px 10px; font-size: 0.8rem; outline: none; }
-.btn-matrix-action { font-size: 0.78rem; padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 6px; }
-.btn-matrix-outline { background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
-.btn-matrix-outline:hover { background: var(--border); color: var(--text-bright); }
-.btn-matrix-primary { background: linear-gradient(135deg, var(--accent), #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); }
-.btn-matrix-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+.study-matrix-card {
+  background: linear-gradient(165deg, rgba(20, 34, 29, 0.95), rgba(12, 22, 18, 0.95));
+  border: 1px solid rgba(45, 212, 168, 0.22);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.matrix-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; }
+.matrix-badge-live { font-size: 0.68rem; background: rgba(45, 212, 168, 0.18); color: #2dd4a8; border: 1px solid rgba(45, 212, 168, 0.35); border-radius: 99px; padding: 3px 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 0 10px rgba(45, 212, 168, 0.2); }
+.matrix-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.matrix-select-sm { background: var(--bg3); border: 1px solid rgba(45, 212, 168, 0.25); border-radius: 99px !important; color: var(--text); padding: 7px 14px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer; transition: all 0.2s ease; }
+.matrix-select-sm:focus { border-color: #2dd4a8; box-shadow: 0 0 12px rgba(45, 212, 168, 0.25); }
+.btn-matrix-action { font-size: 0.78rem; padding: 7px 14px; border-radius: 99px !important; font-weight: 700; cursor: pointer; transition: all 0.2s ease; border: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn-matrix-outline { background: rgba(45, 212, 168, 0.08); border: 1px solid rgba(45, 212, 168, 0.28); color: #5eead4; }
+.btn-matrix-outline:hover { background: rgba(45, 212, 168, 0.2); border-color: #2dd4a8; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.btn-matrix-primary { background: linear-gradient(135deg, #2dd4a8, #059669); color: #022c22; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35); }
+.btn-matrix-primary:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(45, 212, 168, 0.45); }
 
-.matrix-stats-bar { display: flex; align-items: center; gap: 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; flex-wrap: wrap; }
-.matrix-stat-item { display: flex; flex-direction: column; gap: 2px; }
-.matrix-stat-item .stat-lbl { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.matrix-stat-item .stat-val { font-size: 0.95rem; font-weight: 700; color: var(--text); font-family: var(--font-display); }
-.matrix-stat-item .stat-val.highlight { color: #38bdf8; }
-.matrix-stat-divider { width: 1px; height: 24px; background: var(--border); }
+.matrix-stats-bar { display: flex; align-items: center; gap: 20px; background: rgba(14, 25, 21, 0.7); border: 1px solid rgba(45, 212, 168, 0.16); border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; flex-wrap: wrap; box-shadow: inset 0 2px 6px rgba(0,0,0,0.25); }
+.matrix-stat-item { display: flex; flex-direction: column; gap: 3px; }
+.matrix-stat-item .stat-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+.matrix-stat-item .stat-val { font-size: 0.98rem; font-weight: 700; color: #fff; font-family: var(--font-display); }
+.matrix-stat-item .stat-val.highlight { color: #5eead4; }
+.matrix-stat-divider { width: 1px; height: 26px; background: rgba(255, 255, 255, 0.08); }
 
-.matrix-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg1); max-height: 480px; overflow-y: auto; }
-.daily-matrix-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.83rem; white-space: nowrap; }
-.daily-matrix-table th { position: sticky; top: 0; background: var(--bg3); color: var(--text-bright); font-weight: 700; padding: 12px 14px; border-bottom: 2px solid var(--border); z-index: 2; font-family: var(--font-display); }
-.daily-matrix-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
-.daily-matrix-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
-.daily-matrix-table tfoot td { position: sticky; bottom: 0; background: var(--bg3); font-weight: 700; border-top: 2px solid var(--border); color: var(--text-bright); z-index: 2; }
+.matrix-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid rgba(45, 212, 168, 0.18); border-radius: 16px; background: rgba(10, 18, 15, 0.85); max-height: 500px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+.daily-matrix-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; white-space: nowrap; }
+.daily-matrix-table th { position: sticky; top: 0; background: rgba(18, 30, 26, 0.98); backdrop-filter: blur(10px); color: var(--text-bright); font-weight: 700; padding: 13px 16px; border-bottom: 2px solid rgba(45, 212, 168, 0.28); z-index: 2; font-family: var(--font-display); letter-spacing: 0.04em; }
+.daily-matrix-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text); vertical-align: middle; }
+.daily-matrix-table tbody tr { transition: background 0.15s ease; }
+.daily-matrix-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.015); }
+.daily-matrix-table tbody tr:hover { background: rgba(45, 212, 168, 0.08) !important; }
+.daily-matrix-table tbody tr.is-today { background: rgba(45, 212, 168, 0.07); box-shadow: inset 3px 0 0 #2dd4a8; }
+.daily-matrix-table tfoot td { position: sticky; bottom: 0; background: rgba(18, 30, 26, 0.98); backdrop-filter: blur(10px); font-weight: 700; border-top: 2px solid rgba(45, 212, 168, 0.32); color: var(--text-bright); z-index: 2; }
 
-.matrix-cell-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.78rem; font-family: var(--font-display); cursor: pointer; }
-.matrix-cell-empty { color: var(--muted); opacity: 0.5; }
-.matrix-date-cell { font-weight: 600; color: var(--text-bright); display: flex; align-items: center; gap: 6px; }
-.matrix-date-today { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
-.matrix-row-total { font-weight: 700; color: var(--accent); font-family: var(--font-display); }
+.matrix-th-date, .matrix-td-date { text-align: left !important; padding-left: 20px !important; }
+.matrix-th-subj, .matrix-td-subj { text-align: center !important; }
+.matrix-th-total, .matrix-td-total { text-align: right !important; padding-right: 22px !important; }
+.matrix-th-act, .matrix-td-act { text-align: center !important; }
+
+.matrix-cell-badge { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 12px; border-radius: 99px; font-weight: 600; font-size: 0.78rem; font-family: var(--font-display); cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.matrix-cell-badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45, 212, 168, 0.25); filter: brightness(1.12); }
+.matrix-cell-empty { color: var(--muted); opacity: 0.35; font-weight: 500; font-size: 0.95rem; padding: 4px 12px; border-radius: 99px; display: inline-block; transition: all 0.2s ease; }
+.matrix-cell-empty:hover { opacity: 0.85; color: var(--text-bright); background: rgba(255,255,255,0.06); }
+.matrix-date-cell { font-weight: 600; color: var(--text-bright); display: flex; align-items: center; gap: 8px; font-family: var(--font-display); }
+.matrix-date-today { background: rgba(45, 212, 168, 0.18); color: #2dd4a8; border: 1px solid rgba(45, 212, 168, 0.35); padding: 2px 8px; border-radius: 99px; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px; }
+.matrix-row-total { font-weight: 700; color: #5eead4; font-family: var(--font-display); font-size: 0.88rem; }
 
 .matrix-cols-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
-.matrix-col-checkbox-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s ease; }
+.matrix-col-checkbox-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.15s ease; }
 .matrix-col-checkbox-card:hover { border-color: var(--accent); }
 .matrix-col-checkbox-card input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
 .matrix-col-name { font-size: 0.84rem; font-weight: 600; }
-.matrix-col-type { font-size: 0.7rem; color: var(--muted); margin-left: auto; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; }
+.matrix-col-type { font-size: 0.7rem; color: var(--muted); margin-left: auto; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 99px; }
 
 
 /* ===================== GREEN/TEAL DASHBOARD THEME OVERRIDES FOR COMMUNITY & FRIENDS ===================== */
 /* ── Community Page ── */
 #page-community .page-title { background: linear-gradient(135deg, #2dd4a8, #5eead4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: 800; }
 #page-community .post-form-area { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.25); border-radius: var(--radius-lg); backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); }
-#page-community .post-form-area textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius); transition: all 0.2s ease; }
+#page-community .post-form-area textarea { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: 12px; transition: all 0.2s ease; }
 #page-community .post-form-area textarea:focus { border-color: #2dd4a8; box-shadow: 0 0 12px rgba(45, 212, 168, 0.25); outline: none; }
-#page-community .attach-btn { background: rgba(45, 212, 168, 0.08); border: 1px dashed rgba(45, 212, 168, 0.4); color: #2dd4a8; font-weight: 600; font-size: 0.82rem; border-radius: var(--radius-sm); transition: all 0.2s ease; }
+#page-community .attach-btn { background: rgba(45, 212, 168, 0.08); border: 1px dashed rgba(45, 212, 168, 0.4); color: #2dd4a8; font-weight: 600; font-size: 0.82rem; border-radius: 99px; transition: all 0.2s ease; }
 #page-community .attach-btn:hover { background: rgba(45, 212, 168, 0.2); border-color: #2dd4a8; color: #5eead4; transform: translateY(-1px); }
-#post-submit-btn { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease !important; }
+#post-submit-btn { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease !important; }
 #post-submit-btn:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(45, 212, 168, 0.45) !important; }
 
 .post-card { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.2); border-radius: var(--radius-lg); backdrop-filter: blur(10px); transition: all 0.2s ease; }
 .post-card:hover { border-color: rgba(45, 212, 168, 0.4); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
 .post-avatar { background: linear-gradient(135deg, #2dd4a8, #5eead4) !important; color: #022c22 !important; font-weight: 800 !important; box-shadow: 0 2px 8px rgba(45, 212, 168, 0.3); }
 .post-username { color: #2dd4a8 !important; font-weight: 700 !important; }
-.post-attach-chip { background: rgba(45, 212, 168, 0.12) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; border-radius: 6px !important; font-weight: 600 !important; }
+.post-attach-chip { background: rgba(45, 212, 168, 0.12) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; border-radius: 99px !important; font-weight: 600 !important; }
 .post-attach-chip:hover { background: rgba(45, 212, 168, 0.22) !important; border-color: #2dd4a8 !important; }
 
 /* ── Friends Page ── */
 #page-friends .page-title { background: linear-gradient(135deg, #2dd4a8, #5eead4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; font-weight: 800; }
-#friends-count-pill { background: rgba(45, 212, 168, 0.12) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 700 !important; }
-.btn-friends-list { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 600 !important; border-radius: 99px !important; padding: 7px 14px !important; cursor: pointer; transition: all 0.2s ease; }
-.btn-friends-list:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; }
-.btn-friends-add { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; padding: 7px 16px !important; cursor: pointer; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
+#friends-count-pill { background: rgba(45, 212, 168, 0.12) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 700 !important; border-radius: 99px !important; }
+.btn-friends-list { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: #2dd4a8 !important; font-weight: 600 !important; border-radius: 99px !important; padding: 8px 16px !important; cursor: pointer; transition: all 0.2s ease; }
+.btn-friends-list:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; transform: translateY(-1px); }
+.btn-friends-add { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; padding: 8px 18px !important; cursor: pointer; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
 .btn-friends-add:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(45, 212, 168, 0.45) !important; }
-.btn-friends-req { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: var(--text) !important; font-weight: 600 !important; border-radius: 99px !important; padding: 7px 14px !important; cursor: pointer; transition: all 0.2s ease; }
-.btn-friends-req:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; }
+.btn-friends-req { background: rgba(45, 212, 168, 0.08) !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; color: var(--text) !important; font-weight: 600 !important; border-radius: 99px !important; padding: 8px 16px !important; cursor: pointer; transition: all 0.2s ease; }
+.btn-friends-req:hover { background: rgba(45, 212, 168, 0.18) !important; border-color: #2dd4a8 !important; transform: translateY(-1px); }
 
-#page-friends .card { background: var(--bg2); border: 1px solid rgba(45, 212, 168, 0.25); border-radius: var(--radius-lg); backdrop-filter: blur(12px); }
+#page-friends .card { background: linear-gradient(165deg, rgba(20, 34, 29, 0.95), rgba(12, 22, 18, 0.95)); border: 1px solid rgba(45, 212, 168, 0.22); border-radius: var(--radius-lg); backdrop-filter: blur(12px); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25); }
 #page-friends .card-title { color: #2dd4a8; font-weight: 700; }
+#share-friend-select { border-radius: 12px !important; }
 #share-friend-select:focus, #share-prompt-text:focus { border-color: #2dd4a8 !important; box-shadow: 0 0 12px rgba(45, 212, 168, 0.25) !important; outline: none; }
-.label-attach-file { background: rgba(45, 212, 168, 0.08) !important; border: 1px dashed rgba(45, 212, 168, 0.4) !important; color: #2dd4a8 !important; transition: all 0.2s ease; }
-.label-attach-file:hover { background: rgba(45, 212, 168, 0.2) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; }
-.btn-send-friend { background: linear-gradient(135deg, #2dd4a8, #5eead4) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
-.btn-send-friend:hover { opacity: 0.95; transform: translateY(-1px); }
+#share-prompt-text { border-radius: 12px !important; }
+.label-attach-file { background: rgba(45, 212, 168, 0.08) !important; border: 1px dashed rgba(45, 212, 168, 0.4) !important; color: #2dd4a8 !important; border-radius: 99px !important; padding: 8px 16px !important; transition: all 0.2s ease; font-weight: 600 !important; }
+.label-attach-file:hover { background: rgba(45, 212, 168, 0.2) !important; border-color: #2dd4a8 !important; color: #5eead4 !important; transform: translateY(-1px); }
+.btn-send-friend { background: linear-gradient(135deg, #2dd4a8, #5eead4) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; padding: 9px 22px !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; transition: all 0.2s ease; }
+.btn-send-friend:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(45, 212, 168, 0.45) !important; }
 
-.share-msg-card { background: var(--bg3); border: 1px solid var(--border); border-left: 4px solid #2dd4a8; border-radius: var(--radius); padding: 10px 14px; transition: all 0.2s ease; cursor: pointer; }
-.share-msg-card:hover { border-color: #2dd4a8; background: rgba(45, 212, 168, 0.05); }
-.share-type-badge.badge-prompt { background: rgba(45, 212, 168, 0.15) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.3) !important; }
-.share-type-badge.badge-image { background: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; }
-.share-type-badge.badge-pdf { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+.friend-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(14, 25, 21, 0.75); border-radius: 14px; border: 1px solid rgba(45, 212, 168, 0.18); transition: all 0.2s ease; }
+.friend-item:hover { border-color: rgba(45, 212, 168, 0.35); background: rgba(20, 36, 30, 0.85); }
+.friend-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #2dd4a8, #059669); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: #022c22; flex-shrink: 0; box-shadow: 0 2px 8px rgba(45, 212, 168, 0.3); }
+.friend-info { flex: 1; min-width: 0; }
+.friend-name { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.friend-email { font-size: 0.74rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.friend-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-accept { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border: none; border-radius: 99px !important; padding: 6px 14px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); }
+.btn-accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
+.btn-decline { background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid var(--border); border-radius: 99px !important; padding: 6px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+.btn-decline:hover { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #ef4444; }
+.btn-unfriend { background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 99px !important; padding: 5px 12px; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+.btn-unfriend:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; transform: translateY(-1px); }
+
+.share-msg-card { background: rgba(14, 25, 21, 0.75); border: 1px solid rgba(45, 212, 168, 0.18); border-left: 4px solid #2dd4a8; border-radius: 14px; padding: 12px 14px; transition: all 0.2s ease; cursor: pointer; }
+.share-msg-card:hover { border-color: #2dd4a8; background: rgba(45, 212, 168, 0.08); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+.share-type-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 700; border-radius: 99px; padding: 3px 10px; width: fit-content; }
+.share-type-badge.badge-prompt { background: rgba(45, 212, 168, 0.18) !important; color: #2dd4a8 !important; border: 1px solid rgba(45, 212, 168, 0.35) !important; }
+.share-type-badge.badge-image { background: rgba(56, 189, 248, 0.18) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.35) !important; }
+.share-type-badge.badge-pdf { background: rgba(245, 158, 11, 0.18) !important; color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.35) !important; }
 
 /* Modals */
-#modal-add-friend .modal-title, #modal-friend-requests .modal-title, #modal-friends-list .modal-title { color: #2dd4a8; }
-#modal-add-friend .btn-primary { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; }
+#modal-add-friend .modal-title, #modal-friend-requests .modal-title, #modal-friends-list .modal-title, #modal-content-view .modal-title { color: #2dd4a8; }
+#modal-add-friend .btn-primary, #modal-friends-list .btn-primary, #modal-friend-requests .btn-primary, #modal-content-view .btn-primary { background: linear-gradient(135deg, #2dd4a8, #059669) !important; color: #022c22 !important; font-weight: 800 !important; border: none !important; border-radius: 99px !important; padding: 8px 18px !important; box-shadow: 0 2px 10px rgba(45, 212, 168, 0.35) !important; }
+#modal-add-friend .btn-secondary, #modal-friends-list .btn-secondary, #modal-friend-requests .btn-secondary, #modal-content-view .btn-secondary { border-radius: 99px !important; padding: 8px 16px !important; }
+#add-friend-email { border-radius: 12px !important; }
+
+/* ── 3D Graph Cards Enhancements ── */
+.chart-card {
+  background: linear-gradient(160deg, rgba(22, 38, 32, 0.95), rgba(12, 22, 18, 0.95));
+  border: 1px solid rgba(45, 212, 168, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(45, 212, 168, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.study-hero-chart {
+  height: 150px;
+  position: relative;
+  background: rgba(12, 22, 18, 0.5);
+  border-radius: 16px;
+  padding: 8px 12px;
+  border: 1px solid rgba(45, 212, 168, 0.15);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+}
 
 </style>
 </head>
@@ -3370,8 +3431,19 @@ input, textarea { -webkit-user-select: text; user-select: text; }
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">Session History</div>
+        <div class="card" id="session-history-card">
+          <div class="timer-history-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+            <div>
+              <div class="card-title" style="margin-bottom:2px;">Session History</div>
+              <div style="font-size:0.75rem;color:var(--muted);" id="timer-history-sub">Showing sessions for current running month</div>
+            </div>
+            <div class="timer-month-nav" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <button class="btn-icon" onclick="changeTimerMonth(-1)" title="Previous month" aria-label="Previous month" style="width:30px;height:30px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.2s ease;">‹</button>
+              <span id="timer-month-title" style="font-size:0.88rem;font-weight:700;color:var(--accent);min-width:120px;text-align:center;">This Month</span>
+              <button class="btn-icon" id="timer-next-month-btn" onclick="changeTimerMonth(1)" title="Next month" aria-label="Next month" style="width:30px;height:30px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.2s ease;">›</button>
+              <select id="timer-month-dropdown" class="matrix-select-sm" onchange="selectTimerMonth(this.value)" aria-label="Select month" style="padding:5px 12px;font-size:0.78rem;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text);outline:none;cursor:pointer;"></select>
+            </div>
+          </div>
           <div id="session-history-list">
             <div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions recorded yet</div></div>
           </div>
@@ -3583,6 +3655,14 @@ input, textarea { -webkit-user-select: text; user-select: text; }
               </div>
             </div>
             <div>
+              <div class="an-control-label">Particular Month</div>
+              <div class="an-day-row">
+                <select id="analytics-month-select" onchange="setAnalyticsMonth(this.value)" class="matrix-select-sm" style="padding:6px 14px;border-radius:99px;background:var(--bg3);color:var(--text);border:1px solid rgba(45,212,168,0.25);cursor:pointer;outline:none;" aria-label="Select specific month">
+                  <option value="">— Select Month —</option>
+                </select>
+              </div>
+            </div>
+            <div>
               <div class="an-control-label">Day lookup</div>
               <div class="an-day-row">
                 <input type="date" id="analytics-day-picker" onchange="lookupSpecificDay()" aria-label="Pick a day">
@@ -3611,6 +3691,18 @@ input, textarea { -webkit-user-select: text; user-select: text; }
             <div class="an-chart-title">Monthly Study Hours</div>
             <div class="chart-wrap"><canvas id="analytics-monthly-chart"></canvas></div>
           </div>
+        </div>
+
+        <!-- Particular Month History Section -->
+        <div id="an-month-history-card" class="card" style="margin-top:22px;display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div>
+              <div class="card-title" id="an-month-history-title" style="margin-bottom:2px;">Month History</div>
+              <div style="font-size:0.75rem;color:var(--muted);" id="an-month-history-sub">Full session breakdown for selected month</div>
+            </div>
+            <div id="an-month-history-badge" style="font-size:0.8rem;font-weight:700;color:#2dd4a8;background:rgba(45,212,168,0.14);border:1px solid rgba(45,212,168,0.3);padding:4px 14px;border-radius:99px;">0 Sessions</div>
+          </div>
+          <div id="an-month-history-list"></div>
         </div>
       </div>
 
@@ -3720,17 +3812,17 @@ input, textarea { -webkit-user-select: text; user-select: text; }
         <div class="card" style="margin-bottom:16px;">
           <div class="card-title" style="margin-bottom:14px;">📤 Send to Friend</div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <select id="share-friend-select" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.85rem;width:100%;">
+            <select id="share-friend-select" style="background:var(--bg3);border:1px solid rgba(45,212,168,0.25);border-radius:12px;padding:10px 14px;color:var(--text);font-size:0.85rem;width:100%;outline:none;cursor:pointer;">
               <option value="">— Select a friend —</option>
             </select>
-            <textarea id="share-prompt-text" placeholder="Type a prompt, note, or message to share privately…" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:0.85rem;width:100%;min-height:80px;resize:vertical;font-family:inherit;box-sizing:border-box;"></textarea>
+            <textarea id="share-prompt-text" placeholder="Type a prompt, note, or message to share privately…" style="background:var(--bg3);border:1px solid rgba(45,212,168,0.25);border-radius:12px;padding:12px 14px;color:var(--text);font-size:0.85rem;width:100%;min-height:85px;resize:vertical;font-family:inherit;box-sizing:border-box;outline:none;"></textarea>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <label class="label-attach-file" style="display:flex;align-items:center;gap:8px;border-radius:var(--radius);padding:8px 14px;cursor:pointer;font-size:0.82rem;">
+              <label class="label-attach-file" style="display:flex;align-items:center;gap:8px;border-radius:99px;padding:8px 16px;cursor:pointer;font-size:0.82rem;">
                 📎 Attach File (Image/PDF)
                 <input type="file" id="share-file-input" accept="image/*,.pdf" style="display:none;" onchange="previewShareFile(this)">
               </label>
               <span id="share-file-preview" style="font-size:0.78rem;color:var(--accent3);"></span>
-              <button onclick="sendToFriend()" class="btn-send-friend" style="margin-left:auto;padding:9px 20px;font-size:0.85rem;cursor:pointer;">
+              <button onclick="sendToFriend()" class="btn-send-friend" style="margin-left:auto;padding:9px 22px;font-size:0.85rem;border-radius:99px;cursor:pointer;">
                 Send 🚀
               </button>
             </div>
@@ -3738,7 +3830,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
         </div>
 
         <!-- Sent & Received split -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div id="friends-split-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
 
           <!-- SENT -->
           <div class="card" style="min-width:0;">
@@ -5103,17 +5195,17 @@ function renderDailyStudyMatrix() {
   if (statCols) statCols.textContent = `${visibleSubjs.length} Active Column${visibleSubjs.length !== 1 ? 's' : ''}`;
 
   // 1. Render Table Headers
-  let headHtml = `<th>Date</th>`;
+  let headHtml = `<th class="matrix-th-date">Date</th>`;
   visibleSubjs.forEach(s => {
     const c = colorForSubject(s);
-    headHtml += `<th style="color:${c};">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block;"></span>
+    headHtml += `<th class="matrix-th-subj" style="color:${c};">
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block;box-shadow:0 0 6px ${c};"></span>
         <span>${escHtml(s.name)}</span>
       </div>
     </th>`;
   });
-  headHtml += `<th>Total Time</th><th>Action</th>`;
+  headHtml += `<th class="matrix-th-total">Total Time</th><th class="matrix-th-act">Action</th>`;
   headEl.innerHTML = headHtml;
 
   // 2. Gather Dates Range
@@ -5181,27 +5273,27 @@ function renderDailyStudyMatrix() {
 
       const c = colorForSubject(s);
       if (ms > 0) {
-        rowCellsHtml += `<td>
-          <span class="matrix-cell-badge" style="background:${c}18;color:${c};border:1px solid ${c}33;" onclick="openQuickLogModal('${dateStr}', '${s.id}')" title="Click to edit or log time">
+        rowCellsHtml += `<td class="matrix-td-subj">
+          <span class="matrix-cell-badge" style="background:${c}1f;color:${c};border:1px solid ${c}40;" onclick="openQuickLogModal('${dateStr}', '${s.id}')" title="Click to edit or log time">
             ⏱️ ${formatMatrixDuration(ms)}
           </span>
         </td>`;
       } else {
-        rowCellsHtml += `<td><span class="matrix-cell-empty" onclick="openQuickLogModal('${dateStr}', '${s.id}')" style="cursor:pointer;" title="Click to log time">—</span></td>`;
+        rowCellsHtml += `<td class="matrix-td-subj"><span class="matrix-cell-empty" onclick="openQuickLogModal('${dateStr}', '${s.id}')" style="cursor:pointer;" title="Click to log time">—</span></td>`;
       }
     });
 
-    bodyHtml += `<tr>
-      <td>
+    bodyHtml += `<tr class="${isToday ? 'is-today' : ''}">
+      <td class="matrix-td-date">
         <div class="matrix-date-cell">
           <span>${formatDateFriendly(dateStr)}</span>
           ${isToday ? '<span class="matrix-date-today">TODAY</span>' : ''}
         </div>
       </td>
       ${rowCellsHtml}
-      <td><span class="matrix-row-total">${formatMatrixDuration(rowTotalMs)}</span></td>
-      <td>
-        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.72rem;padding:3px 8px;" onclick="openQuickLogModal('${dateStr}')">✏️ Log</button>
+      <td class="matrix-td-total"><span class="matrix-row-total">${formatMatrixDuration(rowTotalMs)}</span></td>
+      <td class="matrix-td-act">
+        <button class="btn-matrix-action btn-matrix-outline" style="font-size:0.72rem;padding:4px 10px;border-radius:99px;" onclick="openQuickLogModal('${dateStr}')">✏️ Log</button>
       </td>
     </tr>`;
   });
@@ -5209,15 +5301,15 @@ function renderDailyStudyMatrix() {
   bodyEl.innerHTML = bodyHtml;
 
   // 5. Build Footer Row
-  let footHtml = `<tr><td><strong>Total Study Time</strong></td>`;
+  let footHtml = `<tr><td class="matrix-td-date"><strong>Total Study Time</strong></td>`;
   let grandTotalRangeMs = 0;
   visibleSubjs.forEach(s => {
     const totMs = subjectTotals[s.id] || 0;
     grandTotalRangeMs += totMs;
     const c = colorForSubject(s);
-    footHtml += `<td style="color:${c};font-weight:700;">${totMs > 0 ? formatMatrixDuration(totMs) : '0m'}</td>`;
+    footHtml += `<td class="matrix-td-subj" style="color:${c};font-weight:700;">${totMs > 0 ? formatMatrixDuration(totMs) : '0m'}</td>`;
   });
-  footHtml += `<td style="color:var(--accent);font-weight:800;">${formatMatrixDuration(grandTotalRangeMs)}</td><td>—</td></tr>`;
+  footHtml += `<td class="matrix-td-total" style="color:#5eead4;font-weight:800;">${formatMatrixDuration(grandTotalRangeMs)}</td><td class="matrix-td-act" style="color:var(--muted);font-weight:600;">—</td></tr>`;
   footEl.innerHTML = footHtml;
 
   // 6. Update Stats Bar
@@ -7085,9 +7177,73 @@ function calcStreak() {
   return streak;
 }
 
+let _chart3DRegistered = false;
+function ensureChart3DPlugin() {
+  if (_chart3DRegistered || typeof Chart === 'undefined') return;
+  try {
+    Chart.register({
+      id: 'chart3DEffect',
+      afterDatasetsDraw(chart) {
+        if (chart.config.type !== 'bar') return;
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset, dIdx) => {
+          const meta = chart.getDatasetMeta(dIdx);
+          if (!meta || !meta.visible) return;
+          meta.data.forEach((bar) => {
+            const { x, y, base, width } = bar;
+            const h = Math.abs(base - y);
+            if (h < 3) return;
+            const topY = Math.min(y, base);
+            const leftX = x - width / 2;
+
+            ctx.save();
+            // 1. 3D Cylindrical Reflection Highlight (Left)
+            const leftLight = ctx.createLinearGradient(leftX, topY, leftX + width * 0.4, topY);
+            leftLight.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+            leftLight.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+            leftLight.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+            ctx.fillStyle = leftLight;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(leftX, topY, width * 0.4, h, [6, 0, 0, 6]);
+            else ctx.rect(leftX, topY, width * 0.4, h);
+            ctx.fill();
+
+            // 2. 3D Curvature Shading (Right)
+            const rightShade = ctx.createLinearGradient(x, topY, leftX + width, topY);
+            rightShade.addColorStop(0, 'rgba(0, 0, 0, 0.0)');
+            rightShade.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+            ctx.fillStyle = rightShade;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x, topY, width / 2, h, [0, 6, 6, 0]);
+            else ctx.rect(x, topY, width / 2, h);
+            ctx.fill();
+
+            // 3. 3D Beveled Top Specular Cap
+            const capH = Math.min(6, h);
+            const capGrad = ctx.createLinearGradient(leftX, topY, leftX + width, topY);
+            capGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+            capGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
+            capGrad.addColorStop(1, 'rgba(255, 255, 255, 0.35)');
+            ctx.fillStyle = capGrad;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(leftX, topY, width, capH, [6, 6, 2, 2]);
+            else ctx.rect(leftX, topY, width, capH);
+            ctx.fill();
+
+            ctx.restore();
+          });
+        });
+      }
+    });
+    _chart3DRegistered = true;
+  } catch (e) {}
+}
+
 function renderWeekChart() {
   const ctx = document.getElementById('study-week-chart');
-  if (!ctx) return;
+  if (!ctx || typeof Chart === 'undefined') return;
+  ensureChart3DPlugin();
+
   const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const now = new Date();
   const todayIdx = (now.getDay() + 6) % 7; // Mon=0 ... Sun=6
@@ -7102,30 +7258,52 @@ function renderWeekChart() {
   });
   if (state.weekChartRef) state.weekChartRef.destroy();
   const canvasCtx = ctx.getContext('2d');
-  const gradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
-  gradient.addColorStop(0, '#7dffd0');
-  gradient.addColorStop(1, '#2dd4a8');
-  const colors = days.map((_, i) => i === todayIdx ? gradient : 'rgba(45,212,168,0.35)');
-  const borderColors = days.map((_, i) => i === todayIdx ? '#7dffd0' : 'rgba(45,212,168,0.5)');
+  
+  // 3D vertical gradient for active day
+  const activeGradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+  activeGradient.addColorStop(0, '#5eead4');
+  activeGradient.addColorStop(0.5, '#2dd4a8');
+  activeGradient.addColorStop(1, '#0f766e');
+
+  // 3D vertical gradient for other days
+  const barGradient = canvasCtx.createLinearGradient(0, 0, 0, 150);
+  barGradient.addColorStop(0, 'rgba(94, 234, 212, 0.55)');
+  barGradient.addColorStop(0.6, 'rgba(45, 212, 168, 0.35)');
+  barGradient.addColorStop(1, 'rgba(15, 118, 110, 0.25)');
+
+  const colors = days.map((_, i) => i === todayIdx ? activeGradient : barGradient);
+  const borderColors = days.map((_, i) => i === todayIdx ? '#5eead4' : 'rgba(45,212,168,0.5)');
   state.weekChartRef = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: days,
-      datasets: [{ data: weekData, backgroundColor: colors, borderColor: borderColors, borderWidth: 1.5, borderRadius: 8, maxBarThickness: 36 }]
+      datasets: [{
+        data: weekData,
+        backgroundColor: colors,
+        borderColor: borderColors,
+        borderWidth: 1.5,
+        borderRadius: 8,
+        maxBarThickness: 38
+      }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a2a24', borderColor: '#2a4038', borderWidth: 1, padding: 10,
-          titleFont: { family: 'Inter', size: 11 }, bodyFont: { family: 'Inter', size: 12, weight: '600' },
+          backgroundColor: 'rgba(15, 28, 23, 0.95)',
+          borderColor: 'rgba(45, 212, 168, 0.4)',
+          borderWidth: 1.5,
+          padding: 10,
+          cornerRadius: 10,
+          titleFont: { family: 'Inter', size: 11, weight: '700' },
+          bodyFont: { family: 'Inter', size: 12, weight: '600' },
           callbacks: { label: ctx => ctx.parsed.y + ' hours' }
         }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter' } } },
-        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter' } }, beginAtZero: true }
+        x: { grid: { display: false }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter', weight: '600' } } },
+        y: { grid: { color: 'rgba(45,212,168,0.06)' }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter' } }, beginAtZero: true }
       }
     }
   });
@@ -7564,23 +7742,102 @@ function renderActiveTimers() {
   }
 }
 
+let timerMonthOffset = 0; // 0 = current running month, -1 = last month, etc.
+
+function changeTimerMonth(dir) {
+  const newOffset = timerMonthOffset + dir;
+  if (newOffset > 0) return; // can't go beyond current month
+  timerMonthOffset = newOffset;
+  renderSessions();
+}
+
+function selectTimerMonth(val) {
+  if (!val) return;
+  const [yearStr, monthStr] = val.split('-');
+  const targetYear = parseInt(yearStr, 10);
+  const targetMonth = parseInt(monthStr, 10) - 1;
+  const now = new Date();
+  const diff = (targetYear - now.getFullYear()) * 12 + (targetMonth - now.getMonth());
+  if (diff > 0) return;
+  timerMonthOffset = diff;
+  renderSessions();
+}
+
+function formatTimerSessionDateHeader(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const today = toDateKey(new Date());
+  const yesterday = toDateKey(new Date(Date.now() - 86400000));
+  const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+  const monthName = d.toLocaleDateString('en-US', { month: 'short' });
+  const dayNum = d.getDate();
+  const baseFormatted = `${dayName}, ${monthName} ${dayNum}`;
+  if (dateStr === today) return `${baseFormatted} (Today)`;
+  if (dateStr === yesterday) return `${baseFormatted} (Yesterday)`;
+  return baseFormatted;
+}
+
 function renderSessions() {
   const list = document.getElementById('session-history-list');
   if (!list) return;
-  if (state.sessions.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions yet</div></div>';
+
+  const base = new Date();
+  const viewDate = new Date(base.getFullYear(), base.getMonth() + timerMonthOffset, 1);
+  const viewYear = viewDate.getFullYear();
+  const viewMonth = viewDate.getMonth();
+  const monthKey = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`;
+  const monthTitle = viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Update month title and button state
+  const titleEl = document.getElementById('timer-month-title');
+  if (titleEl) titleEl.textContent = monthTitle;
+  const nextBtn = document.getElementById('timer-next-month-btn');
+  if (nextBtn) {
+    nextBtn.style.opacity = timerMonthOffset >= 0 ? '0.25' : '1';
+    nextBtn.style.pointerEvents = timerMonthOffset >= 0 ? 'none' : 'auto';
+  }
+
+  // Populate month dropdown if present
+  const dropdownEl = document.getElementById('timer-month-dropdown');
+  if (dropdownEl) {
+    const monthKeysSet = new Set([toDateKey(base).slice(0, 7)]);
+    state.sessions.forEach(s => {
+      if (s.date && s.date.length >= 7) monthKeysSet.add(s.date.slice(0, 7));
+    });
+    const sortedMonthKeys = Array.from(monthKeysSet).sort().reverse();
+    dropdownEl.innerHTML = sortedMonthKeys.map(k => {
+      const [y, m] = k.split('-');
+      const d = new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1);
+      const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      return `<option value="${k}" ${k === monthKey ? 'selected' : ''}>${label}</option>`;
+    }).join('');
+  }
+
+  // Filter sessions for the selected month only
+  const monthSessions = state.sessions.filter(s => s.date && s.date.startsWith(monthKey));
+  const monthTotalMs = monthSessions.filter(s => s.status === 'done').reduce((a, s) => a + (s.duration || 0), 0);
+
+  const subEl = document.getElementById('timer-history-sub');
+  if (subEl) {
+    const isCurrent = timerMonthOffset === 0;
+    subEl.textContent = `${isCurrent ? 'Current Running Month' : 'Selected Month'} · ${formatHM(monthTotalMs)} total · ${monthSessions.length} session${monthSessions.length !== 1 ? 's' : ''}`;
+  }
+
+  if (monthSessions.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions recorded in ${monthTitle}</div></div>`;
     return;
   }
+
   // Group by date
   const grouped = {};
-  [...state.sessions].reverse().forEach(s => {
+  [...monthSessions].reverse().forEach(s => {
     if (!grouped[s.date]) grouped[s.date] = [];
     grouped[s.date].push(s);
   });
+
   list.innerHTML = Object.entries(grouped).map(([date, sessions]) => {
     const totalMs = sessions.filter(s => s.status === 'done').reduce((a, s) => a + s.duration, 0);
     return `<div class="session-day">
-      <div class="session-day-header"><span>${formatDateFriendly(date)}</span><span>${formatHM(totalMs)}</span></div>
+      <div class="session-day-header"><span>${formatTimerSessionDateHeader(date)}</span><span>${formatHM(totalMs)}</span></div>
       ${sessions.map(s => {
         const subj = state.subjects.find(x => x.id === s.subjectId);
         const c = subj ? colorForSubject(subj) : '#8ba89c';
@@ -8092,12 +8349,62 @@ function deletePost(id) {
 }
 
 // ===================== ANALYTICS =====================
-let analyticsRange = 6; // months: 1, 3, 6, 12, or 'all'
+let analyticsRange = 6; // months: 1, 3, 6, 12, or 'all', or 'month'
+let analyticsSelectedMonth = null; // 'YYYY-MM' format when a specific month is chosen
+
+function populateAnalyticsMonthSelect() {
+  const sel = document.getElementById('analytics-month-select');
+  if (!sel) return;
+  const currentVal = sel.value;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const monthsSet = new Set();
+
+  // Add all 12 months for current year and previous year
+  for (let y = currentYear; y >= currentYear - 1; y--) {
+    for (let m = 1; m <= 12; m++) {
+      monthsSet.add(`${y}-${String(m).padStart(2, '0')}`);
+    }
+  }
+  // Add any months from recorded sessions
+  state.sessions.forEach(s => {
+    if (s.date && s.date.length >= 7) monthsSet.add(s.date.slice(0, 7));
+  });
+
+  const sortedMonths = Array.from(monthsSet).sort().reverse();
+  sel.innerHTML = '<option value="">— Select Month —</option>' + sortedMonths.map(k => {
+    const [y, m] = k.split('-');
+    const d = new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1);
+    const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return `<option value="${k}" ${k === analyticsSelectedMonth ? 'selected' : ''}>${label}</option>`;
+  }).join('');
+
+  if (analyticsSelectedMonth && sel.value !== analyticsSelectedMonth) {
+    sel.value = analyticsSelectedMonth;
+  }
+}
+
+function setAnalyticsMonth(monthKey) {
+  if (!monthKey) {
+    analyticsSelectedMonth = null;
+    setAnalyticsRange(6);
+    return;
+  }
+  analyticsSelectedMonth = monthKey;
+  analyticsRange = 'month';
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  renderAnalytics();
+}
 
 function setAnalyticsRange(range) {
+  analyticsSelectedMonth = null;
+  const mSel = document.getElementById('analytics-month-select');
+  if (mSel) mSel.value = '';
   analyticsRange = range;
   document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`.range-btn[data-range="${range}"]`)?.classList.add('active');
+  const monthCardEl = document.getElementById('an-month-history-card');
+  if (monthCardEl) monthCardEl.style.display = 'none';
   renderAnalytics();
 }
 
@@ -8108,7 +8415,7 @@ function getRangeStartDate() {
     return new Date(dates[0] + 'T00:00:00');
   }
   const d = new Date();
-  d.setMonth(d.getMonth() - Number(analyticsRange));
+  d.setMonth(d.getMonth() - (Number(analyticsRange) || 6));
   return d;
 }
 
@@ -8162,14 +8469,82 @@ function lookupSpecificDay() {
 }
 
 function renderAnalytics() {
+  if (typeof Chart === 'undefined') return;
+  ensureChart3DPlugin();
+  populateAnalyticsMonthSelect();
+
   // Destroy old charts
   Object.values(state.analyticsCharts).forEach(c => { try { c.destroy(); } catch {} });
   state.analyticsCharts = {};
 
-  const startDate = getRangeStartDate();
-  const startKey = toDateKey(startDate);
-  const rangeSessions = state.sessions.filter(s => s.status === 'done' && s.date >= startKey);
-  const rangeMs = rangeSessions.reduce((a, s) => a + s.duration, 0);
+  const isSpecificMonth = Boolean(analyticsSelectedMonth);
+  let rangeSessions = [];
+  let rangeMs = 0;
+  let rangeLabelText = '';
+  let startDate = new Date();
+
+  if (isSpecificMonth) {
+    const [yStr, mStr] = analyticsSelectedMonth.split('-');
+    const mYear = parseInt(yStr, 10);
+    const mMonth = parseInt(mStr, 10) - 1;
+    startDate = new Date(mYear, mMonth, 1);
+    rangeLabelText = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    rangeSessions = state.sessions.filter(s => s.status === 'done' && s.date && s.date.startsWith(analyticsSelectedMonth));
+    rangeMs = rangeSessions.reduce((a, s) => a + (s.duration || 0), 0);
+
+    // Render Month History Card
+    const monthCardEl = document.getElementById('an-month-history-card');
+    const monthListEl = document.getElementById('an-month-history-list');
+    const monthTitleEl = document.getElementById('an-month-history-title');
+    const monthSubEl = document.getElementById('an-month-history-sub');
+    const monthBadgeEl = document.getElementById('an-month-history-badge');
+    if (monthCardEl) monthCardEl.style.display = 'block';
+    if (monthTitleEl) monthTitleEl.textContent = `${rangeLabelText} History`;
+    if (monthSubEl) monthSubEl.textContent = `Total study time: ${formatHM(rangeMs)} across ${rangeSessions.length} session${rangeSessions.length !== 1 ? 's' : ''}`;
+    if (monthBadgeEl) monthBadgeEl.textContent = `${rangeSessions.length} Session${rangeSessions.length !== 1 ? 's' : ''}`;
+    if (monthListEl) {
+      if (rangeSessions.length === 0) {
+        monthListEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No study sessions recorded in ${rangeLabelText}</div></div>`;
+      } else {
+        const grouped = {};
+        [...rangeSessions].reverse().forEach(s => {
+          if (!grouped[s.date]) grouped[s.date] = [];
+          grouped[s.date].push(s);
+        });
+        monthListEl.innerHTML = Object.entries(grouped).map(([date, sessions]) => {
+          const dayTotalMs = sessions.reduce((a, s) => a + s.duration, 0);
+          return `<div class="session-day" style="background:rgba(14,25,21,0.75);border-radius:14px;padding:12px 16px;border:1px solid rgba(45,212,168,0.18);margin-bottom:10px;">
+            <div class="session-day-header" style="border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:700;color:#5eead4;">${formatTimerSessionDateHeader(date)}</span>
+              <span style="font-weight:700;color:var(--accent);font-family:var(--font-display);">${formatHM(dayTotalMs)}</span>
+            </div>
+            ${sessions.map(s => {
+              const subj = state.subjects.find(x => x.id === s.subjectId);
+              const c = subj ? colorForSubject(subj) : '#8ba89c';
+              return `<div class="session-item" style="padding:6px 0;">
+                <div class="session-dot done"></div>
+                <div class="session-info">
+                  <div class="session-sub" style="color:${c};font-weight:700;">${escHtml(getSubjectName(s.subjectId))}</div>
+                  <div class="session-task" style="font-size:0.8rem;color:var(--muted);">${escHtml(s.taskName)}</div>
+                </div>
+                <div class="session-dur" style="font-weight:700;color:#fff;">${formatHM(s.duration)}</div>
+              </div>`;
+            }).join('')}
+          </div>`;
+        }).join('');
+      }
+    }
+  } else {
+    startDate = getRangeStartDate();
+    const startKey = toDateKey(startDate);
+    rangeSessions = state.sessions.filter(s => s.status === 'done' && s.date >= startKey);
+    rangeMs = rangeSessions.reduce((a, s) => a + s.duration, 0);
+    const rangeLabels = { 1: 'Last 1 Month', 3: 'Last 3 Months', 6: 'Last 6 Months', 12: 'Last 1 Year', all: 'All Time' };
+    rangeLabelText = rangeLabels[analyticsRange] || 'Selected Range';
+    const monthCardEl = document.getElementById('an-month-history-card');
+    if (monthCardEl) monthCardEl.style.display = 'none';
+  }
+
   const avgProgress = state.subjects.length
     ? Math.round(state.subjects.reduce((a, s) => a + calcSubjectProgress(s), 0) / state.subjects.length)
     : 0;
@@ -8177,9 +8552,8 @@ function renderAnalytics() {
   const taskDone = state.tasks.filter(t => t.status === 'completed').length;
   const taskPct = taskTotal > 0 ? Math.round((taskDone / taskTotal) * 100) : 0;
 
-  const rangeLabels = { 1: 'Last 1 Month', 3: 'Last 3 Months', 6: 'Last 6 Months', 12: 'Last 1 Year', all: 'All Time' };
   const rangeLabelEl = document.getElementById('an-range-label');
-  if (rangeLabelEl) rangeLabelEl.textContent = rangeLabels[analyticsRange] || 'Selected Range';
+  if (rangeLabelEl) rangeLabelEl.textContent = rangeLabelText;
 
   const kpiHours = document.getElementById('an-kpi-hours');
   const kpiSessions = document.getElementById('an-kpi-sessions');
@@ -8191,75 +8565,145 @@ function renderAnalytics() {
   if (kpiTasks) kpiTasks.textContent = taskPct + '%';
 
   const tick = '#8ba89c';
-  const grid = 'rgba(120,160,150,0.08)';
+  const grid = 'rgba(45, 212, 168, 0.07)';
   const cOpts = {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: tick, font: { size: 11 } } } },
+    plugins: {
+      legend: { labels: { color: tick, font: { size: 11, family: 'Inter', weight: '600' } } },
+      tooltip: {
+        backgroundColor: 'rgba(15, 28, 23, 0.95)',
+        borderColor: 'rgba(45, 212, 168, 0.4)',
+        borderWidth: 1.5,
+        padding: 10,
+        cornerRadius: 10,
+        titleFont: { family: 'Inter', size: 11, weight: '700' },
+        bodyFont: { family: 'Inter', size: 12, weight: '600' }
+      }
+    },
     scales: {
-      x: { grid: { color: grid }, ticks: { color: tick, font: { size: 10 } } },
-      y: { grid: { color: grid }, ticks: { color: tick, font: { size: 10 } }, beginAtZero: true }
+      x: { grid: { display: false }, ticks: { color: tick, font: { size: 10, family: 'Inter', weight: '600' } } },
+      y: { grid: { color: grid }, ticks: { color: tick, font: { size: 10, family: 'Inter' } }, beginAtZero: true }
     }
   };
 
-  // Subject performance
+  // 1. Subject Performance Chart (3D beveled bars)
   const subjCtx = document.getElementById('analytics-subjects-chart');
   if (subjCtx && state.subjects.length > 0) {
+    const canvasSubjCtx = subjCtx.getContext('2d');
     const colors = state.subjects.map(s => colorForSubject(s));
+    
+    // Calculate metric for subjects: if in specific month, show study hours logged in that month
+    let subjLabels = state.subjects.map(s => s.name);
+    let subjData = [];
+    let subjMetricLabel = 'Progress %';
+
+    if (isSpecificMonth) {
+      subjMetricLabel = 'Hours Studied';
+      subjData = state.subjects.map(s => {
+        const ms = rangeSessions.filter(sess => matchSessionToSubject(sess, s)).reduce((a, b) => a + (b.duration || 0), 0);
+        return Math.round(ms / 3600000 * 10) / 10;
+      });
+    } else {
+      subjData = state.subjects.map(s => calcSubjectProgress(s));
+    }
+
+    const barGradients = colors.map(c => {
+      const grad = canvasSubjCtx.createLinearGradient(0, 0, 0, 180);
+      grad.addColorStop(0, c);
+      grad.addColorStop(0.6, c + 'aa');
+      grad.addColorStop(1, c + '44');
+      return grad;
+    });
+
     state.analyticsCharts.subj = new Chart(subjCtx, {
       type: 'bar',
       data: {
-        labels: state.subjects.map(s => s.name),
-        datasets: [{ label: 'Progress %', data: state.subjects.map(s => calcSubjectProgress(s)), backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 1, borderRadius: 6 }]
+        labels: subjLabels,
+        datasets: [{
+          label: subjMetricLabel,
+          data: subjData,
+          backgroundColor: barGradients,
+          borderColor: colors,
+          borderWidth: 1.5,
+          borderRadius: 8,
+          maxBarThickness: 38
+        }]
       },
-      options: { ...cOpts, plugins: { ...cOpts.plugins }, scales: { ...cOpts.scales, y: { ...cOpts.scales.y, max: 100 } } }
+      options: {
+        ...cOpts,
+        scales: {
+          ...cOpts.scales,
+          y: { ...cOpts.scales.y, max: isSpecificMonth ? undefined : 100 }
+        }
+      }
     });
   }
 
-  // Study hours trend — granularity adapts to selected range
+  // 2. Study Hours Trend Chart (3D line & area gradient)
   const weekCtx = document.getElementById('analytics-weekly-chart');
   const titleEl = document.getElementById('weekly-chart-title');
   if (weekCtx) {
-    const now = new Date();
-    const totalDays = Math.max(1, Math.round((now - startDate) / 86400000));
+    const canvasWeekCtx = weekCtx.getContext('2d');
     let labels = [], data = [];
 
-    if (analyticsRange === 1 || totalDays <= 31) {
-      // Daily granularity
-      if (titleEl) titleEl.textContent = 'Daily Study Hours (Last 30 Days)';
-      for (let i = 29; i >= 0; i--) {
-        const d = new Date(); d.setDate(d.getDate() - i);
-        const key = toDateKey(d);
-        labels.push(d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
-        const ms = state.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + s.duration, 0);
-        data.push(Math.round(ms / 3600000 * 10) / 10);
-      }
-    } else if (totalDays <= 200) {
-      // Weekly buckets
-      if (titleEl) titleEl.textContent = 'Weekly Study Hours';
-      const numWeeks = Math.ceil(totalDays / 7);
-      for (let w = numWeeks - 1; w >= 0; w--) {
-        const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() - (w * 7));
-        const weekStart = new Date(weekEnd); weekStart.setDate(weekStart.getDate() - 6);
-        labels.push(weekStart.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
-        let ms = 0;
-        for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
-          const key = toDateKey(d);
-          ms += state.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + s.duration, 0);
-        }
+    if (isSpecificMonth) {
+      const [yStr, mStr] = analyticsSelectedMonth.split('-');
+      const mYear = parseInt(yStr, 10);
+      const mMonth = parseInt(mStr, 10);
+      const daysInMonth = new Date(mYear, mMonth, 0).getDate();
+      const monthShort = new Date(mYear, mMonth - 1, 1).toLocaleDateString('en-US', { month: 'short' });
+      if (titleEl) titleEl.textContent = `Daily Study Hours (${rangeLabelText})`;
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const key = `${analyticsSelectedMonth}-${String(day).padStart(2, '0')}`;
+        labels.push(`${day} ${monthShort}`);
+        const ms = state.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + (s.duration || 0), 0);
         data.push(Math.round(ms / 3600000 * 10) / 10);
       }
     } else {
-      // Monthly buckets
-      if (titleEl) titleEl.textContent = 'Monthly Study Hours Trend';
-      const numMonths = Math.ceil(totalDays / 30);
-      for (let i = numMonths - 1; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-        labels.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-        const ms = state.sessions.filter(s => s.date.startsWith(key) && s.status === 'done').reduce((a, s) => a + s.duration, 0);
-        data.push(Math.round(ms / 3600000 * 10) / 10);
+      const now = new Date();
+      const totalDays = Math.max(1, Math.round((now - startDate) / 86400000));
+
+      if (analyticsRange === 1 || totalDays <= 31) {
+        if (titleEl) titleEl.textContent = 'Daily Study Hours (Last 30 Days)';
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          const key = toDateKey(d);
+          labels.push(d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
+          const ms = state.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + s.duration, 0);
+          data.push(Math.round(ms / 3600000 * 10) / 10);
+        }
+      } else if (totalDays <= 200) {
+        if (titleEl) titleEl.textContent = 'Weekly Study Hours';
+        const numWeeks = Math.ceil(totalDays / 7);
+        for (let w = numWeeks - 1; w >= 0; w--) {
+          const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() - (w * 7));
+          const weekStart = new Date(weekEnd); weekStart.setDate(weekStart.getDate() - 6);
+          labels.push(weekStart.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
+          let ms = 0;
+          for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+            const key = toDateKey(d);
+            ms += state.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + s.duration, 0);
+          }
+          data.push(Math.round(ms / 3600000 * 10) / 10);
+        }
+      } else {
+        if (titleEl) titleEl.textContent = 'Monthly Study Hours Trend';
+        const numMonths = Math.ceil(totalDays / 30);
+        for (let i = numMonths - 1; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+          labels.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+          const ms = state.sessions.filter(s => s.date.startsWith(key) && s.status === 'done').reduce((a, s) => a + s.duration, 0);
+          data.push(Math.round(ms / 3600000 * 10) / 10);
+        }
       }
     }
+
+    const areaGradient = canvasWeekCtx.createLinearGradient(0, 0, 0, 200);
+    areaGradient.addColorStop(0, 'rgba(45, 212, 168, 0.45)');
+    areaGradient.addColorStop(0.6, 'rgba(45, 212, 168, 0.12)');
+    areaGradient.addColorStop(1, 'rgba(45, 212, 168, 0.0)');
 
     state.analyticsCharts.week = new Chart(weekCtx, {
       type: 'line',
@@ -8268,17 +8712,23 @@ function renderAnalytics() {
         datasets: [{
           label: 'Hours', data,
           borderColor: '#2dd4a8',
-          backgroundColor: 'rgba(45,212,168,0.14)',
-          fill: true, tension: 0.35,
+          borderWidth: 3,
+          backgroundColor: areaGradient,
+          fill: true,
+          tension: 0.38,
           pointBackgroundColor: '#5eead4',
-          pointRadius: labels.length > 20 ? 0 : 3
+          pointBorderColor: '#091512',
+          pointBorderWidth: 2.5,
+          pointRadius: labels.length > 25 ? 0 : 4,
+          pointHoverRadius: 7,
+          pointHoverBorderWidth: 3
         }]
       },
       options: cOpts
     });
   }
 
-  // Task breakdown
+  // 3. Task Status Breakdown Chart (3D Doughnut)
   const taskCtx = document.getElementById('analytics-tasks-chart');
   if (taskCtx) {
     const done = state.tasks.filter(t => t.status === 'completed').length;
@@ -8290,39 +8740,71 @@ function renderAnalytics() {
         labels: ['Completed', 'Pending', 'Cancelled'],
         datasets: [{
           data: [done, pend, can],
-          backgroundColor: ['rgba(45,212,168,0.75)', 'rgba(94,234,212,0.55)', 'rgba(52,211,153,0.45)'],
-          borderColor: ['#2dd4a8', '#5eead4', '#34d399'],
-          borderWidth: 1
+          backgroundColor: ['#2dd4a8', '#38bdf8', '#fb7185'],
+          hoverBackgroundColor: ['#5eead4', '#7dd3fc', '#fda4af'],
+          borderColor: '#0e1d18',
+          borderWidth: 4,
+          hoverOffset: 6
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: tick, font: { size: 11 } } } } }
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: { labels: { color: tick, font: { size: 11, family: 'Inter', weight: '600' } } },
+          tooltip: cOpts.plugins.tooltip
+        }
+      }
     });
   }
 
-  // Monthly study — respects selected range (capped 3-24 months for readability)
+  // 4. Monthly Study Hours Chart (3D Beveled Bars)
   const monthCtx = document.getElementById('analytics-monthly-chart');
   if (monthCtx) {
+    const canvasMonthCtx = monthCtx.getContext('2d');
     const now = new Date();
-    const monthCount = analyticsRange === 'all' ? Math.min(24, Math.max(3, Math.ceil((now - getRangeStartDate()) / 30 / 86400000))) : Math.max(3, Number(analyticsRange) || 6);
+    const monthCount = isSpecificMonth ? 12 : (analyticsRange === 'all' ? Math.min(24, Math.max(3, Math.ceil((now - getRangeStartDate()) / 30 / 86400000))) : Math.max(3, Number(analyticsRange) || 6));
     const months = [];
     const data = [];
+    const barColors = [];
+    const borderColors = [];
+
     for (let i = monthCount - 1; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
       months.push(d.toLocaleDateString('en-US', { month: 'short' }));
       const ms = state.sessions.filter(s => s.date.startsWith(key) && s.status === 'done').reduce((a, s) => a + s.duration, 0);
       data.push(Math.round(ms / 3600000 * 10) / 10);
+
+      const isCurrentSelected = isSpecificMonth ? (key === analyticsSelectedMonth) : (i === 0);
+      if (isCurrentSelected) {
+        const grad = canvasMonthCtx.createLinearGradient(0, 0, 0, 180);
+        grad.addColorStop(0, '#5eead4');
+        grad.addColorStop(0.5, '#2dd4a8');
+        grad.addColorStop(1, '#0f766e');
+        barColors.push(grad);
+        borderColors.push('#5eead4');
+      } else {
+        const grad = canvasMonthCtx.createLinearGradient(0, 0, 0, 180);
+        grad.addColorStop(0, 'rgba(94, 234, 212, 0.55)');
+        grad.addColorStop(0.6, 'rgba(45, 212, 168, 0.35)');
+        grad.addColorStop(1, 'rgba(15, 118, 110, 0.25)');
+        barColors.push(grad);
+        borderColors.push('rgba(45, 212, 168, 0.5)');
+      }
     }
+
     state.analyticsCharts.monthly = new Chart(monthCtx, {
       type: 'bar',
       data: {
         labels: months,
         datasets: [{
           label: 'Hours', data,
-          backgroundColor: 'rgba(45,212,168,0.55)',
-          borderColor: '#2dd4a8',
-          borderWidth: 1,
-          borderRadius: 6
+          backgroundColor: barColors,
+          borderColor: borderColors,
+          borderWidth: 1.5,
+          borderRadius: 8,
+          maxBarThickness: 38
         }]
       },
       options: cOpts
@@ -8572,27 +9054,60 @@ function ownerSetRoundProgress(circleId, pctId, pct) {
 }
 
 function renderOwnerCharts(d) {
+  if (typeof Chart === 'undefined') return;
+  ensureChart3DPlugin();
   Object.values(ownerState.charts).forEach(c => { try { c.destroy(); } catch {} });
   ownerState.charts = {};
   const cOpts = {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#8ba89c', font: { size: 11 } } } },
+    plugins: {
+      legend: { labels: { color: '#8ba89c', font: { size: 11, family: 'Inter', weight: '600' } } },
+      tooltip: {
+        backgroundColor: 'rgba(15, 28, 23, 0.95)',
+        borderColor: 'rgba(45, 212, 168, 0.4)',
+        borderWidth: 1.5,
+        padding: 10,
+        cornerRadius: 10,
+        titleFont: { family: 'Inter', size: 11, weight: '700' },
+        bodyFont: { family: 'Inter', size: 12, weight: '600' }
+      }
+    },
     scales: {
-      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8ba89c', font: { size: 10 } } },
-      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8ba89c', font: { size: 10 } }, beginAtZero: true }
+      x: { grid: { display: false }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter', weight: '600' } } },
+      y: { grid: { color: 'rgba(45,212,168,0.06)' }, ticks: { color: '#8ba89c', font: { size: 10, family: 'Inter' } }, beginAtZero: true }
     }
   };
   const subjCtx = document.getElementById('owner-subjects-chart');
   if (subjCtx && d.subjects.length > 0) {
+    const canvasSubjCtx = subjCtx.getContext('2d');
     const colors = d.subjects.map(s => colorForSubject(s));
+    const barGradients = colors.map(c => {
+      const grad = canvasSubjCtx.createLinearGradient(0, 0, 0, 180);
+      grad.addColorStop(0, c);
+      grad.addColorStop(0.6, c + 'aa');
+      grad.addColorStop(1, c + '44');
+      return grad;
+    });
     ownerState.charts.subj = new Chart(subjCtx, {
       type: 'bar',
-      data: { labels: d.subjects.map(s => s.name), datasets: [{ label: 'Progress %', data: d.subjects.map(s => calcSubjectProgress(s)), backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 1, borderRadius: 5 }] },
+      data: {
+        labels: d.subjects.map(s => s.name),
+        datasets: [{
+          label: 'Progress %',
+          data: d.subjects.map(s => calcSubjectProgress(s)),
+          backgroundColor: barGradients,
+          borderColor: colors,
+          borderWidth: 1.5,
+          borderRadius: 8,
+          maxBarThickness: 38
+        }]
+      },
       options: { ...cOpts, scales: { ...cOpts.scales, y: { ...cOpts.scales.y, max: 100 } } }
     });
   }
   const weekCtx = document.getElementById('owner-weekly-chart');
   if (weekCtx) {
+    const canvasWeekCtx = weekCtx.getContext('2d');
     const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const now = new Date();
     const weekData = days.map((d2, i) => {
@@ -8604,9 +9119,29 @@ function renderOwnerCharts(d) {
       const ms = d.sessions.filter(s => s.date === key && s.status === 'done').reduce((a, s) => a + s.duration, 0);
       return Math.round(ms / 3600000 * 10) / 10;
     });
+    const areaGradient = canvasWeekCtx.createLinearGradient(0, 0, 0, 200);
+    areaGradient.addColorStop(0, 'rgba(45, 212, 168, 0.45)');
+    areaGradient.addColorStop(0.6, 'rgba(45, 212, 168, 0.12)');
+    areaGradient.addColorStop(1, 'rgba(45, 212, 168, 0.0)');
     ownerState.charts.week = new Chart(weekCtx, {
       type: 'line',
-      data: { labels: days, datasets: [{ label: 'Hours', data: weekData, borderColor: '#3ee0b4', backgroundColor: 'rgba(45,212,168,0.15)', fill: true, tension: 0.3, pointBackgroundColor: '#7dffd0' }] },
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Hours',
+          data: weekData,
+          borderColor: '#2dd4a8',
+          borderWidth: 3,
+          backgroundColor: areaGradient,
+          fill: true,
+          tension: 0.38,
+          pointBackgroundColor: '#5eead4',
+          pointBorderColor: '#091512',
+          pointBorderWidth: 2.5,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }]
+      },
       options: cOpts
     });
   }
