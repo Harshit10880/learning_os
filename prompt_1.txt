@@ -1,0 +1,19 @@
+https://github.com/Harshit10880/learning_os.git, inside make one new branch named version_2 and keep the base branch of the main branch means like inside these new branch you just have to copy the main branch and give inside this new branch, 
+
+Now as a point of the UI, inside the main dashboard you can see there is a green theme color. Also inside the subject, I added that color to the Add Task button or you can see a green theme color like tht, but inside the analytics you can see there is a kind of orange color. I want to change that to the green color. Inside the dashboard subject task, in the different sections with the same thing inside the trophies or exps, or that kind of section, there is no theme with that green color. You just have to keep that green color there as well. Also inside the profile sections, there is no green color in the song so there is a need to add green color as well. 
+
+The second thing: inside the left sections and at the top, there is a kind of purple theme or background. I want to change it to a light or dark green or black color. Please change the background on the left sidebar and the top navbar as well. 
+
+Also in any sections when we click any button, inside the task sections when we click Add Task, it opens the popup. That popup has a purple color theme so I want to change that to the theme color, which is a green color.
+
+Just like that, in all sections when we click any other button, it opens the popup. That popup's color looks purple or something like that. When we click any button and open the popup, that popup's color should be different, or a green color.
+
+As for the same thing inside the analytic page, there is subject performance, different tasks, and graphs and that. I want to change the color of those graphs to green or the theme color.
+
+One more thing: in every section we can see achievements parts, which I don't want. We can see those achievement parts only inside the trophies or XP sections so do that as well. 
+
+
+At the end inside the UI perspective, I want to remove that purple theme and so on and replace it with that green color so that it looks perfect and professional. Change all of the things where there is purple color: change the background of the community to green or the other theme color, not purple. Change the entire UI color, which I want perfectly. You just have to do that without changing any other features or any other details. 
+
+
+without changing any other details u just have to do this only
