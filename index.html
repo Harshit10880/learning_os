@@ -4991,92 +4991,28 @@ const MLOPS_ENGINEER_TOPICS = [
   "Capstone Project — Cloud deployment & monitoring dashboard"
 ];
 
-// ===================== CORE COLLEGE SUBJECTS SEED DATA =====================
-const COMPUTER_NETWORKS_TOPICS = [
-  "Unit 1: Network Fundamentals & OSI vs TCP/IP Stack",
-  "Unit 1: Physical Layer, Media & Transmission Signals",
-  "Unit 1: Data Link Layer & Framing Protocols",
-  "Unit 2: IP Addressing, IPv4/IPv6 & Subnetting",
-  "Unit 2: Routing Algorithms (OSPF, BGP, RIP)",
-  "Unit 3: Transport Layer (TCP, UDP, Flow & Congestion Control)",
-  "Unit 4: Application Layer (HTTP/HTTPS, DNS, FTP, SMTP)",
-  "Unit 5: Network Security, Cryptography & Firewalls"
+// ===================== REMOVE LEGACY COLLEGE SUBJECTS =====================
+const REMOVED_COLLEGE_SUBJECT_NAMES = [
+  'Computer Networks',
+  'Database Management Systems (DBMS)',
+  'Operating Systems',
+  'Software Engineering & OO Design'
 ];
 
-const DBMS_TOPICS = [
-  "Unit 1: ER Modeling, Entities, Attributes & Relational Model",
-  "Unit 1: Relational Algebra & Relational Calculus",
-  "Unit 2: SQL Queries, Aggregations, Joins & Views",
-  "Unit 2: Functional Dependencies & Normalization (1NF to BCNF)",
-  "Unit 3: Transaction Processing & ACID Properties",
-  "Unit 4: Concurrency Control (Locking, Timestamping & Deadlocks)",
-  "Unit 5: Indexing Techniques, B-Trees & NoSQL Databases"
-];
-
-const OPERATING_SYSTEMS_TOPICS = [
-  "Unit 1: OS Architecture, Kernel Modes & System Calls",
-  "Unit 1: Process Concept, PCB & Process State Transitions",
-  "Unit 2: CPU Scheduling Algorithms (FCFS, SJF, Priority, RR)",
-  "Unit 2: Process Synchronization, Semaphores & Mutex Locks",
-  "Unit 3: Deadlocks Characterization, Prevention & Avoidance",
-  "Unit 4: Memory Management, Paging, Segmentation & Virtual Memory",
-  "Unit 5: File System Structure, Disk Scheduling (SCAN, C-LOOK)"
-];
-
-const SOFTWARE_ENG_TOPICS = [
-  "Unit 1: Software Development Life Cycle (Waterfall, Agile, Scrum)",
-  "Unit 1: Requirements Engineering & Use Case Modeling",
-  "Unit 2: Object-Oriented Analysis & Design Patterns (SOLID)",
-  "Unit 3: Software Architecture & Modular System Design",
-  "Unit 4: Software Testing (Unit, Integration, System & Automation)",
-  "Unit 5: CI/CD Pipelines, DevOps Basics & Software Maintenance"
-];
-
-function seedComputerNetworksSubject() {
-  const alreadyExists = state.subjects.some(s => s.name === 'Computer Networks');
-  if (alreadyExists) return;
-  const id = 'subj_cn_' + Date.now();
-  const color = '#38bdf8'; // Sky blue
-  const topics = COMPUTER_NETWORKS_TOPICS.map(name => ({ name, done: false }));
-  state.subjects.push({ id, name: 'Computer Networks', color, topics, isCollege: true });
+function removeCollegeSubjects() {
+  if (!state.subjects || !Array.isArray(state.subjects)) return;
+  const removedIds = new Set(
+    state.subjects
+      .filter(s => REMOVED_COLLEGE_SUBJECT_NAMES.includes(s.name))
+      .map(s => s.id)
+  );
+  if (removedIds.size === 0) return;
+  state.subjects = state.subjects.filter(s => !removedIds.has(s.id));
+  if (state.tasks && Array.isArray(state.tasks)) {
+    state.tasks = state.tasks.filter(t => !removedIds.has(t.subjectId));
+    saveData('tasks');
+  }
   saveData('subjects');
-}
-
-function seedDBMSSubject() {
-  const alreadyExists = state.subjects.some(s => s.name === 'Database Management Systems (DBMS)');
-  if (alreadyExists) return;
-  const id = 'subj_dbms_' + Date.now();
-  const color = '#2dd4a8'; // Mint green
-  const topics = DBMS_TOPICS.map(name => ({ name, done: false }));
-  state.subjects.push({ id, name: 'Database Management Systems (DBMS)', color, topics, isCollege: true });
-  saveData('subjects');
-}
-
-function seedOSSubject() {
-  const alreadyExists = state.subjects.some(s => s.name === 'Operating Systems');
-  if (alreadyExists) return;
-  const id = 'subj_os_' + Date.now();
-  const color = '#2dd4a8'; // Emerald/Teal
-  const topics = OPERATING_SYSTEMS_TOPICS.map(name => ({ name, done: false }));
-  state.subjects.push({ id, name: 'Operating Systems', color, topics, isCollege: true });
-  saveData('subjects');
-}
-
-function seedSoftwareEngSubject() {
-  const alreadyExists = state.subjects.some(s => s.name === 'Software Engineering & OO Design');
-  if (alreadyExists) return;
-  const id = 'subj_se_' + Date.now();
-  const color = '#f59e0b'; // Amber/Gold
-  const topics = SOFTWARE_ENG_TOPICS.map(name => ({ name, done: false }));
-  state.subjects.push({ id, name: 'Software Engineering & OO Design', color, topics, isCollege: true });
-  saveData('subjects');
-}
-
-function seedCollegeSubjects() {
-  seedComputerNetworksSubject();
-  seedDBMSSubject();
-  seedOSSubject();
-  seedSoftwareEngSubject();
 }
 
 // ===================== DAILY SUBJECT STUDY MATRIX TABLE JS =====================
@@ -6622,7 +6558,7 @@ async function showApp(isRealLogin = false) {
   seedAgenticAISubject();
   seedAIAutoAgentSubject();
   seedMLOpsEngineerSubject();
-  seedCollegeSubjects();
+  removeCollegeSubjects();
   renderDailyStudyMatrix();
   renderDashboard();
   renderTasks();
