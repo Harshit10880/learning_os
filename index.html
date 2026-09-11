@@ -7614,6 +7614,7 @@ function startSession() {
     subjectId, taskName,
     status: 'running',
     startTime: Date.now(),
+    startDateTime: new Date().toLocaleString(),
     elapsed: 0
   });
   saveData('activeTimers');
@@ -7665,7 +7666,9 @@ function finishTimer(id, status = 'done') {
     subjectId: t.subjectId,
     taskName: t.taskName,
     duration: finalElapsed,
-    status
+    status,
+    startDateTime: t.startDateTime,
+    endDateTime: new Date().toLocaleString()
   };
   state.sessions.push(session);
   saveData('sessions');
@@ -7709,6 +7712,7 @@ function renderActiveTimers() {
           <div class="timer-card-task">${escHtml(t.taskName)}</div>
         </div>
         <div class="timer-card-display ${isPaused ? 'paused' : 'running'}" id="timer-disp-${t.id}">${formatDuration(liveElapsed)}</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Started: ${escHtml(t.startDateTime)}</div>
         <div class="timer-card-actions">
           <button class="btn-timer-sm ${isPaused ? 'btn-start' : 'btn-pause'}" onclick="pauseResumeTimer('${t.id}')">${isPaused ? '▶ Resume' : '⏸ Pause'}</button>
           <button class="btn-timer-sm btn-done" onclick="finishTimer('${t.id}', 'done')">✓ Done</button>
@@ -7847,6 +7851,9 @@ function renderSessions() {
           <div class="session-info">
             <div class="session-sub" style="color:${c};">${escHtml(getSubjectName(s.subjectId))}</div>
             <div class="session-task">${escHtml(s.taskName)}</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">
+              ${s.startDateTime ? '⏱ ' + escHtml(s.startDateTime.split(',')[1]) : ''} - ${s.endDateTime ? '⏱ ' + escHtml(s.endDateTime.split(',')[1]) : ''}
+            </div>
           </div>
           <div class="session-dur">${s.status === 'done' ? formatHM(s.duration) : s.status}</div>
         </div>`;
@@ -8526,6 +8533,9 @@ function renderAnalytics() {
                 <div class="session-info">
                   <div class="session-sub" style="color:${c};font-weight:700;">${escHtml(getSubjectName(s.subjectId))}</div>
                   <div class="session-task" style="font-size:0.8rem;color:var(--muted);">${escHtml(s.taskName)}</div>
+                  <div style="font-size:0.7rem;color:var(--muted);margin-top:2px;">
+                    ${s.startDateTime ? '⏱ ' + escHtml(s.startDateTime.split(',')[1]) : ''} - ${s.endDateTime ? '⏱ ' + escHtml(s.endDateTime.split(',')[1]) : ''}
+                  </div>
                 </div>
                 <div class="session-dur" style="font-weight:700;color:#fff;">${formatHM(s.duration)}</div>
               </div>`;
