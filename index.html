@@ -2042,6 +2042,8 @@ input, textarea, select { font-family: inherit; outline: none; }
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: var(--radius-sm); color: var(--text); font-size: 0.9rem;
 }
+.field-row { display: flex; gap: 12px; }
+.field-row .field { flex: 1; }
 .field input[type="file"] {
   padding: 8px; color: var(--muted); font-size: 0.82rem;
 }
@@ -2054,18 +2056,286 @@ input, textarea, select { font-family: inherit; outline: none; }
 .field textarea { min-height: 80px; resize: vertical; }
 .field select option { background: var(--bg2); }
 
-.btn-secondary {
-  padding: 9px 20px; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  color: var(--muted); font-size: 0.85rem; transition: all 0.2s;
+/* ── Timer Buttons Styling ── */
+.timer-btn-primary {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--mint), var(--accent3));
+  color: #06241c;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(94, 234, 212, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
 }
-.btn-secondary:hover { color: var(--text); border-color: var(--muted); }
-.btn-accent {
-  padding: 9px 20px; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;
-  transition: opacity 0.2s;
+
+.timer-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
 }
-.btn-accent:hover { opacity: 0.85; }
+
+.timer-btn-primary:hover::before {
+  left: 100%;
+}
+
+.timer-btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(94, 234, 212, 0.5);
+  filter: brightness(1.1);
+}
+
+.timer-btn-primary:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.timer-btn-primary .btn-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.timer-btn-secondary {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--bg3), var(--surface2));
+  border: 2px solid var(--mint-line);
+  border-radius: 16px;
+  color: var(--mint-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.timer-btn-secondary:hover::before {
+  left: 100%;
+}
+
+.timer-btn-secondary:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint);
+  box-shadow: 0 12px 30px rgba(94, 234, 212, 0.3), 0 0 20px rgba(94, 234, 212, 0.1);
+  background: linear-gradient(135deg, var(--surface2), var(--bg3));
+  color: var(--mint);
+}
+
+.timer-btn-secondary:active {
+  transform: translateY(-1px);
+}
+
+.timer-btn-secondary .btn-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .timer-btn-primary,
+  .timer-btn-secondary {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .timer-btn-primary .btn-icon,
+  .timer-btn-secondary .btn-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 1rem;
+  }
+}
+
+/* ── Modern Modal Buttons Styling ── */
+.modal-btn-primary {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--mint), var(--accent3));
+  color: #06241c;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(94, 234, 212, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.modal-btn-primary:hover::before {
+  left: 100%;
+}
+
+.modal-btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(94, 234, 212, 0.5);
+  filter: brightness(1.1);
+}
+
+.modal-btn-primary:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.modal-btn-secondary {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--bg3), var(--surface2));
+  border: 2px solid var(--mint-line);
+  border-radius: 12px;
+  color: var(--mint-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.modal-btn-secondary:hover::before {
+  left: 100%;
+}
+
+.modal-btn-secondary:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint);
+  box-shadow: 0 12px 30px rgba(94, 234, 212, 0.3), 0 0 20px rgba(94, 234, 212, 0.1);
+  background: linear-gradient(135deg, var(--surface2), var(--bg3));
+  color: var(--mint);
+}
+
+.modal-btn-secondary:active {
+  transform: translateY(-1px);
+}
+
+.modal-btn-cancel {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--surface2), var(--bg3));
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-btn-cancel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  transition: left 0.5s;
+}
+
+.modal-btn-cancel:hover::before {
+  left: 100%;
+}
+
+.modal-btn-cancel:hover {
+  transform: translateY(-3px);
+  border-color: var(--muted);
+  color: var(--text);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-btn-cancel:active {
+  transform: translateY(-1px);
+}
+
+.modal-btn-icon {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+/* Responsive adjustments for modal buttons */
+@media (max-width: 600px) {
+  .modal-btn-primary,
+  .modal-btn-secondary,
+  .modal-btn-cancel {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .modal-btn-primary .modal-btn-icon,
+  .modal-btn-secondary .modal-btn-icon,
+  .modal-btn-cancel .modal-btn-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 1rem;
+  }
+}
 .btn-danger {
   padding: 9px 20px; background: rgba(239,68,68,0.15);
   border: 1px solid var(--danger); border-radius: var(--radius-sm);
@@ -3412,12 +3682,21 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 
       <!-- ======= TIMER ======= -->
       <div class="page" id="page-timer">
-        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-          <div>
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div style="flex:1;min-width:200px;">
             <div class="page-title">Study Timer</div>
             <div class="page-sub">Run multiple study sessions in parallel</div>
           </div>
-          <button class="btn-accent" onclick="openSessionModal()">+ Add Timer</button>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button class="btn-accent timer-btn-primary" onclick="openSessionModal()">
+              <span class="btn-icon">⏱</span>
+              <span>Add Timer</span>
+            </button>
+            <button class="btn-secondary timer-btn-secondary" onclick="openManualSessionModal()">
+              <span class="btn-icon">⏰</span>
+              <span>Add Manual Time</span>
+            </button>
+          </div>
         </div>
 
         <div id="active-timers-container" style="display:flex;flex-direction:column;gap:16px;margin-bottom:22px;">
@@ -4255,8 +4534,11 @@ input, textarea { -webkit-user-select: text; user-select: text; }
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-session')">Cancel</button>
-      <button class="btn-accent" onclick="startSession()">▶ Start</button>
+      <button class="btn-secondary modal-btn-cancel" onclick="closeModal('modal-session')">Cancel</button>
+      <button class="btn-accent modal-btn-primary" onclick="startSession()">
+        <span class="modal-btn-icon">▶</span>
+        <span>Start</span>
+      </button>
     </div>
   </div>
 </div>
@@ -4285,6 +4567,51 @@ input, textarea { -webkit-user-select: text; user-select: text; }
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-leave')">Cancel</button>
       <button class="btn-accent" onclick="applyLeave()">Apply Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Session Modal -->
+<div class="modal-overlay" id="modal-manual-session">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Manual Session</div>
+      <button class="modal-close" onclick="closeModal('modal-manual-session')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Subject</label>
+        <select id="manual-session-subject"></select>
+      </div>
+      <div class="field">
+        <label>Session Name</label>
+        <input type="text" id="manual-session-name" placeholder="e.g. Chapter 5 Review">
+      </div>
+      <div class="field">
+        <label>Description (Optional)</label>
+        <textarea id="manual-session-desc" placeholder="Any notes about this session…"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Start Time</label>
+          <input type="time" id="manual-start-time" step="60">
+        </div>
+        <div class="field">
+          <label>End Time</label>
+          <input type="time" id="manual-end-time" step="60">
+        </div>
+      </div>
+      <div class="field">
+        <label>Duration (Auto-calculated)</label>
+        <input type="text" id="manual-duration" readonly placeholder="00 hours 00 minutes">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary modal-btn-cancel" onclick="closeModal('modal-manual-session')">Cancel</button>
+      <button class="btn-accent modal-btn-primary" onclick="saveManualSession()">
+        <span class="modal-btn-icon">✓</span>
+        <span>Done</span>
+      </button>
     </div>
   </div>
 </div>
@@ -6986,7 +7313,11 @@ function navTo(page) {
   if (page === 'dashboard')  renderDashboard();
   if (page === 'subjects')   renderSubjects();
   if (page === 'tasks')      { renderTaskSubjectFilter(); renderTasks(); }
-  if (page === 'timer')      { renderActiveTimers(); renderSessions(); }
+  if (page === 'timer')      {
+    renderActiveTimers();
+    renderSessions();
+    renderTaskSubjectFilter();
+  }
   if (page === 'attendance') renderAttendance();
   if (page === 'profile')    renderProfile();
   if (page === 'community')  renderPosts();
@@ -7441,10 +7772,12 @@ function renderTaskSubjectFilter() {
   const sel1 = document.getElementById('task-filter-subject');
   const sel2 = document.getElementById('task-subject-input');
   const sel3 = document.getElementById('session-subject-input');
+  const sel4 = document.getElementById('manual-session-subject');
   const opts = state.subjects.map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
   if (sel1) sel1.innerHTML = '<option value="">All Subjects</option>' + opts;
   if (sel2) sel2.innerHTML = opts || '<option value="">⚠ Add a subject first</option>';
   if (sel3) sel3.innerHTML = opts || '<option value="">⚠ Add a subject first</option>';
+  if (sel4) sel4.innerHTML = opts || '<option value="">⚠ Add a subject first</option>';
 }
 
 function renderTasks() {
@@ -7601,6 +7934,96 @@ function openSessionModal() {
   renderTaskSubjectFilter();
   document.getElementById('session-task-input').value = '';
   openModal('modal-session');
+}
+
+function openManualSessionModal() {
+  renderTaskSubjectFilter();
+  document.getElementById('manual-session-name').value = '';
+  document.getElementById('manual-session-desc').value = '';
+  document.getElementById('manual-start-time').value = '';
+  document.getElementById('manual-end-time').value = '';
+  document.getElementById('manual-duration').value = '';
+
+  // Add event listeners for auto-calculation
+  const startTimeInput = document.getElementById('manual-start-time');
+  const endTimeInput = document.getElementById('manual-end-time');
+
+  if (startTimeInput) {
+    startTimeInput.addEventListener('input', calculateDuration);
+  }
+  if (endTimeInput) {
+    endTimeInput.addEventListener('input', calculateDuration);
+  }
+
+  openModal('modal-manual-session');
+}
+
+function calculateDuration() {
+  const startTime = document.getElementById('manual-start-time').value;
+  const endTime = document.getElementById('manual-end-time').value;
+  const durationEl = document.getElementById('manual-duration');
+
+  if (startTime && endTime) {
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+
+    let start = startH * 60 + startM;
+    let end = endH * 60 + endM;
+
+    if (end < start) {
+      end += 24 * 60; // Handle overnight sessions
+    }
+
+    const diff = end - start;
+    const hours = Math.floor(diff / 60);
+    const minutes = diff % 60;
+    durationEl.value = `${hours} hours ${minutes} minutes`;
+  } else {
+    durationEl.value = '';
+  }
+}
+
+function saveManualSession() {
+  if (state.subjects.length === 0) { showToast('Add a subject first', 'error'); return; }
+  const subjectId = document.getElementById('manual-session-subject').value;
+  const sessionName = document.getElementById('manual-session-name').value.trim();
+  const description = document.getElementById('manual-session-desc').value.trim();
+  const startTime = document.getElementById('manual-start-time').value;
+  const endTime = document.getElementById('manual-end-time').value;
+
+  if (!sessionName) { showToast('Enter a session name', 'error'); return; }
+  if (!startTime || !endTime) { showToast('Please set start and end times', 'error'); return; }
+
+  const [startH, startM] = startTime.split(':').map(Number);
+  const [endH, endM] = endTime.split(':').map(Number);
+
+  let start = startH * 60 + startM;
+  let end = endH * 60 + endM;
+
+  if (end < start) {
+    end += 24 * 60; // Handle overnight sessions
+  }
+
+  const durationMs = (end - start) * 60 * 1000;
+
+  const now = new Date();
+  const session = {
+    id: 'sess_' + Date.now(),
+    date: toDateKey(now),
+    subjectId,
+    taskName: sessionName,
+    duration: durationMs,
+    status: 'done',
+    startDateTime: now.toLocaleString(),
+    endDateTime: now.toLocaleString()
+  };
+
+  state.sessions.push(session);
+  saveData('sessions');
+  closeModal('modal-manual-session');
+  renderSessions();
+  renderDashboard();
+  showToast(`Session saved: ${formatHM(durationMs)}`, 'success');
 }
 
 function startSession() {
