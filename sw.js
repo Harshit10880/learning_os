@@ -3,10 +3,10 @@
 // ║         Enhanced caching + Offline Queue + Background Sync      ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
-const SW_VERSION   = 'learnos-v6';
-const SHELL_CACHE  = 'learnos-shell-v6';   // App shell — rarely changes
-const ASSET_CACHE  = 'learnos-assets-v6';  // Fonts, scripts, icons
-const PAGE_CACHE   = 'learnos-pages-v6';   // HTML pages
+const SW_VERSION   = 'learnos-v7';
+const SHELL_CACHE  = 'learnos-shell-v7';   // App shell — rarely changes
+const ASSET_CACHE  = 'learnos-assets-v7';  // Fonts, scripts, icons
+const PAGE_CACHE   = 'learnos-pages-v7';   // HTML pages
 const OFFLINE_URL  = '/offline.html';
 
 // App Shell — cache static assets but NEVER cache index.html
