@@ -9,7 +9,7 @@
 <!-- PWA META TAGS                               -->
 <!-- ═══════════════════════════════════════════ -->
 <meta name="description" content="Your personal learning command center. Track subjects, attendance, sessions and performance.">
-<meta name="theme-color" content="#151515">
+<meta name="theme-color" content="#151515" id="meta-theme-color">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,6 +17,24 @@
 <meta name="application-name" content="LearnOS">
 <meta name="msapplication-TileColor" content="#151515">
 <meta name="msapplication-tap-highlight" content="no">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THEME BOOTSTRAP — must run before the CSS   -->
+<!-- so the page never paints in the wrong theme -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+(function () {
+  var pref = 'system';
+  try { pref = JSON.parse(localStorage.getItem('los_theme')) || 'system'; } catch (e) {}
+  if (pref !== 'light' && pref !== 'dark') pref = 'system';
+  var resolved = pref;
+  if (pref === 'system') {
+    resolved = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', resolved);
+  window.__losTheme = { pref: pref, resolved: resolved };
+})();
+</script>
 
 <!-- PWA Manifest -->
 <link rel="manifest" href="/manifest.json">
@@ -2667,6 +2685,236 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
   .btn-accent, .btn-secondary, .card, .modal, .nav-item.active { border: 1px solid CanvasText; }
 }
 
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  DESIGN SYSTEM v6 — appended after v5, so it wins                ║
+   ║  A Light palette · B Light fixes · C Topbar utilities ·          ║
+   ║  D Settings page · E Command palette · F Empty-state CTAs        ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ---------- A. LIGHT PALETTE — same token contract, inverted values ---------- */
+/* Every pair below was checked against WCAG AA (4.5:1) on its own surface.     */
+:root[data-theme="light"] {
+  /* Neutrals — warm-free greys, matching the graphite direction */
+  --bg:        #f4f5f6;
+  --bg2:       #ffffff;
+  --bg3:       #eceef0;
+  --surface:   #ffffff;
+  --surface2:  #f1f2f4;
+  --border:    #d9dbde;
+  --line:        rgba(24, 26, 28, 0.10);
+  --line-strong: rgba(24, 26, 28, 0.20);
+  --line-soft:   rgba(24, 26, 28, 0.06);
+
+  /* Text */
+  --text:        #2b2d31;
+  --text-bright: #14161a;
+  --muted:       #5b6069;
+  --muted2:      #71777f;
+
+  /* Accent — the steel blue darkened so it carries text on white */
+  --accent:    #2f6d9e;
+  --accent2:   #2a6590;
+  --accent3:   #235579;
+  --glow:      rgba(47, 109, 158, 0.12);
+  --brand:        #35678f;
+  --brand-hover:  #2b5477;
+  --brand-press:  #23445f;
+  --on-brand:     #ffffff;
+  --on-accent:    #ffffff;
+
+  /* Semantic */
+  --success:   #3d8259;
+  --warn:      #996a1f;
+  --danger:    #b0464a;
+  --info:      #2f6d9e;
+  --danger-text:  #a13a3e;
+  --success-text: #2f6b46;
+  --warn-text:    #7d5518;
+
+  /* Elevation & focus — light surfaces need far less shadow */
+  --shadow-sm: 0 1px 2px rgba(16, 18, 20, 0.08);
+  --shadow:    0 6px 20px rgba(16, 18, 20, 0.10);
+  --shadow-lg: 0 20px 56px rgba(16, 18, 20, 0.18);
+  --shadow-accent: 0 0 0 1px rgba(47, 109, 158, 0.3);
+  --ring:      0 0 0 3px rgba(47, 109, 158, 0.2);
+  --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6069' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* Legacy aliases that hold literal colours rather than var() references */
+  --mint-dim:       rgba(47, 109, 158, 0.1);
+  --mint-coral-dim: rgba(176, 70, 74, 0.1);
+  --mint-amber-dim: rgba(153, 106, 31, 0.1);
+}
+
+/* ---------- B. LIGHT FIXES — rules that hold dark-only literals ---------- */
+html[data-theme="light"] { color-scheme: light; }
+[data-theme="light"] input[type="date"], [data-theme="light"] input[type="time"] { color-scheme: light; }
+[data-theme="light"] ::selection { background: rgba(47, 109, 158, 0.2); color: #14161a; }
+@media (min-width: 701px) {
+  [data-theme="light"] * { scrollbar-color: #c3c6ca transparent; }
+  [data-theme="light"] ::-webkit-scrollbar-thumb { background: #c3c6ca; }
+  [data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #adb1b6; }
+}
+/* Wordmark: the "Learn" half is a hard-coded white SVG fill */
+[data-theme="light"] .topbar-logo svg text { fill: #14161a; }
+[data-theme="light"] .btn-secondary:hover, [data-theme="light"] .timer-btn-secondary:hover,
+[data-theme="light"] .modal-btn-secondary:hover, [data-theme="light"] .modal-btn-cancel:hover,
+[data-theme="light"] .btn-matrix-outline:hover, [data-theme="light"] .btn-friends-list:hover,
+[data-theme="light"] .btn-friends-req:hover, [data-theme="light"] .btn-decline:hover,
+[data-theme="light"] .btn-pending-t:hover, [data-theme="light"] .goal-edit-btn:hover,
+[data-theme="light"] .attach-btn:hover, [data-theme="light"] .label-attach-file:hover {
+  background: #e6e8ea; border-color: rgba(24, 26, 28, 0.3); color: var(--text-bright);
+}
+[data-theme="light"] .btn-danger, [data-theme="light"] .btn-unfriend,
+[data-theme="light"] .btn-cancel-t, [data-theme="light"] .pf-logout {
+  color: var(--danger-text); border-color: rgba(176, 70, 74, 0.35);
+}
+[data-theme="light"] .btn-danger:hover, [data-theme="light"] .btn-unfriend:hover,
+[data-theme="light"] .btn-cancel-t:hover, [data-theme="light"] .pf-logout:hover {
+  background: rgba(176, 70, 74, 0.09); border-color: rgba(176, 70, 74, 0.6); color: #8f3034;
+}
+[data-theme="light"] .btn-logout:hover, [data-theme="light"] .btn-icon.danger:hover {
+  background: rgba(176, 70, 74, 0.09); border-color: rgba(176, 70, 74, 0.45); color: var(--danger-text);
+}
+[data-theme="light"] .btn-pause { background: rgba(153, 106, 31, 0.1); border-color: rgba(153, 106, 31, 0.35); color: var(--warn-text); }
+[data-theme="light"] .btn-pause:hover { background: rgba(153, 106, 31, 0.18); }
+[data-theme="light"] .btn-done, [data-theme="light"] .btn-accept { background: rgba(61, 130, 89, 0.1); border-color: rgba(61, 130, 89, 0.35); color: var(--success-text); }
+[data-theme="light"] .btn-done:hover, [data-theme="light"] .btn-accept:hover { background: rgba(61, 130, 89, 0.18); }
+[data-theme="light"] .nav-item.active { background: rgba(47, 109, 158, 0.1); }
+[data-theme="light"] .tag.subject { background: rgba(47, 109, 158, 0.1); color: var(--accent3); }
+[data-theme="light"] #login-error { color: var(--danger-text); }
+[data-theme="light"] #login-error:not(:empty) { border-color: rgba(176, 70, 74, 0.3); background: rgba(176, 70, 74, 0.06); }
+[data-theme="light"] .login-grid { background-image: radial-gradient(rgba(24, 26, 28, 0.1) 1px, transparent 1px); }
+[data-theme="light"] .modal-overlay { background: rgba(28, 30, 34, 0.42); }
+[data-theme="light"] .empty-icon { opacity: 0.55; }
+[data-theme="light"] #profile-avatar-circle { box-shadow: 0 4px 20px rgba(47, 109, 158, 0.28) !important; }
+[data-theme="light"] #bottom-nav { box-shadow: 0 -2px 16px rgba(16, 18, 20, 0.07) !important; }
+@media (max-width: 900px) {
+  [data-theme="light"] #sidebar.open, [data-theme="light"] #owner-sidebar.open { box-shadow: 4px 0 20px rgba(16, 18, 20, 0.14); }
+}
+
+/* ---------- C. TOPBAR UTILITIES — search trigger + theme toggle ---------- */
+.topbar-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 34px; height: 34px; min-height: 34px; padding: 0;
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  background: transparent; color: var(--muted);
+  font-family: var(--font-ui); font-size: 0.82rem; font-weight: 500; line-height: 1;
+  cursor: pointer; flex-shrink: 0;
+  transition: background-color .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+}
+.topbar-btn:hover { background: var(--surface2); border-color: var(--line-strong); color: var(--text-bright); }
+.topbar-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.topbar-search { width: auto; padding: 0 8px 0 10px; }
+.topbar-search .kbd-hint {
+  font-family: var(--font-mono); font-size: 0.66rem; padding: 2px 5px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-xs);
+  background: var(--bg3); color: var(--muted2);
+}
+@media (max-width: 860px) {
+  .topbar-search { width: 34px; padding: 0; }
+  .topbar-search .search-label, .topbar-search .kbd-hint { display: none; }
+}
+
+/* ---------- D. SETTINGS PAGE ---------- */
+.set-rows { display: flex; flex-direction: column; }
+.set-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px 20px;
+  padding: 15px 0; border-bottom: 1px solid var(--line);
+}
+.set-row:first-child { padding-top: 0; }
+.set-row:last-child { padding-bottom: 0; border-bottom: 0; }
+.set-row-main { min-width: 0; }
+.set-row-title { font-size: 0.875rem; font-weight: 500; color: var(--text); }
+.set-row-desc { margin-top: 4px; font-size: 0.8rem; line-height: 1.45; color: var(--muted2); max-width: 52ch; }
+.set-row-action { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
+.set-row-val { font-size: 0.85rem; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; word-break: break-all; text-align: right; }
+.set-row-val.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+.seg { display: inline-flex; gap: 2px; padding: 2px; background: var(--bg3); border: 1px solid var(--line-strong); border-radius: var(--r-md); }
+.seg-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 28px; padding: 0 11px; border: 1px solid transparent; border-radius: var(--r-sm);
+  background: transparent; color: var(--muted);
+  font-family: var(--font-ui); font-size: 0.8rem; font-weight: 500; line-height: 1; cursor: pointer;
+  transition: background-color .15s var(--ease), color .15s var(--ease);
+}
+.seg-btn:hover { color: var(--text-bright); }
+.seg-btn[aria-pressed="true"] { background: var(--surface); border-color: var(--line); color: var(--text-bright); }
+.seg-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.set-kbd { display: grid; grid-template-columns: 1fr auto; gap: 11px 20px; align-items: center; }
+.set-kbd dt { font-size: 0.83rem; color: var(--muted); margin: 0; }
+.set-kbd dd { margin: 0; text-align: right; }
+kbd.k {
+  display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; padding: 2px 6px;
+  border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: var(--r-xs);
+  background: var(--bg3); color: var(--text); white-space: nowrap;
+}
+.set-note { margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-left: 2px solid var(--warn); border-radius: var(--r-sm); background: var(--bg3); font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
+#import-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-bottom: 18px; }
+.imp-cell { padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg3); }
+.imp-cell-val { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); }
+.imp-cell-lbl { margin-top: 2px; font-size: 0.72rem; color: var(--muted2); }
+@media (max-width: 620px) {
+  .set-row { flex-direction: column; align-items: stretch; }
+  .set-row-action, .set-row-val { justify-content: flex-start; text-align: left; }
+  .seg { width: 100%; } .seg-btn { flex: 1; justify-content: center; }
+}
+
+/* ---------- E. COMMAND PALETTE (Ctrl/⌘ + K) ---------- */
+#cmdk {
+  display: none; position: fixed; inset: 0; z-index: var(--z-toast);
+  align-items: flex-start; justify-content: center; padding: 11vh 16px 16px;
+  background: rgba(6, 7, 8, 0.62); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+#cmdk.open { display: flex; }
+[data-theme="light"] #cmdk { background: rgba(28, 30, 34, 0.36); }
+.cmdk-panel {
+  display: flex; flex-direction: column; width: 100%; max-width: 560px; max-height: 72vh;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.cmdk-search { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.cmdk-search > svg { width: 17px; height: 17px; flex-shrink: 0; color: var(--muted2); stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#cmdk-input { flex: 1; min-width: 0; padding: 0; border: 0; outline: none; background: transparent; color: var(--text); font-family: var(--font-ui); font-size: 0.95rem; }
+#cmdk-input::placeholder { color: var(--muted2); }
+.cmdk-list { flex: 1; min-height: 0; overflow-y: auto; padding: 6px; }
+.cmdk-group-label { padding: 10px 10px 5px; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); }
+.cmdk-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 8px 10px; border: 0; border-radius: var(--r-md);
+  background: transparent; color: var(--text);
+  font-family: var(--font-ui); font-size: 0.875rem; text-align: left; cursor: pointer;
+}
+.cmdk-item:hover { background: var(--surface2); }
+.cmdk-item.sel { background: var(--surface2); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.cmdk-item-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; flex-shrink: 0; color: var(--muted2); }
+.cmdk-item-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.cmdk-item-dot { width: 7px; height: 7px; border-radius: 50%; margin: 0 5px; flex-shrink: 0; }
+.cmdk-item-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmdk-item-meta { flex-shrink: 0; font-size: 0.72rem; color: var(--muted2); }
+.cmdk-empty { padding: 30px 16px; text-align: center; font-size: 0.85rem; color: var(--muted2); }
+.cmdk-foot { display: flex; align-items: center; gap: 14px; padding: 9px 14px; border-top: 1px solid var(--line); background: var(--bg3); font-size: 0.72rem; color: var(--muted2); }
+.cmdk-foot span { display: inline-flex; align-items: center; gap: 5px; }
+.cmdk-foot kbd { font-family: var(--font-mono); font-size: 0.68rem; padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); background: var(--surface); color: var(--muted); }
+@media (max-width: 700px) {
+  #cmdk { align-items: flex-end; padding: 0; }
+  .cmdk-panel { max-width: none; max-height: 86vh; max-height: 86dvh; border-radius: var(--r-xl) var(--r-xl) 0 0; border-bottom: 0; }
+  .cmdk-foot { display: none; }
+}
+
+/* ---------- F. EMPTY-STATE CTAs ---------- */
+.empty-cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 34px; margin-top: 15px; padding: 0 14px;
+  background: transparent; color: var(--accent);
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  font-family: var(--font-ui); font-size: 0.83rem; font-weight: 500; line-height: 1; cursor: pointer;
+  transition: background-color .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease);
+}
+.empty-cta:hover { background: var(--glow); border-color: var(--accent); color: var(--accent3); }
+.empty-cta svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.empty-state .empty-cta + .empty-cta { margin-left: 8px; }
+
 </style>
 </head>
 <body>
@@ -2853,6 +3101,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
       <button onclick="navTo('achievements');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16M10 14.66V17c0 .55-.47.98-1.97 1.5C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98 1.97 1.5 1.18.25 2.03 1.74 2.03 3.5"/><path d="M18 2H6v7a6 6 0 0 0 12 0z"/></svg>Trophies
       </button>
+      <button onclick="navTo('settings');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+      </button>
     </div>
   </div>
   <!-- More menu overlay -->
@@ -2896,6 +3147,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
       <div id="topbar-offline-dot" title="Offline — changes queued for sync"
         style="display:none;width:8px;height:8px;border-radius:50%;
         background:#c75f5f;flex-shrink:0;animation:pulseDot 1.5s infinite;"></div>
+      <button class="topbar-btn topbar-search" onclick="openCmdk()" title="Search & commands (Ctrl+K)" aria-label="Search and commands"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="search-label">Search</span><span class="kbd-hint" id="cmdk-hint">Ctrl K</span></button>
+      <button class="topbar-btn" id="theme-toggle-btn" onclick="cycleTheme()" title="Theme" aria-label="Change theme"></button>
       <div class="topbar-time" id="topbar-time">--:--:--</div>
       <div class="topbar-user"><span id="topbar-name">—</span></div>
       <button class="btn-logout" onclick="doLogout()" title="Logout" aria-label="Log out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg></button>
@@ -2927,6 +3180,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
         <div class="nav-label">Account</div>
         <button class="nav-item" data-page="achievements" onclick="navTo('achievements')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16M10 14.66V17c0 .55-.47.98-1.97 1.5C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98 1.97 1.5 1.18.25 2.03 1.74 2.03 3.5"/><path d="M18 2H6v7a6 6 0 0 0 12 0z"/></svg></span> Trophies & XP</button>
         <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></span> Profile</button>
+        <button class="nav-item" data-page="settings" onclick="navTo('settings')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Settings</button>
       </div>
     </nav>
     <!-- Main -->
@@ -3020,7 +3274,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
         <div class="card" style="margin-bottom:18px;">
           <div class="card-title">Subject Progress</div>
           <div id="dash-subjects">
-            <div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No subjects yet — add some in Subjects</div></div>
+            <div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
           </div>
         </div>
         <!-- Task summary -->
@@ -3133,7 +3387,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
           <button class="btn-add-subject" onclick="addSubject()">+ Add Subject</button>
         </div>
         <div class="subjects-grid" id="subjects-grid">
-          <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📚</div><div class="empty-text">No subjects yet</div></div>
+          <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
         </div>
       </div>
 
@@ -3157,7 +3411,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
           <button class="btn-accent" onclick="openTaskModal()">+ Add Task</button>
         </div>
         <div class="task-list" id="task-list">
-          <div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No tasks yet</div></div>
+          <div class="empty-state"><div class="empty-icon" aria-hidden="true">✅</div><div class="empty-text">No tasks yet</div><button type="button" class="empty-cta" onclick="openTaskModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first task</button></div>
         </div>
       </div>
 
@@ -3181,7 +3435,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
         </div>
 
         <div id="active-timers-container" style="display:flex;flex-direction:column;gap:16px;margin-bottom:22px;">
-          <div class="empty-state" id="no-active-timers"><div class="empty-icon">⏱</div><div class="empty-text">No active timers — click "+ Add Timer" to start studying</div></div>
+          <div class="empty-state" id="no-active-timers"><div class="empty-icon" aria-hidden="true">⏱</div><div class="empty-text">No active timers</div><button type="button" class="empty-cta" onclick="openSessionModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Start a study session</button></div>
         </div>
 
         <div class="card" style="margin-bottom:20px;" id="pending-sessions-card">
@@ -3205,7 +3459,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
             </div>
           </div>
           <div id="session-history-list">
-            <div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions recorded yet</div></div>
+            <div class="empty-state"><div class="empty-icon" aria-hidden="true">⏱</div><div class="empty-text">No sessions recorded yet</div><button type="button" class="empty-cta" onclick="openManualSessionModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a past session</button></div>
           </div>
         </div>
       </div>
@@ -3313,7 +3567,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
             <div class="att-panel-title">Leave Tickets</div>
           </div>
           <div class="leave-list" id="leave-list">
-            <div class="empty-state"><div class="empty-icon">🏖</div><div class="empty-text">No leaves applied</div></div>
+            <div class="empty-state"><div class="empty-icon" aria-hidden="true">🏖</div><div class="empty-text">No leaves applied</div><button type="button" class="empty-cta" onclick="openLeaveModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Apply for leave</button></div>
           </div>
         </section>
       </div>
@@ -3336,7 +3590,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
           <button class="btn-accent" onclick="openNoteModal()">+ New Note</button>
         </div>
         <div class="task-list" id="notes-list">
-          <div class="empty-state"><div class="empty-icon">🗒</div><div class="empty-text">No notes yet — add your first one!</div></div>
+          <div class="empty-state"><div class="empty-icon" aria-hidden="true">🗒</div><div class="empty-text">No notes yet</div><button type="button" class="empty-cta" onclick="openNoteModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Write your first note</button></div>
         </div>
       </div>
 
@@ -3364,7 +3618,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
         </div>
         <!-- Feed -->
         <div class="posts-feed" id="posts-feed">
-          <div class="empty-state"><div class="empty-icon">🌐</div><div class="empty-text">No posts yet — be the first to share!</div></div>
+          <div class="empty-state"><div class="empty-icon" aria-hidden="true">🌐</div><div class="empty-text">No posts yet</div><button type="button" class="empty-cta" onclick="focusNewPost()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Share the first post</button></div>
         </div>
       </div>
 
@@ -3539,6 +3793,141 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
         <div class="card">
           <div class="card-title" style="margin-bottom:16px;">Subject Progress</div>
           <div id="profile-subject-list"></div>
+        </div>
+      </div>
+
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- SETTINGS PAGE                                           -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Appearance, your data, and keyboard shortcuts</div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title">Appearance</div>
+          <div class="set-rows">
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Theme</div>
+                <div class="set-row-desc">“System” follows your device setting and changes with it. Your choice is stored on this device only.</div>
+              </div>
+              <div class="set-row-action">
+                <div class="seg" role="group" aria-label="Theme">
+                  <button class="seg-btn" id="theme-seg-system" onclick="setTheme('system')" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>System
+                  </button>
+                  <button class="seg-btn" id="theme-seg-light" onclick="setTheme('light')" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Light
+                  </button>
+                  <button class="seg-btn" id="theme-seg-dark" onclick="setTheme('dark')" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>Dark
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Currently showing</div>
+                <div class="set-row-desc">The palette in use right now, after resolving the option above.</div>
+              </div>
+              <div class="set-row-val" id="set-theme-resolved">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title">Your data</div>
+          <div class="set-rows">
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Export a backup</div>
+                <div class="set-row-desc">Downloads subjects, tasks, sessions, attendance, leaves and notes as a single JSON file.</div>
+              </div>
+              <div class="set-row-action">
+                <button class="btn-secondary" onclick="exportData()">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>
+                  Export JSON
+                </button>
+              </div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Restore from a backup</div>
+                <div class="set-row-desc">Reads a file produced by Export. You pick merge or replace before anything is written, and see the record counts first.</div>
+              </div>
+              <div class="set-row-action">
+                <input type="file" id="import-file-input" accept=".json,application/json" style="display:none;" onchange="handleImportFile(this)">
+                <button class="btn-secondary" onclick="document.getElementById('import-file-input').click()">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 8l5-5 5 5M12 3v12"/></svg>
+                  Import JSON
+                </button>
+              </div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Records held</div>
+                <div class="set-row-desc">What is in your account right now, across all devices.</div>
+              </div>
+              <div class="set-row-val" id="set-record-counts">—</div>
+            </div>
+          </div>
+          <div class="set-note">
+            <strong>Replace</strong> discards everything currently stored for the categories present in the file, then writes the file's records.
+            <strong>Merge</strong> keeps what you have and only adds records that are not already there. Either way, export a fresh backup first.
+          </div>
+        </div>
+
+        <!-- Keyboard -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title">Keyboard</div>
+          <dl class="set-kbd">
+            <dt>Open search &amp; commands</dt>
+            <dd><kbd class="k" id="set-kbd-cmdk">Ctrl</kbd> <kbd class="k">K</kbd></dd>
+            <dt>Move through results</dt>
+            <dd><kbd class="k">↑</kbd> <kbd class="k">↓</kbd></dd>
+            <dt>Run the highlighted result</dt>
+            <dd><kbd class="k">Enter</kbd></dd>
+            <dt>Close the palette or a dialog</dt>
+            <dd><kbd class="k">Esc</kbd></dd>
+          </dl>
+        </div>
+
+        <!-- About -->
+        <div class="card">
+          <div class="card-title">This device</div>
+          <div class="set-rows">
+            <div class="set-row">
+              <div class="set-row-main"><div class="set-row-title">Signed in as</div></div>
+              <div class="set-row-val" id="set-about-email">—</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main"><div class="set-row-title">Display name</div></div>
+              <div class="set-row-val" id="set-about-name">—</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Local cache</div>
+                <div class="set-row-desc">Copy kept in this browser so the app opens instantly and works offline.</div>
+              </div>
+              <div class="set-row-val mono" id="set-about-cache">—</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
+                <div class="set-row-title">Waiting to sync</div>
+                <div class="set-row-desc">Changes made offline that will be sent when the connection returns.</div>
+              </div>
+              <div class="set-row-val mono" id="set-about-queue">—</div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main"><div class="set-row-title">Offline support</div></div>
+              <div class="set-row-val" id="set-about-sw">—</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4188,6 +4577,50 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-note')">Cancel</button>
       <button class="btn-accent" onclick="saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Backup Modal -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title">Restore from backup</div>
+      <button class="modal-close" onclick="closeModal('modal-import')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:6px;" id="import-file-meta">—</div>
+      <div id="import-summary"></div>
+      <div class="field">
+        <label for="import-mode">How to apply it</label>
+        <select id="import-mode" onchange="renderImportSummary()">
+          <option value="merge" selected>Merge — keep what I have, add what is missing</option>
+          <option value="replace">Replace — discard my current records for these categories</option>
+        </select>
+      </div>
+      <div class="set-note" id="import-mode-note" style="margin-top:0;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-import')">Cancel</button>
+      <button class="btn-accent" id="import-confirm-btn" onclick="applyImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div id="cmdk" role="dialog" aria-modal="true" aria-label="Search and commands">
+  <div class="cmdk-panel">
+    <div class="cmdk-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="cmdk-input" placeholder="Search pages, subjects, tasks, notes — or type a command…"
+        autocomplete="off" spellcheck="false" aria-controls="cmdk-list" aria-autocomplete="list">
+      <button class="modal-close" onclick="closeCmdk()" aria-label="Close">×</button>
+    </div>
+    <div class="cmdk-list" id="cmdk-list" role="listbox" aria-label="Results"></div>
+    <div class="cmdk-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>Enter</kbd> open</span>
+      <span><kbd>Esc</kbd> close</span>
     </div>
   </div>
 </div>
@@ -6376,6 +6809,7 @@ let state = {
 
 // ===================== INIT =====================
 function init() {
+  initTheme();
   startClock();
   // Wait for Firebase auth state — _onFirebaseLogin / _onFirebaseLogout are set below
   window._onFirebaseLogin = async (fbUser) => {
@@ -6805,6 +7239,7 @@ function navTo(page) {
   if (page === 'notes')      renderNotes();
   if (page === 'friends')      initFriends();
   if (page === 'achievements') renderAchievements();
+  if (page === 'settings')     renderSettings();
 
   // Close sidebar + overlay + more menu on mobile
   closeSidebarMobile();
@@ -6889,7 +7324,7 @@ function renderDashboard() {
   // subject bars
   const dashSubj = document.getElementById('dash-subjects');
   if (subjs.length === 0) {
-    dashSubj.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No subjects yet</div></div>';
+    dashSubj.innerHTML = '<div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
   } else {
     dashSubj.innerHTML = subjs.map(s => {
       const pct = calcSubjectProgress(s);
@@ -6950,7 +7385,7 @@ function renderDashboard() {
 
   const sessDiv = document.getElementById('dash-sessions-today');
   if (todaySessions.length === 0) {
-    sessDiv.innerHTML = '<div class="empty-state" style="padding:24px 12px;"><div class="empty-icon" style="font-size:1.8rem;">📖</div><div class="empty-text">No sessions today yet — start a timer!</div></div>';
+    sessDiv.innerHTML = '<div class="empty-state" style="padding:24px 12px;"><div class="empty-icon" style="font-size:1.8rem;" aria-hidden="true">📖</div><div class="empty-text">No sessions today yet</div><button type="button" class="empty-cta" onclick="openSessionModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Start a study session</button></div>';
   } else {
     sessDiv.innerHTML = todaySessions.map(s => {
       const subj = state.subjects.find(x => x.id === s.subjectId);
@@ -7074,7 +7509,7 @@ function calcSubjectProgress(s) {
 function renderSubjects() {
   const grid = document.getElementById('subjects-grid');
   if (state.subjects.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📚</div><div class="empty-text">No subjects yet. Add one above!</div></div>';
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
     return;
   }
   grid.innerHTML = state.subjects.map(s => {
@@ -7219,7 +7654,9 @@ function renderTasks() {
   const list = document.getElementById('task-list');
   if (!list) return;
   if (tasks.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No tasks found</div></div>';
+    list.innerHTML = tasksFiltered()
+      ? '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🔍</div><div class="empty-text">No tasks match these filters</div><button type="button" class="empty-cta" onclick="clearTaskFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear filters</button></div>'
+      : '<div class="empty-state"><div class="empty-icon" aria-hidden="true">✅</div><div class="empty-text">No tasks yet</div><button type="button" class="empty-cta" onclick="openTaskModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first task</button></div>';
     return;
   }
   list.innerHTML = tasks.map(t => {
@@ -7547,7 +7984,7 @@ function renderActiveTimers() {
   if (badge) badge.style.display = running.length > 0 ? 'inline-block' : 'none';
 
   if (running.length === 0) {
-    container.innerHTML = '<div class="empty-state" id="no-active-timers"><div class="empty-icon">⏱</div><div class="empty-text">No active timers — click "+ Add Timer" to start studying</div></div>';
+    container.innerHTML = '<div class="empty-state" id="no-active-timers"><div class="empty-icon" aria-hidden="true">⏱</div><div class="empty-text">No active timers</div><button type="button" class="empty-cta" onclick="openSessionModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Start a study session</button></div>';
   } else {
     container.innerHTML = running.map(t => {
       const subj = state.subjects.find(s => s.id === t.subjectId);
@@ -7676,7 +8113,7 @@ function renderSessions() {
   }
 
   if (monthSessions.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions recorded in ${monthTitle}</div></div>`;
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon" aria-hidden="true">⏱</div><div class="empty-text">No sessions recorded in ${monthTitle}</div><button type="button" class="empty-cta" onclick="openManualSessionModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a past session</button></div>`;
     return;
   }
 
@@ -7841,7 +8278,7 @@ function renderAttendance() {
   const monthEnd = `${monthStr}-${String(daysInMonth).padStart(2,'0')}`;
   const monthLeaves = state.leaves.filter(l => l.startDate <= monthEnd && l.endDate >= monthStart);
   if (monthLeaves.length === 0) {
-    leaveList.innerHTML = `<div class="empty-state"><div class="empty-icon">🏖</div><div class="empty-text">No leaves in ${monthLabel}</div></div>`;
+    leaveList.innerHTML = `<div class="empty-state"><div class="empty-icon" aria-hidden="true">🏖</div><div class="empty-text">No leaves in ${monthLabel}</div><button type="button" class="empty-cta" onclick="openLeaveModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Apply for leave</button></div>`;
   } else {
     leaveList.innerHTML = [...monthLeaves].reverse().map(l => {
       const realIdx = state.leaves.indexOf(l);
@@ -7911,7 +8348,9 @@ function renderNotes() {
     return true;
   });
   if (notes.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🗒</div><div class="empty-text">No notes found</div></div>';
+    list.innerHTML = notesFiltered()
+      ? '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🔍</div><div class="empty-text">No notes match these filters</div><button type="button" class="empty-cta" onclick="clearNotesFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear filters</button></div>'
+      : '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🗒</div><div class="empty-text">No notes yet</div><button type="button" class="empty-cta" onclick="openNoteModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Write your first note</button></div>';
     return;
   }
   list.innerHTML = notes.map(n => {
@@ -8122,7 +8561,7 @@ function renderPosts() {
   const feed = document.getElementById('posts-feed');
   if (!feed) return;
   if (state.posts.length === 0) {
-    feed.innerHTML = '<div class="empty-state"><div class="empty-icon">🌐</div><div class="empty-text">No posts yet — be the first to share!</div></div>';
+    feed.innerHTML = '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🌐</div><div class="empty-text">No posts yet</div><button type="button" class="empty-cta" onclick="focusNewPost()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Share the first post</button></div>';
     return;
   }
   const icons = { prompt: '📋', pdf: '📄', image: '🖼', note: '📝' };
@@ -9304,6 +9743,504 @@ document.addEventListener('visibilitychange', () => {
     document.documentElement.classList.toggle('slow-connection', isSlow);
   });
 })();
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  THEME — system / light / dark, stored per device                ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const THEME_KEY   = 'los_theme';
+const THEME_ORDER = ['system', 'light', 'dark'];
+const THEME_META  = { dark: '#151515', light: '#f4f5f6' };
+const THEME_ICON  = {
+  system: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  light:  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  dark:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg>'
+};
+
+let _themePref = (window.__losTheme && window.__losTheme.pref) || 'system';
+
+function resolveTheme(pref) {
+  if (pref === 'light' || pref === 'dark') return pref;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+// Paints the resolved palette and syncs every control that shows the current choice.
+function applyTheme() {
+  const resolved = resolveTheme(_themePref);
+  document.documentElement.setAttribute('data-theme', resolved);
+  const meta = document.getElementById('meta-theme-color');
+  if (meta) meta.setAttribute('content', THEME_META[resolved]);
+
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) {
+    btn.innerHTML = THEME_ICON[_themePref];
+    const label = _themePref === 'system'
+      ? `System theme (currently ${resolved})`
+      : `${_themePref === 'light' ? 'Light' : 'Dark'} theme`;
+    btn.title = label + ' — click to change';
+    btn.setAttribute('aria-label', label + '. Click to change theme.');
+  }
+  THEME_ORDER.forEach(p => {
+    const seg = document.getElementById('theme-seg-' + p);
+    if (seg) seg.setAttribute('aria-pressed', String(p === _themePref));
+  });
+  const rv = document.getElementById('set-theme-resolved');
+  if (rv) rv.textContent = resolved === 'light' ? 'Light' : 'Dark';
+
+  window.__losTheme = { pref: _themePref, resolved };
+}
+
+function setTheme(pref) {
+  if (THEME_ORDER.indexOf(pref) === -1) pref = 'system';
+  _themePref = pref;
+  S.set(THEME_KEY, pref);
+  applyTheme();
+}
+
+// Topbar button walks System → Light → Dark.
+function cycleTheme() {
+  const next = THEME_ORDER[(THEME_ORDER.indexOf(_themePref) + 1) % THEME_ORDER.length];
+  setTheme(next);
+  showToast(next === 'system' ? 'Theme follows your device' : `${next === 'light' ? 'Light' : 'Dark'} theme`);
+}
+
+function initTheme() {
+  applyTheme();
+  // Only matters while the preference is "system"
+  const mq = window.matchMedia('(prefers-color-scheme: light)');
+  const onChange = () => { if (_themePref === 'system') applyTheme(); };
+  if (mq.addEventListener) mq.addEventListener('change', onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  COMMAND PALETTE — Ctrl/⌘ + K                                    ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const CMDK_ICON = {
+  page:    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg>',
+  action:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  task:    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  note:    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
+  theme:   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z"/></svg>',
+  data:    '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>',
+  logout:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>'
+};
+
+const CMDK_PAGES = [
+  { page: 'dashboard',    label: 'Dashboard',     kw: 'home overview today' },
+  { page: 'subjects',     label: 'Subjects',      kw: 'roadmap topics syllabus' },
+  { page: 'tasks',        label: 'Tasks',         kw: 'todo deadlines' },
+  { page: 'timer',        label: 'Study Timer',   kw: 'stopwatch focus sessions' },
+  { page: 'attendance',   label: 'Attendance',    kw: 'present absent leave calendar' },
+  { page: 'analytics',    label: 'Analytics',     kw: 'charts insight hours reports' },
+  { page: 'notes',        label: 'Notes',         kw: 'scratchpad ideas reminders' },
+  { page: 'community',    label: 'Community',     kw: 'posts prompts share feed' },
+  { page: 'friends',      label: 'Friends',       kw: 'requests invite send files' },
+  { page: 'achievements', label: 'Trophies & XP', kw: 'badges level gamification' },
+  { page: 'profile',      label: 'Profile',       kw: 'account me stats' },
+  { page: 'settings',     label: 'Settings',      kw: 'theme preferences export import backup' }
+];
+
+const CMDK_ACTIONS = [
+  { label: 'New task',              kw: 'add create todo',            icon: 'action', run: () => { navTo('tasks');      openTaskModal(null); } },
+  { label: 'New note',              kw: 'add create idea reminder',   icon: 'note',   run: () => { navTo('notes');      openNoteModal(null); } },
+  { label: 'Start a study session', kw: 'timer begin focus',          icon: 'action', run: () => { navTo('timer');      openSessionModal(); } },
+  { label: 'Log a past session',    kw: 'manual backfill time',       icon: 'action', run: () => { navTo('timer');      openManualSessionModal(); } },
+  { label: 'Apply for leave',       kw: 'absent holiday off',         icon: 'action', run: () => { navTo('attendance'); openLeaveModal(); } },
+  { label: "Set today's study goal",kw: 'target daily minutes',       icon: 'action', run: () => { navTo('dashboard');  openGoalModal(); } },
+  { label: 'Export a backup',       kw: 'download json save data',    icon: 'data',   run: () => exportData() },
+  { label: 'Import a backup',       kw: 'restore upload json data',   icon: 'data',   run: () => { navTo('settings'); setTimeout(() => document.getElementById('import-file-input')?.click(), 80); } },
+  { label: 'Switch theme',          kw: 'dark light appearance mode', icon: 'theme',  run: () => cycleTheme() },
+  { label: 'Log out',               kw: 'sign out exit',              icon: 'logout', run: () => doLogout() }
+];
+
+let _cmdkResults = [];
+let _cmdkSel     = 0;
+let _cmdkPrevFocus = null;
+
+function cmdkIsOpen() {
+  return document.getElementById('cmdk')?.classList.contains('open') === true;
+}
+
+// The palette only makes sense once the student app is on screen.
+function cmdkAvailable() {
+  return !!state.user && document.getElementById('app')?.classList.contains('visible') === true;
+}
+
+function openCmdk() {
+  if (!cmdkAvailable()) return;
+  const wrap = document.getElementById('cmdk');
+  if (!wrap) return;
+  _cmdkPrevFocus = document.activeElement;
+  wrap.classList.add('open');
+  const input = document.getElementById('cmdk-input');
+  input.value = '';
+  cmdkRender('');
+  input.focus();
+}
+
+function closeCmdk() {
+  const wrap = document.getElementById('cmdk');
+  if (!wrap || !wrap.classList.contains('open')) return;
+  wrap.classList.remove('open');
+  _cmdkResults = [];
+  if (_cmdkPrevFocus && typeof _cmdkPrevFocus.focus === 'function') _cmdkPrevFocus.focus();
+  _cmdkPrevFocus = null;
+}
+
+function toggleCmdk() { cmdkIsOpen() ? closeCmdk() : openCmdk(); }
+
+function cmdkMatch(q, ...fields) {
+  const terms = String(q || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
+  if (!terms.length) return true;
+  const hay = fields.filter(Boolean).join(' ').toLowerCase();
+  return terms.every(term => hay.indexOf(term) !== -1);
+}
+
+// Builds the flat result list; `group` starts a new labelled section.
+function cmdkCollect(q) {
+  const out = [];
+  const cap = q ? 6 : 99;
+
+  CMDK_PAGES.filter(p => cmdkMatch(q, p.label, p.kw, p.page)).slice(0, cap).forEach(p => {
+    out.push({ group: 'Jump to', label: p.label, icon: CMDK_ICON.page, run: () => navTo(p.page) });
+  });
+
+  CMDK_ACTIONS.filter(a => cmdkMatch(q, a.label, a.kw)).slice(0, cap).forEach(a => {
+    out.push({ group: 'Actions', label: a.label, icon: CMDK_ICON[a.icon] || CMDK_ICON.action, run: a.run });
+  });
+
+  if (q) {
+    state.subjects.filter(s => cmdkMatch(q, s.name)).slice(0, 6).forEach(s => {
+      const done = (s.topics || []).filter(t => t.done).length;
+      out.push({
+        group: 'Subjects', label: s.name, dot: colorForSubject(s),
+        meta: `${done}/${(s.topics || []).length} topics`,
+        run: () => { navTo('subjects'); openRoadmap(s.id); }
+      });
+    });
+
+    state.tasks.filter(t => cmdkMatch(q, t.name, getSubjectName(t.subjectId))).slice(0, 6).forEach(t => {
+      out.push({
+        group: 'Tasks', label: t.name, icon: CMDK_ICON.task,
+        meta: t.status === 'completed' ? 'Done' : (t.deadline ? formatDeadline(t.deadline) : getSubjectName(t.subjectId)),
+        run: () => { navTo('tasks'); openTaskModal(t.id); }
+      });
+    });
+
+    (state.notes || []).filter(n => cmdkMatch(q, n.title, n.content, n.type)).slice(0, 6).forEach(n => {
+      out.push({
+        group: 'Notes', label: n.title || '(untitled)', icon: CMDK_ICON.note,
+        meta: n.type ? n.type.charAt(0).toUpperCase() + n.type.slice(1) : '',
+        run: () => { navTo('notes'); openNoteModal(n.id); }
+      });
+    });
+  }
+
+  return out;
+}
+
+function cmdkRender(q) {
+  _cmdkResults = cmdkCollect(q.trim().toLowerCase());
+  _cmdkSel = 0;
+  const list = document.getElementById('cmdk-list');
+  if (!_cmdkResults.length) {
+    list.innerHTML = `<div class="cmdk-empty">Nothing matches “${escHtml(q.trim())}”</div>`;
+    return;
+  }
+  let html = '', lastGroup = '';
+  _cmdkResults.forEach((r, i) => {
+    if (r.group !== lastGroup) { html += `<div class="cmdk-group-label">${r.group}</div>`; lastGroup = r.group; }
+    const lead = r.dot
+      ? `<span class="cmdk-item-dot" style="background:${escHtml(r.dot)}"></span>`
+      : `<span class="cmdk-item-icon">${r.icon || CMDK_ICON.page}</span>`;
+    html += `<button type="button" class="cmdk-item${i === 0 ? ' sel' : ''}" role="option" aria-selected="${i === 0}" data-i="${i}">`
+         +  lead
+         +  `<span class="cmdk-item-text">${escHtml(r.label)}</span>`
+         +  (r.meta ? `<span class="cmdk-item-meta">${escHtml(r.meta)}</span>` : '')
+         +  `</button>`;
+  });
+  list.innerHTML = html;
+}
+
+function cmdkHighlight(next) {
+  const items = document.querySelectorAll('#cmdk-list .cmdk-item');
+  if (!items.length) return;
+  _cmdkSel = (next + items.length) % items.length;
+  items.forEach((el, i) => {
+    const on = i === _cmdkSel;
+    el.classList.toggle('sel', on);
+    el.setAttribute('aria-selected', String(on));
+    if (on) el.scrollIntoView({ block: 'nearest' });
+  });
+}
+
+function cmdkRun(i) {
+  const r = _cmdkResults[i];
+  if (!r) return;
+  closeCmdk();
+  try { r.run(); } catch (e) { console.warn('Command failed:', e); showToast('That action could not run', 'error'); }
+}
+
+document.getElementById('cmdk-input')?.addEventListener('input', e => cmdkRender(e.target.value));
+document.getElementById('cmdk-list')?.addEventListener('click', e => {
+  const btn = e.target.closest('.cmdk-item');
+  if (btn) cmdkRun(Number(btn.dataset.i));
+});
+document.getElementById('cmdk')?.addEventListener('click', e => {
+  if (e.target.id === 'cmdk') closeCmdk();
+});
+
+document.addEventListener('keydown', e => {
+  // Ctrl/⌘ + K opens or closes the palette from anywhere in the app
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K')) {
+    if (!cmdkAvailable() && !cmdkIsOpen()) return;
+    e.preventDefault();
+    toggleCmdk();
+    return;
+  }
+  if (!cmdkIsOpen()) return;
+  if (e.key === 'Escape')         { e.preventDefault(); closeCmdk(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); cmdkHighlight(_cmdkSel + 1); }
+  else if (e.key === 'ArrowUp')   { e.preventDefault(); cmdkHighlight(_cmdkSel - 1); }
+  else if (e.key === 'Enter')     { e.preventDefault(); cmdkRun(_cmdkSel); }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  DATA IMPORT — the restore half of exportData()                  ║
+// ╚══════════════════════════════════════════════════════════════════╝
+// Each category needs an identity so "merge" can tell new records from ones
+// already held. Only leaves carry no id, so they key on their own fields.
+const IMPORT_KEYS = [
+  { key: 'subjects',   label: 'Subjects',   idOf: r => r && r.id },
+  { key: 'tasks',      label: 'Tasks',      idOf: r => r && r.id },
+  { key: 'sessions',   label: 'Sessions',   idOf: r => r && r.id },
+  { key: 'attendance', label: 'Attendance', idOf: r => r && r.date },
+  { key: 'leaves',     label: 'Leaves',     idOf: r => r && r.startDate ? `${r.startDate}|${r.endDate}|${r.reason || ''}` : null },
+  { key: 'notes',      label: 'Notes',      idOf: r => r && r.id }
+];
+
+let _importPayload  = null;
+let _importFileName = '';
+
+function handleImportFile(input) {
+  const file = input.files && input.files[0];
+  input.value = '';                       // so the same file can be picked again
+  if (!file) return;
+  if (file.size > 25 * 1024 * 1024) { showToast('That file is too large to import', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onerror = () => showToast('Could not read that file', 'error');
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch (err) { showToast('That file is not valid JSON', 'error'); return; }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      showToast('That does not look like a LearnOS backup', 'error'); return;
+    }
+    if (!IMPORT_KEYS.some(k => Array.isArray(data[k.key]))) {
+      showToast('No LearnOS records found in that file', 'error'); return;
+    }
+    _importPayload  = data;
+    _importFileName = file.name;
+    document.getElementById('import-mode').value = 'merge';
+    renderImportSummary();
+    openModal('modal-import');
+  };
+  reader.readAsText(file);
+}
+
+function renderImportSummary() {
+  if (!_importPayload) return;
+  const mode = document.getElementById('import-mode').value;
+
+  const bits = [escHtml(_importFileName)];
+  if (_importPayload.exportedAt) {
+    const d = new Date(_importPayload.exportedAt);
+    if (!isNaN(d.getTime())) bits.push('exported ' + d.toLocaleString());
+  }
+  if (_importPayload.user) bits.push('account “' + escHtml(String(_importPayload.user)) + '”');
+  document.getElementById('import-file-meta').innerHTML = bits.join(' · ');
+
+  let willAdd = 0, willDrop = 0;
+  document.getElementById('import-summary').innerHTML = IMPORT_KEYS.map(k => {
+    const incoming = Array.isArray(_importPayload[k.key]) ? _importPayload[k.key] : null;
+    if (!incoming) {
+      return `<div class="imp-cell"><div class="imp-cell-val" style="color:var(--muted2);">—</div><div class="imp-cell-lbl">${k.label}</div></div>`;
+    }
+    const mine = state[k.key] || [];
+    let n;
+    if (mode === 'replace') {
+      n = incoming.length;
+      willDrop += mine.length;
+    } else {
+      const have = new Set(mine.map(k.idOf).filter(Boolean));
+      n = incoming.filter(r => { const id = k.idOf(r); return id && !have.has(id); }).length;
+    }
+    willAdd += n;
+    return `<div class="imp-cell"><div class="imp-cell-val">${mode === 'replace' ? n : (n ? '+' + n : '0')}</div><div class="imp-cell-lbl">${k.label}</div></div>`;
+  }).join('');
+
+  const plural = n => n === 1 ? '' : 's';
+  document.getElementById('import-mode-note').innerHTML = mode === 'replace'
+    ? `<strong>Replace:</strong> ${willDrop} record${plural(willDrop)} you hold now will be discarded, and ${willAdd} written in their place. Categories missing from the file are left alone.`
+    : `<strong>Merge:</strong> ${willAdd} record${plural(willAdd)} will be added. Nothing you already have is changed or removed.`;
+
+  const btn = document.getElementById('import-confirm-btn');
+  btn.textContent = mode === 'replace'
+    ? `Replace with ${willAdd} record${plural(willAdd)}`
+    : (willAdd ? `Add ${willAdd} record${plural(willAdd)}` : 'Nothing new to add');
+  btn.disabled = mode === 'merge' && willAdd === 0;
+}
+
+function applyImport() {
+  if (!_importPayload) return;
+  const mode = document.getElementById('import-mode').value;
+  let written = 0;
+  const touched = [];
+
+  IMPORT_KEYS.forEach(k => {
+    const incoming = Array.isArray(_importPayload[k.key]) ? _importPayload[k.key] : null;
+    if (!incoming) return;
+    if (mode === 'replace') {
+      state[k.key] = incoming.slice();
+      written += incoming.length;
+    } else {
+      const have = new Set((state[k.key] || []).map(k.idOf).filter(Boolean));
+      incoming.forEach(r => {
+        const id = k.idOf(r);
+        if (!id || have.has(id)) return;
+        state[k.key].push(r);
+        have.add(id);
+        written++;
+      });
+    }
+    touched.push(k.key);
+  });
+
+  touched.forEach(key => saveData(key));
+  closeModal('modal-import');
+  _importPayload = null;
+  _importFileName = '';
+
+  // Every view that reads these arrays, refreshed independently so one
+  // failure cannot leave the rest stale.
+  [renderDailyStudyMatrix, renderDashboard, renderSubjects, renderTaskSubjectFilter,
+   renderTasks, renderSessions, renderAttendance, renderNotes, renderProfile,
+   renderSettings].forEach(fn => { try { fn(); } catch (err) { console.warn('post-import render:', err); } });
+
+  showToast(mode === 'replace' ? `Restored ${written} records` : `Imported ${written} new records`, 'success');
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SETTINGS PAGE                                                   ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function renderSettings() {
+  applyTheme();   // re-syncs the segmented control and the "currently showing" row
+
+  const counts = document.getElementById('set-record-counts');
+  if (counts) {
+    counts.textContent = IMPORT_KEYS
+      .map(k => `${(state[k.key] || []).length} ${k.label.toLowerCase()}`)
+      .join(' · ');
+  }
+
+  const email = document.getElementById('set-about-email');
+  if (email) email.textContent = (window._fbUser && window._fbUser.email) || '—';
+  const name = document.getElementById('set-about-name');
+  if (name) name.textContent = (state.user && state.user.name) || '—';
+
+  const cache = document.getElementById('set-about-cache');
+  if (cache) {
+    let bytes = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        bytes += (k.length + (localStorage.getItem(k) || '').length) * 2;   // UTF-16
+      }
+    } catch (e) { bytes = -1; }
+    cache.textContent = bytes < 0 ? 'unavailable' : formatBytes(bytes);
+  }
+
+  const queue = document.getElementById('set-about-queue');
+  if (queue) {
+    let n = 0;
+    try { n = (JSON.parse(localStorage.getItem('learnos_offline_queue')) || []).length; } catch (e) {}
+    queue.textContent = n === 0 ? 'nothing queued' : `${n} change${n === 1 ? '' : 's'}`;
+  }
+
+  const sw = document.getElementById('set-about-sw');
+  if (sw) {
+    sw.textContent = !('serviceWorker' in navigator) ? 'Not supported by this browser'
+      : navigator.serviceWorker.controller ? 'Active — the app opens offline'
+      : 'Registering…';
+  }
+
+  const kbd = document.getElementById('set-kbd-cmdk');
+  if (kbd && /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)) kbd.textContent = '⌘';
+}
+
+// Mac keyboards show ⌘ rather than Ctrl on the topbar hint too
+(function localiseCmdkHint() {
+  if (!/Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent)) return;
+  const hint = document.getElementById('cmdk-hint');
+  if (hint) hint.textContent = '⌘ K';
+})();
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  EMPTY-STATE ACTIONS — every empty state offers its next step     ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function focusNewSubject() {
+  navTo('subjects');
+  setTimeout(() => {
+    const el = document.getElementById('new-subject-input');
+    if (el) { el.focus(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }, 60);
+}
+
+function focusNewPost() {
+  navTo('community');
+  setTimeout(() => {
+    const el = document.getElementById('post-description');
+    if (el) { el.focus(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }, 60);
+}
+
+// True when the list is empty only because something is filtered out.
+function tasksFiltered() {
+  return !!(document.getElementById('task-search')?.value.trim()
+         || document.getElementById('task-filter-status')?.value
+         || document.getElementById('task-filter-subject')?.value);
+}
+
+function clearTaskFilters() {
+  const s = document.getElementById('task-search');           if (s) s.value = '';
+  const st = document.getElementById('task-filter-status');    if (st) st.value = '';
+  const sb = document.getElementById('task-filter-subject');   if (sb) sb.value = '';
+  renderTasks();
+}
+
+function notesFiltered() {
+  return !!(document.getElementById('notes-search')?.value.trim()
+         || document.getElementById('notes-filter-type')?.value);
+}
+
+function clearNotesFilters() {
+  const s = document.getElementById('notes-search');       if (s) s.value = '';
+  const t = document.getElementById('notes-filter-type');  if (t) t.value = '';
+  renderNotes();
+}
+
+
 
 // ===================== START =====================
 // Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
