@@ -2915,6 +2915,261 @@ kbd.k {
 .empty-cta svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .empty-state .empty-cta + .empty-cta { margin-left: 8px; }
 
+/* ╔═══════════════════════════════════════════════════════════════╗
+   ║  DESIGN SYSTEM v6 — Tier 2: depth on pages that already work      ║
+   ║  G Heatmap · H Calendar · I Pomodoro · J Up next ·                 ║
+   ║  K Subject page · L Task bulk · M Notes · N Sidebar footer        ║
+   ╚═══════════════════════════════════════════════════════════════╝ */
+
+/* ---------- G. CONTRIBUTION HEATMAP ---------- */
+.heat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px 18px; flex-wrap: wrap; margin-bottom: 14px; }
+.heat-head-stats { display: flex; gap: 18px; flex-wrap: wrap; }
+.heat-stat { font-size: 0.75rem; color: var(--muted2); }
+.heat-stat b { display: block; font-family: var(--font-mono); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.heat-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+.heat {
+  display: grid; grid-template-columns: auto auto; gap: 5px 7px; width: max-content;
+  --h0: var(--bg3);
+  --h1: rgba(94, 156, 208, 0.24);
+  --h2: rgba(94, 156, 208, 0.45);
+  --h3: rgba(94, 156, 208, 0.7);
+  --h4: rgba(94, 156, 208, 1);
+}
+[data-theme="light"] .heat {
+  --h1: rgba(47, 109, 158, 0.18);
+  --h2: rgba(47, 109, 158, 0.38);
+  --h3: rgba(47, 109, 158, 0.64);
+  --h4: rgba(47, 109, 158, 0.95);
+}
+.heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: 14px; font-size: 0.66rem; color: var(--muted2); }
+.heat-months span { white-space: nowrap; }
+.heat-days { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; font-size: 0.62rem; color: var(--muted2); }
+.heat-days span { line-height: 11px; text-align: right; }
+.heat-weeks { display: flex; gap: 3px; }
+.heat-col { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; }
+.heat-cell { width: 11px; height: 11px; border-radius: 2px; background: var(--h0); box-shadow: inset 0 0 0 1px var(--line-soft); }
+.heat-cell.l1 { background: var(--h1); box-shadow: none; }
+.heat-cell.l2 { background: var(--h2); box-shadow: none; }
+.heat-cell.l3 { background: var(--h3); box-shadow: none; }
+.heat-cell.l4 { background: var(--h4); box-shadow: none; }
+.heat-cell.is-today { box-shadow: 0 0 0 1.5px var(--text-bright); }
+.heat-cell.blank { background: transparent; box-shadow: none; }
+.heat-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 0.72rem; color: var(--muted2); }
+.heat-legend { display: inline-flex; align-items: center; gap: 4px; }
+
+/* ---------- H. CALENDAR / AGENDA PAGE ---------- */
+.cal-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.cal-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--text-bright); min-width: 168px; }
+.cal-spacer { flex: 1; }
+.cal-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.cal-dow { padding: 0 0 6px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2); text-align: center; }
+.cal-cell {
+  display: flex; flex-direction: column; gap: 5px; min-height: 78px; padding: 7px 8px;
+  border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg3);
+  color: var(--text); text-align: left; cursor: pointer;
+  transition: border-color .15s var(--ease), background-color .15s var(--ease);
+}
+.cal-cell:hover { border-color: var(--line-strong); background: var(--surface2); }
+.cal-cell.is-other { opacity: 0.4; }
+.cal-cell.is-today .cal-num { color: var(--accent); font-weight: 700; }
+.cal-cell.is-sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cal-cell.is-leave { background: rgba(192, 139, 62, 0.08); }
+[data-theme="light"] .cal-cell.is-leave { background: rgba(153, 106, 31, 0.08); }
+.cal-num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal-hours { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); }
+.cal-dots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: auto; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; }
+.cal-dot.sess { background: var(--accent); }
+.cal-dot.task { background: var(--warn); }
+.cal-dot.leave { background: var(--danger); }
+.cal-dot.att { background: var(--success); }
+.cal-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 0.74rem; color: var(--muted2); }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.cal-side-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.cal-side-date { font-size: 0.95rem; font-weight: 600; color: var(--text-bright); }
+.cal-side-sub { font-size: 0.75rem; color: var(--muted2); }
+.agenda-group { margin-bottom: 18px; }
+.agenda-group:last-child { margin-bottom: 0; }
+.agenda-date { display: flex; align-items: baseline; gap: 8px; padding-bottom: 7px; margin-bottom: 9px; border-bottom: 1px solid var(--line); }
+.agenda-date b { font-size: 0.86rem; font-weight: 600; color: var(--text-bright); }
+.agenda-date span { font-size: 0.74rem; color: var(--muted2); }
+.agenda-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 11px; margin-bottom: 6px;
+  border: 1px solid var(--line); border-left: 2px solid var(--line-strong); border-radius: var(--r-md);
+  background: var(--bg3); color: var(--text); font-family: var(--font-ui); font-size: 0.83rem; text-align: left; cursor: pointer;
+  transition: border-color .15s var(--ease), background-color .15s var(--ease);
+}
+.agenda-item:hover { background: var(--surface2); border-color: var(--line-strong); }
+.agenda-item.k-sess  { border-left-color: var(--accent); }
+.agenda-item.k-task  { border-left-color: var(--warn); }
+.agenda-item.k-leave { border-left-color: var(--danger); }
+.agenda-item.k-att   { border-left-color: var(--success); }
+.agenda-item.static { cursor: default; }
+.agenda-item.static:hover { background: var(--bg3); border-color: var(--line); border-left-color: inherit; }
+.agenda-txt { flex: 1; min-width: 0; }
+.agenda-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agenda-sub { margin-top: 2px; font-size: 0.74rem; color: var(--muted2); }
+.agenda-meta { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.agenda-empty { padding: 26px 12px; border: 1px dashed var(--line-strong); border-radius: var(--r-md); text-align: center; font-size: 0.82rem; color: var(--muted2); }
+@media (max-width: 1040px) { .cal-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .cal-cell { min-height: 58px; padding: 5px 6px; }
+  .cal-hours { display: none; }
+  .cal-title { min-width: 0; font-size: 0.95rem; }
+}
+
+/* ---------- I. POMODORO ---------- */
+.pomo-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 2px 0 12px; }
+.pomo-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--glow);
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent);
+}
+.pomo-chip.is-break { color: var(--warn-text); background: rgba(192, 139, 62, 0.12); border-color: rgba(192, 139, 62, 0.35); }
+[data-theme="light"] .pomo-chip.is-break { background: rgba(153, 106, 31, 0.1); border-color: rgba(153, 106, 31, 0.35); }
+.pomo-left { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.pomo-cycles { font-size: 0.75rem; color: var(--muted2); }
+.pomo-track { flex: 1 1 110px; min-width: 80px; height: 4px; border-radius: 99px; background: var(--bg3); overflow: hidden; }
+.pomo-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+.pomo-fill.is-break { background: var(--warn); }
+.pomo-config { display: none; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.pomo-config.on { display: flex; }
+.pomo-config .form-group { flex: 1; min-width: 116px; margin-bottom: 0; }
+.pomo-hint { margin-top: 10px; font-size: 0.78rem; line-height: 1.5; color: var(--muted2); }
+
+/* ---------- J. TODAY / UP NEXT ---------- */
+.dash-topline { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-bottom: 18px; align-items: start; }
+.dash-topline > .grid-2 { margin-bottom: 0 !important; }
+.upnext-card { display: flex; flex-direction: column; height: 100%; }
+.upnext-list { display: flex; flex-direction: column; gap: 7px; }
+.upnext-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--bg3); color: var(--text); font-family: var(--font-ui); font-size: 0.85rem; text-align: left; cursor: pointer;
+  transition: border-color .15s var(--ease), background-color .15s var(--ease);
+}
+.upnext-item:hover { background: var(--surface2); border-color: var(--line-strong); }
+.upnext-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.upnext-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.upnext-when { flex-shrink: 0; font-size: 0.76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.upnext-when.is-overdue { color: var(--danger-text); font-weight: 500; }
+.upnext-when.is-today { color: var(--warn-text); font-weight: 500; }
+.upnext-foot { margin-top: auto; padding-top: 14px; }
+.upnext-resume {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  background: transparent; color: var(--text); font-family: var(--font-ui); font-size: 0.83rem; text-align: left; cursor: pointer;
+  transition: border-color .15s var(--ease), background-color .15s var(--ease), color .15s var(--ease);
+}
+.upnext-resume:hover { background: var(--glow); border-color: var(--accent); color: var(--accent3); }
+.upnext-resume svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.upnext-resume-sub { display: block; margin-top: 2px; font-size: 0.73rem; color: var(--muted2); }
+.upnext-empty { padding: 20px 12px; border: 1px dashed var(--line-strong); border-radius: var(--r-md); text-align: center; font-size: 0.82rem; color: var(--muted2); }
+@media (max-width: 1040px) { .dash-topline { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- K. SUBJECT DETAIL PAGE ---------- */
+.subj-back {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px;
+  padding: 0; border: 0; background: none; color: var(--muted);
+  font-family: var(--font-ui); font-size: 0.82rem; cursor: pointer;
+}
+.subj-back:hover { color: var(--text-bright); }
+.subj-back svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.subj-hero { padding: 20px 24px; border: 1px solid var(--line); border-left: 3px solid var(--subj-c, var(--accent)); border-radius: var(--r-lg); background: var(--surface); margin-bottom: 18px; }
+.subj-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
+.subj-name { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; color: var(--subj-c, var(--accent)); }
+.subj-hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.subj-bar-track { height: 6px; margin: 16px 0 8px; border-radius: 99px; background: var(--bg3); overflow: hidden; }
+.subj-bar-fill { height: 100%; border-radius: 99px; background: var(--subj-c, var(--accent)); transition: width .4s var(--ease); }
+.subj-bar-label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 0.78rem; color: var(--muted); }
+.subj-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 12px; margin-top: 18px; }
+.subj-stat-val { font-family: var(--font-mono); font-size: 1.15rem; font-weight: 600; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.subj-stat-lbl { margin-top: 2px; font-size: 0.74rem; color: var(--muted2); }
+.subj-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.subj-side { display: flex; flex-direction: column; gap: 16px; }
+.subj-mini { display: flex; align-items: center; gap: 10px; padding: 9px 11px; margin-bottom: 6px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg3); font-size: 0.83rem; }
+.subj-mini:last-child { margin-bottom: 0; }
+.subj-mini-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subj-mini-meta { flex-shrink: 0; font-family: var(--font-mono); font-size: 0.76rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.subj-mini.done .subj-mini-txt { color: var(--muted2); text-decoration: line-through; }
+@media (max-width: 1040px) { .subj-cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- L. TASK BULK ACTIONS & SORT ---------- */
+.task-sel-box {
+  display: none; align-items: center; justify-content: center;
+  width: 17px; height: 17px; flex-shrink: 0;
+  border: 1px solid var(--line-strong); border-radius: var(--r-xs);
+  background: var(--bg3); color: var(--on-brand); cursor: pointer;
+}
+.task-list.selecting .task-sel-box { display: inline-flex; }
+.task-sel-box.on { background: var(--brand); border-color: var(--brand); }
+.task-sel-box svg { width: 12px; height: 12px; opacity: 0; stroke: currentColor; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.task-sel-box.on svg { opacity: 1; }
+.bulkbar {
+  display: none; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; margin-bottom: 14px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--surface2);
+}
+.bulkbar.on { display: flex; }
+.bulkbar-count { font-size: 0.83rem; font-weight: 500; color: var(--text-bright); }
+.bulkbar-spacer { flex: 1; }
+.bulkbar .btn-secondary, .bulkbar .btn-danger { min-height: 30px; padding: 0 11px; font-size: 0.8rem; }
+
+/* ---------- M. NOTES — pin, tags, grid ---------- */
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 12px; }
+.note-card { display: flex; flex-direction: column; padding: 15px 16px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+.note-card.pinned, .task-item.pinned { border-color: rgba(192, 139, 62, 0.4); }
+[data-theme="light"] .note-card.pinned, [data-theme="light"] .task-item.pinned { border-color: rgba(153, 106, 31, 0.4); }
+.note-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.note-card-title { flex: 1; min-width: 0; font-size: 0.9rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-card-body { font-size: 0.82rem; line-height: 1.55; color: var(--muted); white-space: pre-wrap; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; }
+.note-card-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
+.note-card-body, .note-card .note-tags { margin-bottom: 12px; }
+.note-card-date { margin-left: auto; font-size: 0.72rem; color: var(--muted2); }
+.note-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.note-tag {
+  padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: var(--r-xs);
+  background: var(--bg3); color: var(--muted); font-family: var(--font-ui); font-size: 0.71rem; cursor: pointer;
+}
+.note-tag:hover { border-color: var(--accent); color: var(--accent); }
+.note-tag.on { background: var(--glow); border-color: var(--accent); color: var(--accent); }
+.pin-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex-shrink: 0;
+  border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--muted2); cursor: pointer;
+  transition: color .15s var(--ease), background-color .15s var(--ease);
+}
+.pin-btn:hover { background: var(--surface2); color: var(--text-bright); }
+.pin-btn.on { color: var(--warn); }
+.pin-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.pin-btn.on svg { fill: currentColor; fill-opacity: 0.2; }
+.view-toggle { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--bg3); }
+.view-toggle button {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 28px;
+  border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--muted); cursor: pointer;
+}
+.view-toggle button[aria-pressed="true"] { background: var(--surface); border-color: var(--line); color: var(--text-bright); }
+.view-toggle svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- N. SIDEBAR FOOTER — streak & goal ---------- */
+#sidebar { display: flex; flex-direction: column; overflow-y: auto; }
+#sidebar-foot { margin-top: auto; padding-top: 14px; }
+.sfoot {
+  display: block; width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--bg3); color: var(--text); font-family: var(--font-ui); text-align: left; cursor: pointer;
+  transition: border-color .15s var(--ease);
+}
+.sfoot:hover { border-color: var(--line-strong); }
+.sfoot-row { display: flex; align-items: center; gap: 8px; }
+.sfoot-streak { display: inline-flex; align-items: center; gap: 4px; font-size: 0.82rem; font-weight: 600; color: var(--warn-text); }
+.sfoot-streak svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sfoot-today { margin-left: auto; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sfoot-goal { margin-top: 10px; font-size: 0.73rem; color: var(--muted2); }
+.sfoot-track { height: 4px; margin-top: 6px; border-radius: 99px; background: var(--surface2); overflow: hidden; }
+.sfoot-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width .4s var(--ease); }
+.sfoot-fill.done { background: var(--success); }
+
 </style>
 </head>
 <body>
@@ -3083,6 +3338,9 @@ kbd.k {
       <button onclick="navTo('tasks');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks
       </button>
+      <button onclick="navTo('calendar');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3M8 18h6"/></svg>Calendar
+      </button>
       <button onclick="navTo('analytics');closeMoreMenu()" style="background:var(--bg3);border:none;border-radius:12px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-size:0.7rem;font-weight:600;-webkit-tap-highlight-color:transparent;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>Analytics
       </button>
@@ -3168,6 +3426,7 @@ kbd.k {
       <div class="nav-section">
         <div class="nav-label">Track</div>
         <button class="nav-item" data-page="attendance" onclick="navTo('attendance')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span> Attendance</button>
+        <button class="nav-item" data-page="calendar" onclick="navTo('calendar')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h3M8 18h6"/></svg></span> Calendar</button>
         <button class="nav-item" data-page="analytics" onclick="navTo('analytics')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg></span> Analytics</button>
         <button class="nav-item" data-page="notes" onclick="navTo('notes')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span> Notes</button>
       </div>
@@ -3181,6 +3440,14 @@ kbd.k {
         <button class="nav-item" data-page="achievements" onclick="navTo('achievements')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16M10 14.66V17c0 .55-.47.98-1.97 1.5C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98 1.97 1.5 1.18.25 2.03 1.74 2.03 3.5"/><path d="M18 2H6v7a6 6 0 0 0 12 0z"/></svg></span> Trophies & XP</button>
         <button class="nav-item" data-page="profile" onclick="navTo('profile')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></span> Profile</button>
         <button class="nav-item" data-page="settings" onclick="navTo('settings')"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Settings</button>
+      </div>
+      <!-- Streak / daily-goal widget — always visible, whatever page you are on -->
+      <div id="sidebar-foot">
+        <button class="sfoot" onclick="navTo('dashboard');openGoalModal()" title="Set today's focus goal" aria-label="Streak and today's goal">
+          <div id="sfoot-body">
+            <div class="sfoot-row"><span class="sfoot-streak">—</span></div>
+          </div>
+        </button>
       </div>
     </nav>
     <!-- Main -->
@@ -3218,6 +3485,7 @@ kbd.k {
           </div>
         </div>
 
+        <div class="dash-topline">
         <div class="grid-2" style="margin-bottom:18px;">
           <!-- Overall progress -->
           <div class="card">
@@ -3270,6 +3538,12 @@ kbd.k {
             </div>
           </div>
         </div>
+          <!-- ── Today / Up next ── -->
+          <div class="card upnext-card">
+            <div class="card-title">Up next</div>
+            <div id="upnext-body"></div>
+          </div>
+        </div>
         <!-- Subject progress -->
         <div class="card" style="margin-bottom:18px;">
           <div class="card-title">Subject Progress</div>
@@ -3317,6 +3591,18 @@ kbd.k {
             </div>
           </div>
           <div id="dash-sessions-today" class="study-sessions-list"></div>
+        </div>
+
+        <!-- ── Contribution heatmap — a year of study at a glance ── -->
+        <div class="card" style="margin-top:18px;">
+          <div class="heat-head">
+            <div>
+              <div class="card-title" style="margin-bottom:2px;">Study Activity</div>
+              <div style="font-size:0.78rem;color:var(--muted);">Every day of the last year — darker means more time studied</div>
+            </div>
+            <div class="heat-head-stats" id="dash-heat-stats"></div>
+          </div>
+          <div id="dash-heatmap"></div>
         </div>
 
         <!-- ── Daily Subject Study Matrix Dashboard Table ── -->
@@ -3391,6 +3677,15 @@ kbd.k {
         </div>
       </div>
 
+      <!-- ======= SUBJECT DETAIL ======= -->
+      <!-- Reached from any subject card; not a nav destination of its own. -->
+      <div class="page" id="page-subject">
+        <button class="subj-back" onclick="navTo('subjects')" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg> All subjects
+        </button>
+        <div id="subject-detail"></div>
+      </div>
+
       <!-- ======= TASKS ======= -->
       <div class="page" id="page-tasks">
         <div class="page-header">
@@ -3408,7 +3703,23 @@ kbd.k {
           <select id="task-filter-subject" onchange="renderTasks()">
             <option value="">All Subjects</option>
           </select>
+          <select id="task-sort" onchange="renderTasks()" aria-label="Sort tasks">
+            <option value="deadline">Deadline — soonest</option>
+            <option value="deadline-desc">Deadline — latest</option>
+            <option value="priority">Priority</option>
+            <option value="name">Name A–Z</option>
+            <option value="created">Recently added</option>
+          </select>
+          <button class="btn-secondary" id="task-select-btn" onclick="toggleTaskSelectMode()">Select</button>
           <button class="btn-accent" onclick="openTaskModal()">+ Add Task</button>
+        </div>
+        <div class="bulkbar" id="task-bulkbar">
+          <button class="btn-secondary" onclick="taskSelectAll()" id="task-selall-btn">Select all</button>
+          <span class="bulkbar-count" id="task-sel-count">0 selected</span>
+          <span class="bulkbar-spacer"></span>
+          <button class="btn-secondary" onclick="bulkSetTaskStatus('completed')">Mark complete</button>
+          <button class="btn-secondary" onclick="bulkSetTaskStatus('pending')">Mark pending</button>
+          <button class="btn-danger" onclick="bulkDeleteTasks()">Delete</button>
         </div>
         <div class="task-list" id="task-list">
           <div class="empty-state"><div class="empty-icon" aria-hidden="true">✅</div><div class="empty-text">No tasks yet</div><button type="button" class="empty-cta" onclick="openTaskModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first task</button></div>
@@ -3572,6 +3883,49 @@ kbd.k {
         </section>
       </div>
 
+      <!-- ======= CALENDAR ======= -->
+      <div class="page" id="page-calendar">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Calendar</div>
+            <div class="page-sub">Deadlines, sessions, attendance and leave on one timeline</div>
+          </div>
+        </div>
+
+        <div class="cal-toolbar">
+          <button class="btn-icon" onclick="calShiftMonth(-1)" type="button" aria-label="Previous month">‹</button>
+          <div class="cal-title" id="cal-title">—</div>
+          <button class="btn-icon" onclick="calShiftMonth(1)" type="button" aria-label="Next month">›</button>
+          <button class="btn-secondary" onclick="calGoToday()" type="button">Today</button>
+          <span class="cal-spacer"></span>
+          <div class="seg" role="group" aria-label="Calendar view">
+            <button class="seg-btn" id="cal-seg-month" onclick="calSetView('month')" aria-pressed="true">Month</button>
+            <button class="seg-btn" id="cal-seg-agenda" onclick="calSetView('agenda')" aria-pressed="false">Agenda</button>
+          </div>
+        </div>
+
+        <div class="cal-layout">
+          <div class="card">
+            <div id="cal-main"></div>
+            <div class="cal-legend">
+              <span><i class="cal-dot sess"></i>Study session</span>
+              <span><i class="cal-dot task"></i>Task deadline</span>
+              <span><i class="cal-dot att"></i>Present</span>
+              <span><i class="cal-dot leave"></i>Leave</span>
+            </div>
+          </div>
+          <div class="card" id="cal-side-card">
+            <div class="cal-side-head">
+              <div>
+                <div class="cal-side-date" id="cal-side-date">—</div>
+                <div class="cal-side-sub" id="cal-side-sub">—</div>
+              </div>
+            </div>
+            <div id="cal-side-body"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ======= NOTES ======= -->
       <div class="page" id="page-notes">
         <div class="page-header">
@@ -3587,6 +3941,17 @@ kbd.k {
             <option value="idea">💡 Idea</option>
             <option value="reminder">⏰ Reminder</option>
           </select>
+          <select id="notes-filter-tag" onchange="renderNotes()" aria-label="Filter by tag">
+            <option value="">All Tags</option>
+          </select>
+          <div class="view-toggle" role="group" aria-label="Notes layout">
+            <button id="notes-view-list" onclick="setNotesView('list')" aria-pressed="true" aria-label="List view" title="List view">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </button>
+            <button id="notes-view-grid" onclick="setNotesView('grid')" aria-pressed="false" aria-label="Grid view" title="Grid view">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+          </div>
           <button class="btn-accent" onclick="openNoteModal()">+ New Note</button>
         </div>
         <div class="task-list" id="notes-list">
@@ -3790,9 +4155,21 @@ kbd.k {
         </div>
 
         <!-- Subject Progress Card -->
-        <div class="card">
+        <div class="card" style="margin-bottom:18px;">
           <div class="card-title" style="margin-bottom:16px;">Subject Progress</div>
           <div id="profile-subject-list"></div>
+        </div>
+
+        <!-- Study Activity — same year grid as the dashboard -->
+        <div class="card">
+          <div class="heat-head">
+            <div>
+              <div class="card-title" style="margin-bottom:2px;">Study Activity</div>
+              <div style="font-size:0.78rem;color:var(--muted);">The last 12 months of study, one square per day</div>
+            </div>
+            <div class="heat-head-stats" id="profile-heat-stats"></div>
+          </div>
+          <div id="profile-heatmap"></div>
         </div>
       </div>
 
@@ -4311,36 +4688,6 @@ kbd.k {
 
 <!-- ============ MODALS ============ -->
 
-<!-- Subject Roadmap Modal -->
-<div class="modal-overlay" id="modal-roadmap">
-  <div class="modal" style="max-width:560px;">
-    <div class="modal-header">
-      <div class="modal-title" id="roadmap-modal-title">Subject Roadmap</div>
-      <button class="modal-close" onclick="closeModal('modal-roadmap')">×</button>
-    </div>
-    <div class="modal-body">
-      <div style="margin-bottom:16px;">
-        <div class="subject-bar-track" style="height:8px;margin-bottom:6px;">
-          <div class="subject-bar-fill" id="roadmap-progress-bar" style="width:0%"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);">
-          <span id="roadmap-progress-text">0 of 0 topics done</span>
-          <span id="roadmap-progress-pct" style="color:var(--accent3);font-weight:600;">0%</span>
-        </div>
-      </div>
-      <div class="topic-list" id="topic-list"></div>
-      <div class="add-topic-row">
-        <input type="text" id="new-topic-input" placeholder="Add new topic…" onkeydown="if(event.key==='Enter')addTopic()">
-        <button class="add-topic-btn" onclick="addTopic()">Add</button>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-danger" onclick="deleteSubject()">Delete Subject</button>
-      <button class="btn-accent" onclick="closeModal('modal-roadmap')">Done</button>
-    </div>
-  </div>
-</div>
-
 <!-- Add Task Modal -->
 <div class="modal-overlay" id="modal-task">
   <div class="modal">
@@ -4401,6 +4748,26 @@ kbd.k {
       <div class="field">
         <label>Task / Topic</label>
         <input type="text" id="session-task-input" placeholder="e.g. ANN Classification">
+      </div>
+      <div class="field">
+        <label>Mode</label>
+        <div class="seg" role="group" aria-label="Timer mode">
+          <button type="button" class="seg-btn" id="mode-seg-free" onclick="setSessionMode('free')" aria-pressed="true">Free run</button>
+          <button type="button" class="seg-btn" id="mode-seg-pomodoro" onclick="setSessionMode('pomodoro')" aria-pressed="false">Pomodoro</button>
+        </div>
+      </div>
+      <div class="pomo-config" id="pomo-config">
+        <div class="form-group field">
+          <label>Focus (min)</label>
+          <input type="number" id="pomo-focus-input" min="1" max="180" step="1" value="25">
+        </div>
+        <div class="form-group field">
+          <label>Break (min)</label>
+          <input type="number" id="pomo-break-input" min="1" max="60" step="1" value="5">
+        </div>
+      </div>
+      <div class="pomo-hint" id="pomo-hint" style="display:none;">
+        The timer runs a focus block, pauses itself for a break, then starts the next block. Only focus time is counted towards the session.
       </div>
     </div>
     <div class="modal-footer">
@@ -4572,6 +4939,10 @@ kbd.k {
       <div class="field">
         <label>Content</label>
         <textarea id="note-content-input" placeholder="Write your note, task detail, or idea…" style="min-height:110px;"></textarea>
+      </div>
+      <div class="field">
+        <label>Tags</label>
+        <input type="text" id="note-tags-input" placeholder="Comma separated — e.g. exam, revision">
       </div>
     </div>
     <div class="modal-footer">
@@ -6607,6 +6978,8 @@ function renderDailyGoal() {
         </button>`
     }`;
 
+  try { renderSidebarFoot(); } catch(e) {}
+
   // Award XP when goal is completed (only once per day)
   if (isComplete && !goal.xpAwarded) {
     goal.xpAwarded = true;
@@ -6782,6 +7155,8 @@ function renderProfile() {
       }).join('');
     }
   }
+
+  try { renderHeatmap('profile-heatmap', 'profile-heat-stats'); } catch(e) {}
 }
 
 function colorForSubject(s) {
@@ -6899,8 +7274,9 @@ async function showApp(isRealLogin = false) {
   renderSessions();
   renderAttendance();
   renderPosts();
-  renderNotes();
+  setNotesView(_notesView);
   navTo('dashboard');
+  renderSidebarFoot();
   // Check for pending friend requests on login
   setTimeout(checkFriendRequestsOnLogin, 2000);
   // Auto-delete completed tasks older than 24h
@@ -7039,6 +7415,7 @@ function updateClock() {
       if (el) el.textContent = formatDuration(elapsed);
     }
   });
+  try { pomoTick(); } catch (e) {}
 }
 function getWeekNumber(d) {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -7213,10 +7590,11 @@ function navTo(page) {
   const pageEl = document.getElementById('page-' + page);
   if (pageEl) pageEl.classList.add('active');
 
-  // Sidebar nav
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navBtn = document.querySelector('.nav-item[data-page="' + page + '"]');
-  if (navBtn) navBtn.classList.add('active');
+  // Sidebar nav — the subject detail page keeps Subjects lit, since that is where it lives
+  const navPage = page === 'subject' ? 'subjects' : page;
+  document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
+  const navBtn = document.querySelector('.nav-item[data-page="' + navPage + '"]');
+  if (navBtn) { navBtn.classList.add('active'); navBtn.setAttribute('aria-current', 'page'); }
 
   // Bottom nav (mobile)
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
@@ -7226,6 +7604,8 @@ function navTo(page) {
   // Render hooks
   if (page === 'dashboard')  renderDashboard();
   if (page === 'subjects')   renderSubjects();
+  if (page === 'subject')    renderSubjectPage();
+  if (page === 'calendar')   renderCalendar();
   if (page === 'tasks')      { renderTaskSubjectFilter(); renderTasks(); }
   if (page === 'timer')      {
     renderActiveTimers();
@@ -7244,6 +7624,7 @@ function navTo(page) {
   // Close sidebar + overlay + more menu on mobile
   closeSidebarMobile();
   closeMoreMenu();
+  try { renderSidebarFoot(); } catch (e) {}
 }
 
 function toggleSidebar() {
@@ -7408,6 +7789,8 @@ function renderDashboard() {
   // Daily goal card
   try { renderDailyGoal(); } catch(e) {}
   try { renderDailyStudyMatrix(); } catch(e) {}
+  try { renderUpNext(); } catch(e) {}
+  try { renderHeatmap('dash-heatmap', 'dash-heat-stats'); } catch(e) {}
 }
 
 function calcStreak() {
@@ -7526,42 +7909,18 @@ function renderSubjects() {
   }).join('');
 }
 
+// Every call site still says openRoadmap(); it now opens the full subject page.
 function openRoadmap(id) {
   const s = state.subjects.find(s => s.id === id);
   if (!s) return;
   state.currentSubjectId = id;
-  const c = colorForSubject(s);
-  document.getElementById('roadmap-modal-title').textContent = s.name;
-  document.getElementById('roadmap-modal-title').style.color = c;
-  renderTopicList(s);
-  openModal('modal-roadmap');
+  navTo('subject');
 }
 
+// Kept as the name the topic editors call after a change — it redraws the page.
 function renderTopicList(s) {
-  const pct = calcSubjectProgress(s);
-  const c = colorForSubject(s);
-  const total = s.topics ? s.topics.length : 0;
-  const done = s.topics ? s.topics.filter(t => t.done).length : 0;
-  document.getElementById('roadmap-progress-bar').style.width = pct + '%';
-  document.getElementById('roadmap-progress-bar').style.background = `linear-gradient(90deg, ${c}, ${c}cc)`;
-  document.getElementById('roadmap-progress-text').textContent = `${done} of ${total} topics done`;
-  document.getElementById('roadmap-progress-pct').textContent = pct + '%';
-  document.getElementById('roadmap-progress-pct').style.color = c;
-  const list = document.getElementById('topic-list');
-  if (!s.topics || s.topics.length === 0) {
-    list.innerHTML = '<div style="font-size:0.83rem;color:var(--muted);padding:8px 0;">No topics yet. Add one below.</div>';
-    return;
-  }
-  list.innerHTML = s.topics.map((t, i) => `
-    <div class="topic-item">
-      <div class="topic-check ${t.done ? 'done' : ''}" style="${t.done ? `background:${c};border-color:${c};` : ''}" onclick="toggleTopic('${s.id}', ${i})">${t.done ? '✓' : ''}</div>
-      <div class="topic-name ${t.done ? 'done' : ''}">${escHtml(t.name)}</div>
-      <div style="display:flex;gap:2px;">
-        <button class="topic-del" onclick="moveTopic('${s.id}', ${i}, -1)" ${i === 0 ? 'style="opacity:0.25;pointer-events:none;"' : ''} title="Move up">↑</button>
-        <button class="topic-del" onclick="moveTopic('${s.id}', ${i}, 1)" ${i === s.topics.length - 1 ? 'style="opacity:0.25;pointer-events:none;"' : ''} title="Move down">↓</button>
-      </div>
-      <button class="topic-del" onclick="deleteTopic('${s.id}', ${i})">✕</button>
-    </div>`).join('');
+  if (s && s.id) state.currentSubjectId = s.id;
+  renderSubjectPage();
 }
 
 function moveTopic(subjectId, idx, dir) {
@@ -7595,7 +7954,7 @@ function deleteTopic(subjectId, idx) {
 }
 
 function addTopic() {
-  const input = document.getElementById('new-topic-input');
+  const input = document.getElementById('subject-new-topic-input');
   const name = input.value.trim();
   if (!name) return;
   const s = state.subjects.find(s => s.id === state.currentSubjectId);
@@ -7611,8 +7970,8 @@ function deleteSubject() {
   if (!confirm('Delete this subject and all its topics?')) return;
   state.subjects = state.subjects.filter(s => s.id !== state.currentSubjectId);
   saveData('subjects');
-  closeModal('modal-roadmap');
-  renderSubjects();
+  state.currentSubjectId = null;
+  navTo('subjects');
   showToast('Subject deleted', 'success');
 }
 
@@ -7651,8 +8010,14 @@ function renderTasks() {
     if (search && !t.name.toLowerCase().includes(search)) return false;
     return true;
   });
+  tasks = sortTasks(tasks, document.getElementById('task-sort')?.value || 'deadline');
   const list = document.getElementById('task-list');
   if (!list) return;
+  list.classList.toggle('selecting', _taskSelectMode);
+  _taskVisibleIds = tasks.map(t => t.id);
+  // A task can be filtered out or deleted while selected — never act on what is not on screen.
+  _taskSel.forEach(id => { if (_taskVisibleIds.indexOf(id) === -1) _taskSel.delete(id); });
+  updateTaskBulkBar();
   if (tasks.length === 0) {
     list.innerHTML = tasksFiltered()
       ? '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🔍</div><div class="empty-text">No tasks match these filters</div><button type="button" class="empty-cta" onclick="clearTaskFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear filters</button></div>'
@@ -7665,7 +8030,10 @@ function renderTasks() {
     const subj = state.subjects.find(s => s.id === t.subjectId);
     const subjColor = subj ? colorForSubject(subj) : '#8a8d93';
     const isOverdue = t.deadline && t.status === 'pending' && t.deadline < toDateKey(new Date());
+    const picked = _taskSel.has(t.id);
     return `<div class="task-item prio-${t.priority || 'medium'}${isDone ? ' is-done' : ''}${isCan ? ' is-cancelled' : ''}">
+      <span class="task-sel-box${picked ? ' on' : ''}" role="checkbox" aria-checked="${picked}" tabindex="0" aria-label="Select task"
+        onclick="taskSelToggle('${t.id}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span>
       <div class="task-checkbox ${isDone ? 'checked' : isCan ? 'cancelled-cb' : ''}" onclick="quickToggleTask('${t.id}')">${isDone ? '✓' : isCan ? '✕' : ''}</div>
       <div class="task-info">
         <div class="task-name ${isDone ? 'done' : ''}">${escHtml(t.name)}</div>
@@ -7793,9 +8161,14 @@ function scheduleTaskAutoClean() {
 }
 
 // ===================== TIMER (MULTI, PARALLEL) =====================
-function openSessionModal() {
+function openSessionModal(subjectId) {
   renderTaskSubjectFilter();
   document.getElementById('session-task-input').value = '';
+  if (subjectId) {
+    const sel = document.getElementById('session-subject-input');
+    if (sel) sel.value = subjectId;
+  }
+  loadPomodoroPrefs();
   openModal('modal-session');
 }
 
@@ -7894,28 +8267,49 @@ function startSession() {
   const subjectId = document.getElementById('session-subject-input').value;
   const taskName = document.getElementById('session-task-input').value.trim();
   if (!taskName) { showToast('Enter a task name', 'error'); return; }
+  const pomo = _sessionMode === 'pomodoro' ? savePomodoroPrefs() : null;
   closeModal('modal-session');
-  state.activeTimers.push({
+  createTimer(subjectId, taskName, pomo);
+  if (pomo) showToast(`Pomodoro started — ${Math.round(pomo.focusMs / 60000)} min of focus`, 'success');
+}
+
+// The one place a timer is born. `pomo` is null for a free-running timer.
+function createTimer(subjectId, taskName, pomo) {
+  const timer = {
     id: 'tmr_' + Date.now() + '_' + Math.floor(Math.random()*1000),
     subjectId, taskName,
     status: 'running',
     startTime: Date.now(),
     startDateTime: new Date().toLocaleString(),
     elapsed: 0
-  });
+  };
+  if (pomo) {
+    timer.mode = 'pomodoro';
+    timer.pomo = {
+      focusMs: pomo.focusMs, breakMs: pomo.breakMs,
+      phase: 'focus', cycles: 0,
+      remain: pomo.focusMs, since: Date.now()
+    };
+  }
+  state.activeTimers.push(timer);
   saveData('activeTimers');
   renderActiveTimers();
+  return timer;
 }
 
 function pauseResumeTimer(id) {
   const t = state.activeTimers.find(t => t.id === id);
   if (!t) return;
+  // While a pomodoro break is counting down, the only sensible resume is "skip it".
+  if (t.pomo && t.pomo.phase === 'break') { pomoSkip(id); return; }
   if (t.status === 'running') {
     t.elapsed += Date.now() - t.startTime;
     t.status = 'paused';
+    if (t.pomo) { t.pomo.remain = pomoRemaining(t); t.pomo.since = Date.now(); }
   } else if (t.status === 'paused') {
     t.startTime = Date.now();
     t.status = 'running';
+    if (t.pomo) t.pomo.since = Date.now();
   }
   saveData('activeTimers');
   renderActiveTimers();
@@ -7989,18 +8383,21 @@ function renderActiveTimers() {
     container.innerHTML = running.map(t => {
       const subj = state.subjects.find(s => s.id === t.subjectId);
       const c = subj ? colorForSubject(subj) : '#b8d5ea';
-      const isPaused = t.status === 'paused';
+      const isBreak = !!(t.pomo && t.pomo.phase === 'break');
+      const isPaused = t.status === 'paused' && !isBreak;
       const liveElapsed = t.elapsed + (t.status === 'running' ? Date.now() - t.startTime : 0);
-      return `<div class="timer-card ${isPaused ? 'is-paused' : ''}" style="--timer-accent:${c};">
+      const statusTxt = isBreak ? '☕ On a break' : isPaused ? '⏸ Paused' : '● Running';
+      return `<div class="timer-card ${isPaused ? 'is-paused' : ''}${isBreak ? ' is-break' : ''}" style="--timer-accent:${c};">
         <div class="timer-card-info">
-          <div class="timer-card-status" style="color:${isPaused ? 'var(--warn)' : c};">${isPaused ? '⏸ Paused' : '● Running'}</div>
+          <div class="timer-card-status" style="color:${isPaused || isBreak ? 'var(--warn)' : c};">${statusTxt}</div>
           <div class="timer-card-subject" style="color:${c};">${escHtml(getSubjectName(t.subjectId))}</div>
           <div class="timer-card-task">${escHtml(t.taskName)}</div>
         </div>
-        <div class="timer-card-display ${isPaused ? 'paused' : 'running'}" id="timer-disp-${t.id}">${formatDuration(liveElapsed)}</div>
+        ${pomoBarHtml(t)}
+        <div class="timer-card-display ${isPaused || isBreak ? 'paused' : 'running'}" id="timer-disp-${t.id}">${formatDuration(liveElapsed)}</div>
         <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px;">Started: ${escHtml(t.startDateTime)}</div>
         <div class="timer-card-actions">
-          <button class="btn-timer-sm ${isPaused ? 'btn-start' : 'btn-pause'}" onclick="pauseResumeTimer('${t.id}')">${isPaused ? '▶ Resume' : '⏸ Pause'}</button>
+          <button class="btn-timer-sm ${isPaused || isBreak ? 'btn-start' : 'btn-pause'}" onclick="pauseResumeTimer('${t.id}')">${isBreak ? '⏭ Skip break' : isPaused ? '▶ Resume' : '⏸ Pause'}</button>
           <button class="btn-timer-sm btn-done" onclick="finishTimer('${t.id}', 'done')">✓ Done</button>
           <button class="btn-timer-sm btn-pending-t" onclick="markTimerPending('${t.id}')">⏸ Pending</button>
           <button class="btn-timer-sm btn-cancel-t" onclick="cancelTimer('${t.id}')">✕ Cancel</button>
@@ -8340,37 +8737,66 @@ const NOTE_TYPE_META = {
 function renderNotes() {
   const list = document.getElementById('notes-list');
   if (!list) return;
+  renderNoteTagFilter();
   const search = (document.getElementById('notes-search')?.value || '').toLowerCase();
   const filterType = document.getElementById('notes-filter-type')?.value || '';
+  const filterTag  = document.getElementById('notes-filter-tag')?.value || '';
   let notes = [...state.notes].reverse().filter(n => {
     if (filterType && n.type !== filterType) return false;
-    if (search && !n.title.toLowerCase().includes(search) && !(n.content||'').toLowerCase().includes(search)) return false;
+    if (filterTag && noteTags(n).indexOf(filterTag) === -1) return false;
+    if (search && !n.title.toLowerCase().includes(search) && !(n.content||'').toLowerCase().includes(search)
+        && !noteTags(n).join(' ').toLowerCase().includes(search)) return false;
     return true;
   });
+  // Pinned notes float to the top; everything else keeps newest-first order.
+  notes.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+  list.className = _notesView === 'grid' ? 'notes-grid' : 'task-list';
   if (notes.length === 0) {
     list.innerHTML = notesFiltered()
       ? '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🔍</div><div class="empty-text">No notes match these filters</div><button type="button" class="empty-cta" onclick="clearNotesFilters()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>Clear filters</button></div>'
       : '<div class="empty-state"><div class="empty-icon" aria-hidden="true">🗒</div><div class="empty-text">No notes yet</div><button type="button" class="empty-cta" onclick="openNoteModal()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Write your first note</button></div>';
     return;
   }
-  list.innerHTML = notes.map(n => {
-    const meta = NOTE_TYPE_META[n.type] || NOTE_TYPE_META.note;
-    return `<div class="task-item" style="align-items:flex-start;">
+  list.innerHTML = notes.map(n => _notesView === 'grid' ? noteGridCard(n) : noteListRow(n)).join('');
+}
+
+function noteListRow(n) {
+  const meta = NOTE_TYPE_META[n.type] || NOTE_TYPE_META.note;
+  return `<div class="task-item${n.pinned ? ' pinned' : ''}" style="align-items:flex-start;">
       <div style="font-size:1.1rem;flex-shrink:0;margin-top:2px;">${meta.icon}</div>
       <div class="task-info">
         <div class="task-name">${escHtml(n.title)}</div>
         ${n.content ? `<div style="font-size:0.82rem;color:var(--muted);margin-top:4px;line-height:1.5;white-space:pre-wrap;">${escHtml(n.content)}</div>` : ''}
         <div class="task-tags">
           <span class="task-meta"><i class="meta-dot" style="background:${meta.color};"></i>${meta.label}</span>
-          <span class="task-meta">${n.date}</span>
+          <span class="task-meta">${escHtml(n.date)}</span>
         </div>
+        ${noteTagsHtml(n)}
       </div>
       <div class="task-actions">
-        <button class="btn-icon" onclick="openNoteModal('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
-        <button class="btn-icon danger" onclick="deleteNote('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        ${pinBtnHtml(n)}
+        <button class="btn-icon" onclick="openNoteModal('${n.id}')" aria-label="Edit note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="btn-icon danger" onclick="deleteNote('${n.id}')" aria-label="Delete note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="15" height="15"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></button>
       </div>
     </div>`;
-  }).join('');
+}
+
+function noteGridCard(n) {
+  const meta = NOTE_TYPE_META[n.type] || NOTE_TYPE_META.note;
+  return `<div class="note-card${n.pinned ? ' pinned' : ''}">
+      <div class="note-card-top">
+        <span style="font-size:1rem;" aria-hidden="true">${meta.icon}</span>
+        <span class="note-card-title">${escHtml(n.title)}</span>
+        ${pinBtnHtml(n)}
+      </div>
+      ${n.content ? `<div class="note-card-body">${escHtml(n.content)}</div>` : ''}
+      ${noteTagsHtml(n)}
+      <div class="note-card-foot">
+        <button class="btn-icon" onclick="openNoteModal('${n.id}')" aria-label="Edit note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+        <button class="btn-icon danger" onclick="deleteNote('${n.id}')" aria-label="Delete note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></button>
+        <span class="note-card-date">${escHtml(n.date)}</span>
+      </div>
+    </div>`;
 }
 
 function openNoteModal(id) {
@@ -8382,10 +8808,12 @@ function openNoteModal(id) {
     document.getElementById('note-type-input').value = n.type;
     document.getElementById('note-title-input').value = n.title;
     document.getElementById('note-content-input').value = n.content || '';
+    document.getElementById('note-tags-input').value = noteTags(n).join(', ');
   } else {
     document.getElementById('note-type-input').value = 'note';
     document.getElementById('note-title-input').value = '';
     document.getElementById('note-content-input').value = '';
+    document.getElementById('note-tags-input').value = '';
   }
   openModal('modal-note');
 }
@@ -8396,13 +8824,14 @@ function saveNote() {
   if (!title) { showToast('Title required', 'error'); return; }
   const type = document.getElementById('note-type-input').value;
   const content = document.getElementById('note-content-input').value.trim();
+  const tags = parseNoteTags(document.getElementById('note-tags-input')?.value || '');
   if (id) {
     const n = state.notes.find(n => n.id === id);
-    if (n) { n.type = type; n.title = title; n.content = content; }
+    if (n) { n.type = type; n.title = title; n.content = content; n.tags = tags; }
   } else {
     state.notes.push({
       id: 'note_' + Date.now(),
-      type, title, content,
+      type, title, content, tags, pinned: false,
       date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
     });
   }
@@ -9831,7 +10260,8 @@ const CMDK_PAGES = [
   { page: 'subjects',     label: 'Subjects',      kw: 'roadmap topics syllabus' },
   { page: 'tasks',        label: 'Tasks',         kw: 'todo deadlines' },
   { page: 'timer',        label: 'Study Timer',   kw: 'stopwatch focus sessions' },
-  { page: 'attendance',   label: 'Attendance',    kw: 'present absent leave calendar' },
+  { page: 'attendance',   label: 'Attendance',    kw: 'present absent leave check-in' },
+  { page: 'calendar',     label: 'Calendar',      kw: 'agenda month deadlines schedule timeline' },
   { page: 'analytics',    label: 'Analytics',     kw: 'charts insight hours reports' },
   { page: 'notes',        label: 'Notes',         kw: 'scratchpad ideas reminders' },
   { page: 'community',    label: 'Community',     kw: 'posts prompts share feed' },
@@ -9846,6 +10276,7 @@ const CMDK_ACTIONS = [
   { label: 'New note',              kw: 'add create idea reminder',   icon: 'note',   run: () => { navTo('notes');      openNoteModal(null); } },
   { label: 'Start a study session', kw: 'timer begin focus',          icon: 'action', run: () => { navTo('timer');      openSessionModal(); } },
   { label: 'Log a past session',    kw: 'manual backfill time',       icon: 'action', run: () => { navTo('timer');      openManualSessionModal(); } },
+  { label: 'Start a pomodoro',      kw: 'timer 25 5 focus break',     icon: 'action', run: () => { navTo('timer');      openSessionModal(); setSessionMode('pomodoro'); } },
   { label: 'Apply for leave',       kw: 'absent holiday off',         icon: 'action', run: () => { navTo('attendance'); openLeaveModal(); } },
   { label: "Set today's study goal",kw: 'target daily minutes',       icon: 'action', run: () => { navTo('dashboard');  openGoalModal(); } },
   { label: 'Export a backup',       kw: 'download json save data',    icon: 'data',   run: () => exportData() },
@@ -10231,16 +10662,866 @@ function clearTaskFilters() {
 
 function notesFiltered() {
   return !!(document.getElementById('notes-search')?.value.trim()
-         || document.getElementById('notes-filter-type')?.value);
+         || document.getElementById('notes-filter-type')?.value
+         || document.getElementById('notes-filter-tag')?.value);
 }
 
 function clearNotesFilters() {
   const s = document.getElementById('notes-search');       if (s) s.value = '';
   const t = document.getElementById('notes-filter-type');  if (t) t.value = '';
+  const g = document.getElementById('notes-filter-tag');   if (g) g.value = '';
   renderNotes();
 }
 
 
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  TIER 2 — depth on the pages that already work                   ║
+// ║  Heatmap · Up next · Calendar · Subject page · Task bulk ·       ║
+// ║  Notes pin/tags · Pomodoro · Sidebar streak widget               ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── mm:ss for anything under an hour, h:mm:ss above it ────────────
+function fmtClock(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+    : `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.1 CONTRIBUTION HEATMAP — 53 weeks of study, one square a day  ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const HEAT_WEEKS = 53;
+
+// Four steps, chosen so an ordinary 45-minute evening is visibly different
+// from a 3-hour one rather than everything saturating at the top.
+function heatLevel(ms) {
+  const mins = ms / 60000;
+  if (mins <= 0)  return 0;
+  if (mins < 30)  return 1;
+  if (mins < 60)  return 2;
+  if (mins < 120) return 3;
+  return 4;
+}
+
+function studyMsByDate() {
+  const map = {};
+  (state.sessions || []).forEach(s => {
+    if (s.status !== 'done') return;
+    map[s.date] = (map[s.date] || 0) + (s.duration || 0);
+  });
+  return map;
+}
+
+function renderHeatmap(mountId, statsId) {
+  const mount = document.getElementById(mountId);
+  if (!mount) return;
+  const byDate = studyMsByDate();
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const end = new Date(today);
+  end.setDate(end.getDate() + (6 - end.getDay()));          // Saturday of the current week
+  const cursor = new Date(end);
+  cursor.setDate(cursor.getDate() - (HEAT_WEEKS * 7 - 1));  // …back to a Sunday
+
+  const todayKey = toDateKey(today);
+  const cols = [];
+  let totalMs = 0, daysStudied = 0, best = 0, run = 0;
+
+  for (let w = 0; w < HEAT_WEEKS; w++) {
+    const cells = [];
+    for (let d = 0; d < 7; d++) {
+      const key    = toDateKey(cursor);
+      const future = cursor > today;
+      const ms     = future ? 0 : (byDate[key] || 0);
+      if (!future) {
+        if (ms > 0) { totalMs += ms; daysStudied++; run++; if (run > best) best = run; }
+        else run = 0;
+      }
+      cells.push({
+        key, ms, future,
+        isToday: key === todayKey,
+        label: cursor.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    cols.push({ cells, month: new Date(cells[0].key + 'T00:00:00').getMonth() });
+  }
+
+  // Month strip: one label per run of columns that share a month, skipping
+  // runs too short to hold the word.
+  let months = '', i = 0;
+  while (i < cols.length) {
+    let span = 1;
+    while (i + span < cols.length && cols[i + span].month === cols[i].month) span++;
+    const name = new Date(2000, cols[i].month, 1).toLocaleDateString('en-US', { month: 'short' });
+    months += `<span style="grid-column:span ${span};">${span >= 3 ? name : ''}</span>`;
+    i += span;
+  }
+
+  const weeks = cols.map(c => '<div class="heat-col">' + c.cells.map(cell => {
+    if (cell.future) return '<i class="heat-cell blank"></i>';
+    const lvl = heatLevel(cell.ms);
+    const title = `${cell.label} — ${cell.ms > 0 ? formatHM(cell.ms) : 'no study'}`;
+    return `<i class="heat-cell l${lvl}${cell.isToday ? ' is-today' : ''}" title="${escHtml(title)}"></i>`;
+  }).join('') + '</div>').join('');
+
+  mount.innerHTML = `
+    <div class="heat-scroll">
+      <div class="heat">
+        <div></div>
+        <div class="heat-months">${months}</div>
+        <div class="heat-days" aria-hidden="true"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+        <div class="heat-weeks">${weeks}</div>
+      </div>
+    </div>
+    <div class="heat-foot">
+      <span>${daysStudied} day${daysStudied === 1 ? '' : 's'} studied in the last year</span>
+      <span class="heat-legend">Less
+        <i class="heat-cell"></i><i class="heat-cell l1"></i><i class="heat-cell l2"></i><i class="heat-cell l3"></i><i class="heat-cell l4"></i>
+      More</span>
+    </div>`;
+
+  // Narrow screens scroll the grid: start at this week rather than last October.
+  const scroller = mount.querySelector('.heat-scroll');
+  if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+
+  const stats = statsId && document.getElementById(statsId);
+  if (stats) {
+    stats.innerHTML = `
+      <div class="heat-stat"><b>${Math.round(totalMs / 3600000)}h</b>studied</div>
+      <div class="heat-stat"><b>${daysStudied}</b>active days</div>
+      <div class="heat-stat"><b>${calcStreak()}</b>current streak</div>
+      <div class="heat-stat"><b>${best}</b>best streak</div>`;
+  }
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.4 TODAY / UP NEXT — the "what do I do now" panel               ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function upNextTasks(limit) {
+  const todayKey = toDateKey(new Date());
+  return state.tasks
+    .filter(t => t.status === 'pending')
+    .sort((a, b) => {
+      const ad = a.deadline || '9999-99-99', bd = b.deadline || '9999-99-99';
+      if (ad !== bd) return ad < bd ? -1 : 1;
+      const rank = { high: 0, medium: 1, low: 2 };
+      return (rank[a.priority] ?? 1) - (rank[b.priority] ?? 1);
+    })
+    .slice(0, limit || 3)
+    .map(t => {
+      let when = t.deadline ? formatDeadline(t.deadline) : 'No date';
+      let cls = '';
+      if (t.deadline && t.deadline < todayKey)      { cls = 'is-overdue'; when = 'Overdue'; }
+      else if (t.deadline === todayKey)             { cls = 'is-today';   when = 'Today'; }
+      return { task: t, when, cls };
+    });
+}
+
+// The resume button points at whatever is closest to "carry on": a live timer
+// first, then the last thing studied, and only then a cold start.
+function upNextResumeTarget() {
+  const paused = state.activeTimers.find(t => t.status === 'paused' || t.status === 'pending');
+  const running = state.activeTimers.find(t => t.status === 'running');
+  if (running) return { kind: 'running', timer: running };
+  if (paused)  return { kind: 'paused',  timer: paused };
+  const done = state.sessions.filter(s => s.status === 'done');
+  const last = done[done.length - 1];
+  if (last) return { kind: 'repeat', session: last };
+  return { kind: 'new' };
+}
+
+function renderUpNext() {
+  const el = document.getElementById('upnext-body');
+  if (!el) return;
+
+  const items = upNextTasks(3);
+  const list = items.length
+    ? `<div class="upnext-list">` + items.map(({ task, when, cls }) => {
+        const subj = state.subjects.find(x => x.id === task.subjectId);
+        const c = subj ? colorForSubject(subj) : '#8a8d93';
+        return `<button type="button" class="upnext-item" onclick="navTo('tasks');openTaskModal('${task.id}')">
+          <span class="upnext-dot" style="background:${c};"></span>
+          <span class="upnext-name">${escHtml(task.name)}</span>
+          <span class="upnext-when ${cls}">${escHtml(when)}</span>
+        </button>`;
+      }).join('') + `</div>`
+    : `<div class="upnext-empty">Nothing pending — every task is closed.</div>`;
+
+  const target = upNextResumeTarget();
+  let label, sub;
+  if (target.kind === 'running')      { label = 'Go to the running timer'; sub = `${getSubjectName(target.timer.subjectId)} · ${target.timer.taskName}`; }
+  else if (target.kind === 'paused')  { label = 'Resume last session';     sub = `${getSubjectName(target.timer.subjectId)} · ${target.timer.taskName}`; }
+  else if (target.kind === 'repeat')  { label = 'Study this again';        sub = `${getSubjectName(target.session.subjectId)} · ${target.session.taskName}`; }
+  else                                { label = 'Start a study session';   sub = 'No sessions recorded yet'; }
+
+  const pending = state.tasks.filter(t => t.status === 'pending').length;
+  el.innerHTML = list + `
+    <div class="upnext-foot">
+      <button type="button" class="upnext-resume" onclick="upNextResume()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 4 13 8-13 8z"/></svg>
+        <span>${escHtml(label)}<span class="upnext-resume-sub">${escHtml(sub)}</span></span>
+      </button>
+      <div style="margin-top:10px;font-size:0.76rem;color:var(--muted2);">${pending} task${pending === 1 ? '' : 's'} still open</div>
+    </div>`;
+}
+
+function upNextResume() {
+  const target = upNextResumeTarget();
+  navTo('timer');
+  if (target.kind === 'paused') {
+    if (target.timer.status === 'pending') resumePendingTimer(target.timer.id);
+    else pauseResumeTimer(target.timer.id);
+    showToast('Session resumed');
+  } else if (target.kind === 'repeat') {
+    createTimer(target.session.subjectId, target.session.taskName, null);
+    showToast(`Timer started for ${target.session.taskName}`, 'success');
+  } else if (target.kind === 'new') {
+    openSessionModal();
+  }
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.2 CALENDAR / AGENDA — every dated record on one surface       ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const CAL = { monthOffset: 0, view: 'month', sel: null };
+
+function calMonthStart() {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth() + CAL.monthOffset, 1);
+}
+
+function calDayData(key) {
+  const sessions = (state.sessions || []).filter(s => s.date === key && s.status === 'done');
+  const tasks    = (state.tasks || []).filter(t => t.deadline === key);
+  const leave    = (state.leaves || []).find(l => key >= l.startDate && key <= l.endDate) || null;
+  const att      = (state.attendance || []).find(a => a.date === key) || null;
+  return { sessions, tasks, leave, att, studyMs: sessions.reduce((a, s) => a + (s.duration || 0), 0) };
+}
+
+function calShiftMonth(dir) {
+  CAL.monthOffset += dir;
+  const m = calMonthStart();
+  // Keep the selection inside the month being looked at.
+  if (!CAL.sel || CAL.sel.slice(0, 7) !== toDateKey(m).slice(0, 7)) CAL.sel = toDateKey(m);
+  renderCalendar();
+}
+
+function calGoToday() {
+  CAL.monthOffset = 0;
+  CAL.sel = toDateKey(new Date());
+  renderCalendar();
+}
+
+function calSetView(view) {
+  CAL.view = view;
+  renderCalendar();
+}
+
+function calSelect(key) {
+  CAL.sel = key;
+  renderCalendar();
+}
+
+function calAddTask(key) {
+  navTo('tasks');
+  openTaskModal();
+  const d = document.getElementById('task-deadline-input');
+  if (d) d.value = key;
+}
+
+function renderCalendar() {
+  const main = document.getElementById('cal-main');
+  if (!main) return;
+  if (!CAL.sel) CAL.sel = toDateKey(new Date());
+
+  const monthStart = calMonthStart();
+  document.getElementById('cal-title').textContent =
+    monthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  document.getElementById('cal-seg-month').setAttribute('aria-pressed', String(CAL.view === 'month'));
+  document.getElementById('cal-seg-agenda').setAttribute('aria-pressed', String(CAL.view === 'agenda'));
+
+  main.innerHTML = CAL.view === 'month' ? calMonthHtml(monthStart) : calAgendaHtml(monthStart);
+  renderCalSide();
+}
+
+function calMonthHtml(monthStart) {
+  const todayKey = toDateKey(new Date());
+  const monthIdx = monthStart.getMonth();
+  const first = new Date(monthStart);
+  first.setDate(1 - first.getDay());                       // back to the Sunday on or before the 1st
+
+  let cells = '';
+  const cursor = new Date(first);
+  for (let i = 0; i < 42; i++) {
+    const key = toDateKey(cursor);
+    const d   = calDayData(key);
+    const cls = [
+      'cal-cell',
+      cursor.getMonth() !== monthIdx ? 'is-other' : '',
+      key === todayKey ? 'is-today' : '',
+      key === CAL.sel ? 'is-sel' : '',
+      d.leave ? 'is-leave' : ''
+    ].filter(Boolean).join(' ');
+
+    const dots = [
+      d.sessions.length ? '<i class="cal-dot sess"></i>' : '',
+      d.tasks.length    ? '<i class="cal-dot task"></i>' : '',
+      d.att && d.att.status === 'present' ? '<i class="cal-dot att"></i>' : '',
+      d.leave           ? '<i class="cal-dot leave"></i>' : ''
+    ].join('');
+
+    cells += `<button type="button" class="${cls}" onclick="calSelect('${key}')"
+        aria-label="${escHtml(cursor.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }))}">
+      <span class="cal-num">${cursor.getDate()}</span>
+      ${d.studyMs ? `<span class="cal-hours">${formatHM(d.studyMs)}</span>` : ''}
+      <span class="cal-dots">${dots}</span>
+    </button>`;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  const dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    .map(d => `<div class="cal-dow">${d}</div>`).join('');
+  return `<div class="cal-grid">${dow}${cells}</div>`;
+}
+
+function calAgendaHtml(monthStart) {
+  const days = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+  let out = '';
+  for (let i = 1; i <= days; i++) {
+    const cursor = new Date(monthStart.getFullYear(), monthStart.getMonth(), i);
+    const key = toDateKey(cursor);
+    const d = calDayData(key);
+    if (!d.sessions.length && !d.tasks.length && !d.leave && !d.att) continue;
+    out += `<div class="agenda-group">
+      <div class="agenda-date">
+        <b>${escHtml(cursor.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }))}</b>
+        <span>${escHtml(cursor.toLocaleDateString('en-US', { weekday: 'long' }))}</span>
+        ${d.studyMs ? `<span style="margin-left:auto;">${formatHM(d.studyMs)} studied</span>` : ''}
+      </div>
+      ${calItemsHtml(key, d)}
+    </div>`;
+  }
+  return out || '<div class="agenda-empty">Nothing recorded in this month yet.</div>';
+}
+
+// The shared row renderer — the month's day panel and the agenda use the same list.
+function calItemsHtml(key, d) {
+  let out = '';
+
+  if (d.att && d.att.status === 'present') {
+    out += `<div class="agenda-item k-att static">
+      <span class="agenda-txt"><span class="agenda-name">Present</span>
+      <span class="agenda-sub">First check-in ${escHtml(d.att.loginTime || '—')}</span></span></div>`;
+  }
+  if (d.leave) {
+    out += `<div class="agenda-item k-leave static">
+      <span class="agenda-txt"><span class="agenda-name">On leave</span>
+      <span class="agenda-sub">${escHtml(d.leave.reason || 'No reason given')}</span></span>
+      <span class="agenda-meta">${escHtml(formatDeadline(d.leave.startDate))}–${escHtml(formatDeadline(d.leave.endDate))}</span></div>`;
+  }
+  d.tasks.forEach(t => {
+    const doneCls = t.status === 'completed' ? ' style="opacity:0.55;"' : '';
+    out += `<button type="button" class="agenda-item k-task"${doneCls} onclick="navTo('tasks');openTaskModal('${t.id}')">
+      <span class="agenda-txt"><span class="agenda-name">${escHtml(t.name)}</span>
+      <span class="agenda-sub">Due · ${escHtml(getSubjectName(t.subjectId))}</span></span>
+      <span class="agenda-meta">${escHtml(t.status)}</span></button>`;
+  });
+  d.sessions.forEach(s => {
+    out += `<div class="agenda-item k-sess static">
+      <span class="agenda-txt"><span class="agenda-name">${escHtml(s.taskName)}</span>
+      <span class="agenda-sub">${escHtml(getSubjectName(s.subjectId))}</span></span>
+      <span class="agenda-meta">${formatHM(s.duration || 0)}</span></div>`;
+  });
+
+  return out || `<div class="agenda-empty">Nothing on this day.
+      <div style="margin-top:12px;"><button type="button" class="empty-cta" onclick="calAddTask('${key}')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add a task due this day</button></div></div>`;
+}
+
+function renderCalSide() {
+  const body = document.getElementById('cal-side-body');
+  if (!body) return;
+  const key = CAL.sel;
+  const d = calDayData(key);
+  const date = new Date(key + 'T00:00:00');
+
+  document.getElementById('cal-side-date').textContent = formatDateFriendly(key);
+  document.getElementById('cal-side-sub').textContent =
+    date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    + (d.studyMs ? ` · ${formatHM(d.studyMs)} studied` : '');
+  body.innerHTML = calItemsHtml(key, d);
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.5 SUBJECT DETAIL PAGE — topics, tasks, sessions in one place  ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function renderSubjectPage() {
+  const mount = document.getElementById('subject-detail');
+  if (!mount) return;
+  const s = state.subjects.find(x => x.id === state.currentSubjectId);
+  if (!s) {
+    mount.innerHTML = '<div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div>'
+      + '<div class="empty-text">That subject is no longer here</div>'
+      + '<button type="button" class="empty-cta" onclick="navTo(\'subjects\')">Back to subjects</button></div>';
+    return;
+  }
+
+  const c       = colorForSubject(s);
+  const topics  = s.topics || [];
+  const done    = topics.filter(t => t.done).length;
+  const pct     = calcSubjectProgress(s);
+  const sess    = state.sessions.filter(x => x.subjectId === s.id && x.status === 'done');
+  const studyMs = sess.reduce((a, x) => a + (x.duration || 0), 0);
+  const tasks   = state.tasks.filter(t => t.subjectId === s.id);
+  const open    = tasks.filter(t => t.status === 'pending').length;
+
+  const topicList = topics.length
+    ? topics.map((t, i) => `
+      <div class="topic-item">
+        <div class="topic-check ${t.done ? 'done' : ''}" style="${t.done ? `background:${c};border-color:${c};` : ''}"
+          onclick="toggleTopic('${s.id}', ${i})" role="checkbox" aria-checked="${!!t.done}" tabindex="0">${t.done ? '✓' : ''}</div>
+        <div class="topic-name ${t.done ? 'done' : ''}">${escHtml(t.name)}</div>
+        <div style="display:flex;gap:2px;">
+          <button class="topic-del" onclick="moveTopic('${s.id}', ${i}, -1)" ${i === 0 ? 'style="opacity:0.25;pointer-events:none;"' : ''} title="Move up" aria-label="Move up">↑</button>
+          <button class="topic-del" onclick="moveTopic('${s.id}', ${i}, 1)" ${i === topics.length - 1 ? 'style="opacity:0.25;pointer-events:none;"' : ''} title="Move down" aria-label="Move down">↓</button>
+        </div>
+        <button class="topic-del" onclick="deleteTopic('${s.id}', ${i})" title="Delete topic" aria-label="Delete topic">✕</button>
+      </div>`).join('')
+    : '<div style="font-size:0.83rem;color:var(--muted);padding:8px 0;">No topics yet. Add the first one below.</div>';
+
+  const taskList = tasks.length
+    ? tasks.slice(0, 8).map(t => `
+      <div class="subj-mini ${t.status === 'completed' ? 'done' : ''}">
+        <span class="subj-mini-txt">${escHtml(t.name)}</span>
+        <span class="subj-mini-meta">${t.deadline ? escHtml(formatDeadline(t.deadline)) : escHtml(t.status)}</span>
+      </div>`).join('')
+    : `<div class="upnext-empty">No tasks for this subject yet.</div>`;
+
+  const recent = sess.slice(-6).reverse();
+  const sessList = recent.length
+    ? recent.map(x => `
+      <div class="subj-mini">
+        <span class="subj-mini-txt">${escHtml(x.taskName)}<br><span style="font-size:0.74rem;color:var(--muted2);">${escHtml(formatDateFriendly(x.date))}</span></span>
+        <span class="subj-mini-meta">${formatHM(x.duration || 0)}</span>
+      </div>`).join('')
+    : `<div class="upnext-empty">No sessions recorded for this subject.</div>`;
+
+  mount.innerHTML = `
+    <div class="subj-hero" style="--subj-c:${c};">
+      <div class="subj-hero-top">
+        <div>
+          <div class="subj-name">${escHtml(s.name)}</div>
+          <div style="margin-top:4px;font-size:0.82rem;color:var(--muted);">${done} of ${topics.length} topics complete</div>
+        </div>
+        <div class="subj-hero-actions">
+          <button class="btn-accent" onclick="openSessionModal('${s.id}')">Start a session</button>
+          <button class="btn-secondary" onclick="addTaskForSubject('${s.id}')">Add task</button>
+          <button class="btn-danger" onclick="deleteSubject()">Delete subject</button>
+        </div>
+      </div>
+      <div class="subj-bar-track"><div class="subj-bar-fill" style="width:${pct}%;"></div></div>
+      <div class="subj-bar-label"><span>Roadmap progress</span><span style="color:${c};font-weight:600;">${pct}%</span></div>
+      <div class="subj-stats">
+        <div><div class="subj-stat-val">${done}/${topics.length}</div><div class="subj-stat-lbl">Topics done</div></div>
+        <div><div class="subj-stat-val">${formatHM(studyMs)}</div><div class="subj-stat-lbl">Time studied</div></div>
+        <div><div class="subj-stat-val">${sess.length}</div><div class="subj-stat-lbl">Sessions</div></div>
+        <div><div class="subj-stat-val">${open}</div><div class="subj-stat-lbl">Open tasks</div></div>
+      </div>
+    </div>
+
+    <div class="subj-cols">
+      <div class="card">
+        <div class="card-title">Topics</div>
+        <div class="topic-list">${topicList}</div>
+        <div class="add-topic-row">
+          <input type="text" id="subject-new-topic-input" placeholder="Add new topic…" onkeydown="if(event.key==='Enter')addTopic()">
+          <button class="add-topic-btn" onclick="addTopic()">Add</button>
+        </div>
+      </div>
+      <div class="subj-side">
+        <div class="card">
+          <div class="card-title">Tasks</div>
+          ${taskList}
+        </div>
+        <div class="card">
+          <div class="card-title">Recent sessions</div>
+          ${sessList}
+        </div>
+      </div>
+    </div>`;
+}
+
+function addTaskForSubject(subjectId) {
+  openTaskModal();
+  const sel = document.getElementById('task-subject-input');
+  if (sel) sel.value = subjectId;
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.6 TASK SORT + BULK ACTIONS                                    ║
+// ╚══════════════════════════════════════════════════════════════════╝
+let _taskSelectMode = false;
+let _taskSel        = new Set();
+let _taskVisibleIds = [];
+
+const TASK_PRIO_RANK = { high: 0, medium: 1, low: 2 };
+
+function sortTasks(tasks, mode) {
+  const list = [...tasks];
+  const far = '9999-99-99';                                  // undated tasks sink to the bottom
+  if (mode === 'deadline')      list.sort((a, b) => (a.deadline || far).localeCompare(b.deadline || far));
+  else if (mode === 'deadline-desc') list.sort((a, b) => (b.deadline || '').localeCompare(a.deadline || ''));
+  else if (mode === 'priority') list.sort((a, b) => (TASK_PRIO_RANK[a.priority] ?? 1) - (TASK_PRIO_RANK[b.priority] ?? 1));
+  else if (mode === 'name')     list.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  else if (mode === 'created')  list.sort((a, b) => taskCreatedAt(b) - taskCreatedAt(a));
+  return list;
+}
+
+// Ids are minted as task_<timestamp>, so they double as a creation clock.
+function taskCreatedAt(t) {
+  const n = parseInt(String(t.id).replace('task_', ''), 10);
+  return isNaN(n) ? 0 : n;
+}
+
+function toggleTaskSelectMode() {
+  _taskSelectMode = !_taskSelectMode;
+  if (!_taskSelectMode) _taskSel.clear();
+  const btn = document.getElementById('task-select-btn');
+  if (btn) btn.textContent = _taskSelectMode ? 'Done selecting' : 'Select';
+  renderTasks();
+}
+
+function taskSelToggle(id) {
+  if (!_taskSelectMode) { toggleTaskSelectMode(); }
+  if (_taskSel.has(id)) _taskSel.delete(id); else _taskSel.add(id);
+  renderTasks();
+}
+
+function taskSelectAll() {
+  const all = _taskVisibleIds.every(id => _taskSel.has(id));
+  if (all) _taskSel.clear();
+  else _taskVisibleIds.forEach(id => _taskSel.add(id));
+  renderTasks();
+}
+
+function updateTaskBulkBar() {
+  const bar = document.getElementById('task-bulkbar');
+  if (!bar) return;
+  bar.classList.toggle('on', _taskSelectMode);
+  const count = document.getElementById('task-sel-count');
+  if (count) count.textContent = `${_taskSel.size} selected`;
+  const all = document.getElementById('task-selall-btn');
+  if (all) all.textContent = _taskVisibleIds.length && _taskVisibleIds.every(id => _taskSel.has(id)) ? 'Clear selection' : 'Select all';
+}
+
+function bulkSetTaskStatus(status) {
+  if (_taskSel.size === 0) { showToast('Nothing selected', 'error'); return; }
+  let changed = 0;
+  state.tasks.forEach(t => {
+    if (!_taskSel.has(t.id) || t.status === status) return;
+    const wasPending = t.status === 'pending';
+    t.status = status;
+    t.completedAt = status === 'completed' ? Date.now() : null;
+    if (status === 'completed' && wasPending) { try { gamOnTaskDone(); } catch (e) {} }
+    changed++;
+  });
+  saveData('tasks');
+  _taskSel.clear();
+  renderTasks();
+  renderDashboard();
+  showToast(`${changed} task${changed === 1 ? '' : 's'} updated`, 'success');
+}
+
+function bulkDeleteTasks() {
+  const n = _taskSel.size;
+  if (n === 0) { showToast('Nothing selected', 'error'); return; }
+  if (!confirm(`Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`)) return;
+  state.tasks = state.tasks.filter(t => !_taskSel.has(t.id));
+  saveData('tasks');
+  _taskSel.clear();
+  renderTasks();
+  renderDashboard();
+  showToast(`${n} task${n === 1 ? '' : 's'} deleted`);
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.7 NOTES — pin, tags, and a grid layout                        ║
+// ╚══════════════════════════════════════════════════════════════════╝
+let _notesView = S.get('los_notes_view') === 'grid' ? 'grid' : 'list';
+
+function noteTags(n) {
+  return Array.isArray(n.tags) ? n.tags : [];
+}
+
+// Tags are plain words: commas split them, and quotes/angle brackets are
+// dropped so a tag is always safe to drop into an attribute.
+function parseNoteTags(raw) {
+  const seen = new Set();
+  return String(raw || '')
+    .split(',')
+    .map(t => t.trim().replace(/["'<>\\]/g, '').slice(0, 24))
+    .filter(t => {
+      const k = t.toLowerCase();
+      if (!t || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
+    .slice(0, 8);
+}
+
+function noteTagsHtml(n) {
+  const tags = noteTags(n);
+  if (!tags.length) return '';
+  const active = document.getElementById('notes-filter-tag')?.value || '';
+  return '<div class="note-tags" style="margin-top:8px;">' + tags.map(t =>
+    `<button type="button" class="note-tag${t === active ? ' on' : ''}" onclick="filterNotesByTag('${escHtml(t)}')">${escHtml(t)}</button>`
+  ).join('') + '</div>';
+}
+
+function pinBtnHtml(n) {
+  return `<button class="pin-btn${n.pinned ? ' on' : ''}" onclick="toggleNotePin('${n.id}')"
+    aria-pressed="${!!n.pinned}" aria-label="${n.pinned ? 'Unpin note' : 'Pin note'}" title="${n.pinned ? 'Unpin' : 'Pin to top'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17v5"/><path d="M9 2h6l-1 7 3 3v2H7v-2l3-3z"/></svg></button>`;
+}
+
+function toggleNotePin(id) {
+  const n = state.notes.find(x => x.id === id);
+  if (!n) return;
+  n.pinned = !n.pinned;
+  saveData('notes');
+  renderNotes();
+  showToast(n.pinned ? 'Note pinned' : 'Note unpinned');
+}
+
+function allNoteTags() {
+  const set = new Set();
+  (state.notes || []).forEach(n => noteTags(n).forEach(t => set.add(t)));
+  return [...set].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+}
+
+function renderNoteTagFilter() {
+  const sel = document.getElementById('notes-filter-tag');
+  if (!sel) return;
+  const tags = allNoteTags();
+  const current = sel.value;
+  sel.innerHTML = '<option value="">All Tags</option>'
+    + tags.map(t => `<option value="${escHtml(t)}">${escHtml(t)}</option>`).join('');
+  if (tags.indexOf(current) !== -1) sel.value = current;
+  sel.style.display = tags.length ? '' : 'none';
+}
+
+function filterNotesByTag(tag) {
+  const sel = document.getElementById('notes-filter-tag');
+  if (!sel) return;
+  sel.value = sel.value === tag ? '' : tag;
+  renderNotes();
+}
+
+function setNotesView(view) {
+  _notesView = view === 'grid' ? 'grid' : 'list';
+  S.set('los_notes_view', _notesView);
+  document.getElementById('notes-view-list')?.setAttribute('aria-pressed', String(_notesView === 'list'));
+  document.getElementById('notes-view-grid')?.setAttribute('aria-pressed', String(_notesView === 'grid'));
+  renderNotes();
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.3 POMODORO — focus blocks with automatic breaks               ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const POMO_KEY = 'los_pomodoro';
+let _sessionMode = 'free';
+
+function setSessionMode(mode) {
+  _sessionMode = mode === 'pomodoro' ? 'pomodoro' : 'free';
+  document.getElementById('mode-seg-free')?.setAttribute('aria-pressed', String(_sessionMode === 'free'));
+  document.getElementById('mode-seg-pomodoro')?.setAttribute('aria-pressed', String(_sessionMode === 'pomodoro'));
+  document.getElementById('pomo-config')?.classList.toggle('on', _sessionMode === 'pomodoro');
+  const hint = document.getElementById('pomo-hint');
+  if (hint) hint.style.display = _sessionMode === 'pomodoro' ? '' : 'none';
+}
+
+function loadPomodoroPrefs() {
+  const saved = S.get(POMO_KEY) || {};
+  const f = document.getElementById('pomo-focus-input');
+  const b = document.getElementById('pomo-break-input');
+  if (f) f.value = saved.focus || 25;
+  if (b) b.value = saved.brk || 5;
+  setSessionMode(saved.mode === 'pomodoro' ? 'pomodoro' : 'free');
+}
+
+function savePomodoroPrefs() {
+  const clamp = (v, lo, hi, dflt) => {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? dflt : Math.min(hi, Math.max(lo, n));
+  };
+  const focus = clamp(document.getElementById('pomo-focus-input')?.value, 1, 180, 25);
+  const brk   = clamp(document.getElementById('pomo-break-input')?.value, 1, 60, 5);
+  S.set(POMO_KEY, { focus, brk, mode: 'pomodoro' });
+  return { focusMs: focus * 60000, breakMs: brk * 60000 };
+}
+
+// A phase counts down while its own side is live: focus while running, break
+// while the timer sits auto-paused. Anything else freezes it.
+function pomoTicking(t) {
+  if (!t.pomo) return false;
+  return t.pomo.phase === 'break' ? t.status === 'paused' : t.status === 'running';
+}
+
+function pomoRemaining(t) {
+  if (!t.pomo) return 0;
+  return pomoTicking(t) ? t.pomo.remain - (Date.now() - t.pomo.since) : t.pomo.remain;
+}
+
+function pomoBarHtml(t) {
+  if (!t.pomo) return '';
+  const isBreak = t.pomo.phase === 'break';
+  const total   = isBreak ? t.pomo.breakMs : t.pomo.focusMs;
+  const left    = Math.max(0, pomoRemaining(t));
+  const pct     = total > 0 ? Math.min(100, Math.round(((total - left) / total) * 100)) : 0;
+  return `<div class="pomo-bar">
+    <span class="pomo-chip${isBreak ? ' is-break' : ''}">${isBreak ? 'Break' : 'Focus'}</span>
+    <span class="pomo-left" id="pomo-left-${t.id}">${fmtClock(left)}</span>
+    <span class="pomo-cycles">${t.pomo.cycles} block${t.pomo.cycles === 1 ? '' : 's'} done</span>
+    <span class="pomo-track"><span class="pomo-fill${isBreak ? ' is-break' : ''}" id="pomo-fill-${t.id}" style="width:${pct}%;"></span></span>
+    <button class="btn-timer-sm btn-pending-t" onclick="pomoSkip('${t.id}')">${isBreak ? '⏭ Skip break' : '⏭ End block'}</button>
+  </div>`;
+}
+
+// Ends the current phase now and starts the other one.
+function pomoAdvance(t) {
+  if (t.pomo.phase === 'focus') {
+    if (t.status === 'running') t.elapsed += Date.now() - t.startTime;
+    t.status     = 'paused';
+    t.pomo.phase = 'break';
+    t.pomo.cycles++;
+    t.pomo.remain = t.pomo.breakMs;
+    t.pomo.since  = Date.now();
+  } else {
+    t.status      = 'running';
+    t.startTime   = Date.now();
+    t.pomo.phase  = 'focus';
+    t.pomo.remain = t.pomo.focusMs;
+    t.pomo.since  = Date.now();
+  }
+}
+
+function pomoSkip(id) {
+  const t = state.activeTimers.find(x => x.id === id);
+  if (!t || !t.pomo) return;
+  const wasBreak = t.pomo.phase === 'break';
+  pomoAdvance(t);
+  saveData('activeTimers');
+  renderActiveTimers();
+  showToast(wasBreak ? 'Break skipped — back to focus' : 'Block ended — break started');
+}
+
+// Driven by the one-second clock.
+function pomoTick() {
+  if (!state.activeTimers || !state.activeTimers.length) return;
+  let flipped = false;
+
+  state.activeTimers.forEach(t => {
+    if (!t.pomo || !pomoTicking(t)) return;
+    if (pomoRemaining(t) > 0) return;
+    const wasFocus = t.pomo.phase === 'focus';
+    pomoAdvance(t);
+    flipped = true;
+    pomoChime();
+    showToast(wasFocus
+      ? `Focus block done — ${Math.round(t.pomo.breakMs / 60000)} min break`
+      : 'Break over — next focus block started', wasFocus ? 'success' : '');
+  });
+
+  if (flipped) {
+    saveData('activeTimers');
+    renderActiveTimers();
+    return;
+  }
+
+  // No phase change: just move the numbers, without rebuilding the cards.
+  state.activeTimers.forEach(t => {
+    if (!t.pomo) return;
+    const left  = Math.max(0, pomoRemaining(t));
+    const total = t.pomo.phase === 'break' ? t.pomo.breakMs : t.pomo.focusMs;
+    const lbl   = document.getElementById('pomo-left-' + t.id);
+    if (lbl) lbl.textContent = fmtClock(left);
+    const fill = document.getElementById('pomo-fill-' + t.id);
+    if (fill && total > 0) fill.style.width = Math.min(100, Math.round(((total - left) / total) * 100)) + '%';
+  });
+}
+
+// A short two-tone beep. Silent (and harmless) where WebAudio is unavailable.
+function pomoChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+    [880, 1180].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now + i * 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.16, now + i * 0.18 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.18 + 0.16);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + i * 0.18);
+      osc.stop(now + i * 0.18 + 0.18);
+    });
+    setTimeout(() => { try { ctx.close(); } catch (e) {} }, 800);
+  } catch (e) { /* audio blocked until the page is interacted with — fine */ }
+}
+
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  2.8 SIDEBAR FOOTER — streak and today's goal, always on screen  ║
+// ╚══════════════════════════════════════════════════════════════════╝
+function renderSidebarFoot() {
+  const el = document.getElementById('sfoot-body');
+  if (!el) return;
+  if (!state.user) { el.innerHTML = ''; return; }
+
+  const todayKey = toDateKey(new Date());
+  const todayMs  = state.sessions
+    .filter(s => s.date === todayKey && s.status === 'done')
+    .reduce((a, s) => a + (s.duration || 0), 0);
+  const streak = calcStreak();
+
+  let goalHtml;
+  const goal = _getGoal();
+  if (goal && goal.subjectId) {
+    const goalMs = state.sessions
+      .filter(s => s.status === 'done' && s.date === todayKey && s.subjectId === goal.subjectId)
+      .reduce((a, s) => a + (s.duration || 0), 0);
+    const mins = Math.round(goalMs / 60000);
+    const pct  = Math.min(100, Math.round((mins / goal.targetMins) * 100));
+    goalHtml = `<div class="sfoot-goal">${escHtml(goal.subjectName)} · ${mins}m of ${goal.targetMins}m</div>
+      <div class="sfoot-track"><div class="sfoot-fill${pct >= 100 ? ' done' : ''}" style="width:${pct}%;"></div></div>`;
+  } else {
+    goalHtml = `<div class="sfoot-goal">No goal set for today — tap to pick one</div>`;
+  }
+
+  el.innerHTML = `
+    <div class="sfoot-row">
+      <span class="sfoot-streak">${STREAK_ICON}${streak} day${streak === 1 ? '' : 's'}</span>
+      <span class="sfoot-today">${formatHM(todayMs)}</span>
+    </div>
+    ${goalHtml}`;
+}
 
 // ===================== START =====================
 // Firebase auth state is observed via firebase.auth().onAuthStateChanged() above.
