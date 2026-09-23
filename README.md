@@ -14,8 +14,9 @@ LearnOS offers a comprehensive suite of features tailored to enhance the learnin
 
 ### 1. User Authentication & Cloud Sync
 
-- **Secure Sign-In/Sign-Up:** Seamless account creation and login using email and password.
-- **Personalized Experience:** New users can set up their display name, while returning users benefit from cloud-synced data, ensuring continuity across sessions.
+- **Google Sign-In + Password:** Choose your Google account, then create a LearnOS password (first time) or enter it (every login).
+- **Auto Logout at 12:00 AM:** Sessions end at midnight on desktop and mobile; sign in again the next day.
+- **Personalized Experience:** Your name comes from your Google account, and your data syncs from the cloud across devices.
 - **Owner Login:** Dedicated access for administrators or instructors to manage the system.
 
 ### 2. Intuitive Dashboard
