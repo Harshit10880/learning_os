@@ -7587,6 +7587,7 @@ async function doGoogleLogin() {
   errEl.textContent = '';
   errEl.classList.remove('info');
   if (!window._auth) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
+  if (!/^https?:$/.test(location.protocol)) { errEl.textContent = friendlyAuthError('auth/operation-not-supported-in-this-environment'); return; }
 
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' }); // always show the account list
@@ -7775,6 +7776,7 @@ function friendlyAuthError(code) {
     'auth/unauthorized-domain': 'This site is not authorised for Google sign-in (add it in Firebase → Authentication → Settings → Authorized domains).',
     'auth/operation-not-allowed': 'This sign-in method is disabled in Firebase. Enable Google and Email/Password providers.',
     'auth/popup-blocked': 'Popup blocked — allow popups for this site and try again.',
+    'auth/operation-not-supported-in-this-environment': 'Google sign-in needs the app served over http(s), not opened as a file. Run a local server (e.g. "python -m http.server 5500") and open http://localhost:5500.',
     'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
     'auth/network-request-failed': 'Network error. Check your internet connection.'
   };
