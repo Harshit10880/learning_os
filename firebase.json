@@ -3,7 +3,12 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      ".firebaserc",
+      ".gitignore",
+      ".git/**",
+      ".firebase/**",
       "**/.*",
+      "**/.*/**",
       "**/node_modules/**",
       "*.md",
       "prompt_*.txt"
@@ -11,7 +16,12 @@
     "headers": [
       {
         "source": "/@(index.html|sw.js|manifest.json)",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       }
     ]
   }
