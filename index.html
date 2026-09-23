@@ -116,13 +116,49 @@
     signOut: (auth) => auth.signOut()
   };
 
+  // ── Google + app-password gate ──
+  // Students sign in with Google (account picker), then must create (first time)
+  // or enter (every later login) an app password before the app opens.
+  // 'los_pw_ok' holds the uid whose password was verified; cleared on sign-out.
+  const OWNER_EMAIL = 'owner@gmail.com';
+  window._googleBtnHtml = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="vertical-align:-3px;margin-right:10px;"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google';
+  const pwVerified = uid => { try { return localStorage.getItem('los_pw_ok') === uid; } catch (e) { return false; } };
+  const whenReady = (fnName, arg) => {
+    if (window[fnName]) { window[fnName](arg); return; }
+    const t = setInterval(() => { if (window[fnName]) { clearInterval(t); window[fnName](arg); } }, 50);
+    setTimeout(() => clearInterval(t), 5000);
+  };
+
+  // Surface errors from a redirect-based Google sign-in (popup fallback)
+  auth.getRedirectResult().catch(e => { window._pendingAuthError = e.code; });
+
   auth.onAuthStateChanged(user => {
     // Enable login button
     const btn = document.getElementById('login-btn');
     if (btn && btn.disabled) {
       btn.disabled = false;
       btn.style.opacity = '1';
-      btn.textContent = 'Sign In / Create Account';
+      btn.style.cursor = '';
+      btn.innerHTML = window._googleBtnHtml;
+    }
+
+    if (user) {
+      const isGoogle = user.providerData.some(p => p.providerId === 'google.com');
+      const isOwner  = user.email === OWNER_EMAIL && !isGoogle;
+      if (!isOwner && !isGoogle) {
+        // Old email/password-only account — students must now use Google
+        window._pendingAuthError = 'app/google-required';
+        auth.signOut();
+        return;
+      }
+      if (isGoogle && !pwVerified(user.uid)) {
+        // Google account chosen, but app password not entered yet
+        window._fbUser = user;
+        window._fbUid  = user.uid;
+        setLoaderStatus('Ready to sign in');
+        whenReady('_onNeedPassword', user);
+        return;
+      }
     }
 
     if (user) {
@@ -149,6 +185,7 @@
     } else {
       window._fbUser = null;
       window._fbUid  = null;
+      try { localStorage.removeItem('los_pw_ok'); } catch (e) {}
       setLoaderStatus('Ready to sign in');
       if (window._onFirebaseLogout) {
         window._onFirebaseLogout();
@@ -2265,6 +2302,30 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 .login-card > div[style*="border-radius"] { border-radius: var(--r-md) !important; background: var(--bg2) !important; border-color: var(--line) !important; }
 #login-error { color: #d98585; font-size: 0.82rem; }
 #login-error:not(:empty) { padding: 10px 12px; border: 1px solid rgba(199, 95, 95, 0.35); border-radius: var(--r-md); background: rgba(199, 95, 95, 0.08); }
+#login-error.info { color: #6bbd8a; }
+#login-error.info:not(:empty) { border-color: rgba(74, 158, 107, 0.35); background: rgba(74, 158, 107, 0.08); }
+.btn-google {
+  width: 100%; padding: 13px 14px; display: flex; align-items: center; justify-content: center;
+  background: #fff; color: #1f1f1f; border: 1px solid #dadce0; border-radius: var(--r-md);
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.15s, box-shadow 0.15s;
+}
+.btn-google:hover:not(:disabled) { background: #f7f8f8; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+.btn-google:disabled { cursor: not-allowed; }
+.login-owner { margin-top: 16px; font-size: 0.78rem; color: var(--muted2); }
+.login-owner summary { cursor: pointer; text-align: center; opacity: 0.7; list-style: none; }
+.login-owner summary::-webkit-details-marker { display: none; }
+.login-owner summary:hover { opacity: 1; }
+.login-account-chip {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 20px;
+  border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg2);
+}
+.login-account-chip img { width: 36px; height: 36px; border-radius: 50%; flex: 0 0 36px; background: var(--surface); }
+.login-account-chip img:not([src]), .login-account-chip img[src=""] { visibility: hidden; }
+.login-account-name { color: var(--text-bright); font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.login-account-email { color: var(--muted); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.login-pw-links { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 0.8rem; }
+.login-pw-links a { color: var(--accent); text-decoration: none; }
+.login-pw-links a:hover { text-decoration: underline; }
 
 /* Loader */
 #app-loader { background: var(--bg); }
@@ -3265,37 +3326,67 @@ kbd.k {
         <span class="login-logo-text">LearnOS</span>
       </div>
 
-      <div class="login-sub">Sign in to continue or create a new account</div>
+      <!-- STEP 1 — Choose Google account -->
+      <div id="login-step-google">
+        <div class="login-sub">Sign in with your Google account to continue</div>
 
-      <div class="login-section-label">Your credentials</div>
+        <div class="login-section-label">Step 1 of 2 · Choose account</div>
 
-      <div class="form-group">
-        <label>Email address</label>
-        <input type="email" id="login-username" placeholder="you@example.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Display Name <span style="color:var(--muted2);font-size:0.85em;font-weight:400;text-transform:none;letter-spacing:0;">(new accounts only)</span></label>
-        <input type="text" id="login-displayname" placeholder="Your name e.g. Harshit" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="btn-google" onclick="doGoogleLogin()" id="login-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+          ⏳ Connecting…
+        </button>
+
+        <div style="margin-top:20px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;font-size:0.76rem;color:var(--muted2);line-height:1.75;">
+          <span style="color:rgba(255,255,255,0.55);font-weight:600;">New here?</span> Pick your Google account, then create a LearnOS password.<br>
+          <span style="color:rgba(255,255,255,0.55);font-weight:600;">Returning?</span> Pick your account and enter your password — your data syncs from the cloud ☁️
+        </div>
+
+        <details class="login-owner">
+          <summary>Owner sign-in</summary>
+          <div class="form-group" style="margin-top:14px;">
+            <label>Owner email</label>
+            <input type="email" id="login-username" placeholder="owner email" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Owner password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+          <button class="btn-primary" onclick="doLogin()" id="owner-login-btn">Sign in as Owner</button>
+        </details>
       </div>
 
-      <button class="btn-primary" onclick="doLogin()" id="login-btn" disabled style="opacity:0.5;cursor:not-allowed;">
-        ⏳ Connecting…
-      </button>
+      <!-- STEP 2 — Create / enter app password -->
+      <div id="login-step-password" style="display:none;">
+        <div class="login-sub" id="login-pw-sub">Enter your LearnOS password</div>
+
+        <div class="login-account-chip">
+          <img id="login-account-photo" alt="" referrerpolicy="no-referrer">
+          <div style="min-width:0;">
+            <div id="login-account-name" class="login-account-name"></div>
+            <div id="login-account-email" class="login-account-email"></div>
+          </div>
+        </div>
+
+        <div class="login-section-label" id="login-pw-label">Step 2 of 2 · Password</div>
+
+        <div class="form-group">
+          <label id="login-pw-field-label">Password</label>
+          <input type="password" id="login-app-password" placeholder="Min 6 characters" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLoginPassword()">
+        </div>
+        <div class="form-group" id="login-pw-confirm-group" style="display:none;">
+          <label>Confirm password</label>
+          <input type="password" id="login-app-password2" placeholder="Re-enter password" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitLoginPassword()">
+        </div>
+
+        <button class="btn-primary" onclick="submitLoginPassword()" id="login-pw-btn">Continue</button>
+
+        <div class="login-pw-links">
+          <a href="#" id="login-forgot-link" onclick="sendLoginPasswordReset();return false;">Forgot password?</a>
+          <a href="#" onclick="useDifferentGoogleAccount();return false;">Use a different account</a>
+        </div>
+      </div>
 
       <div id="login-error"></div>
-
-      <div style="margin-top:20px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;font-size:0.76rem;color:var(--muted2);line-height:1.75;">
-        <span style="color:rgba(255,255,255,0.55);font-weight:600;">New here?</span> Enter email + name + password to create an account.<br>
-        <span style="color:rgba(255,255,255,0.55);font-weight:600;">Returning?</span> Just email + password — your data syncs from the cloud ☁️
-      </div>
-
-      <div style="margin-top:12px;text-align:center;font-size:0.69rem;color:var(--muted2);opacity:0.55;">
-        Owner? Use your owner credentials to access admin panel.
-      </div>
 
     </div>
   </div>
@@ -7192,7 +7283,8 @@ function init() {
 
     // ── Static owner check (email-based, no Firestore needed) ──
     const OWNER_EMAIL = 'owner@gmail.com';
-    if (fbUser.email === OWNER_EMAIL) {
+    const viaGoogle = fbUser.providerData.some(p => p.providerId === 'google.com');
+    if (fbUser.email === OWNER_EMAIL && !viaGoogle) {
       window._fbDisplayName = 'Owner';
       hideAppLoader();
       showOwnerPanel();
@@ -7237,7 +7329,10 @@ function init() {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
-    document.getElementById('login-error').textContent = '';
+    showLoginStep('google');
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = window._pendingAuthError ? friendlyAuthError(window._pendingAuthError) : '';
+    window._pendingAuthError = null;
     hideAppLoader(); // Phase 4
   };
   // Check for owner session flag (fast path, still verified by Firestore meta on auth change)
@@ -7475,30 +7570,166 @@ async function doMidnightLogout() {
 }
 
 // ===================== LOGIN / LOGOUT =====================
-async function doLogin() {
-  const email = document.getElementById('login-username').value.trim();
-  const displayName = (document.getElementById('login-displayname').value || '').trim();
-  const pass  = document.getElementById('login-password').value;
+function showLoginStep(step) {
+  document.getElementById('login-step-google').style.display   = step === 'google' ? '' : 'none';
+  document.getElementById('login-step-password').style.display = step === 'password' ? '' : 'none';
+  document.getElementById('login-app-password').value = '';
+  document.getElementById('login-app-password2').value = '';
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  errEl.classList.remove('info');
+}
+
+// Step 1 — Google account picker
+async function doGoogleLogin() {
   const errEl = document.getElementById('login-error');
   const btn   = document.getElementById('login-btn');
+  errEl.textContent = '';
+  errEl.classList.remove('info');
+  if (!window._auth) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
+  if (!/^https?:$/.test(location.protocol)) { errEl.textContent = friendlyAuthError('auth/operation-not-supported-in-this-environment'); return; }
+
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' }); // always show the account list
+  btn.disabled = true;
+  btn.textContent = 'Opening Google…';
+  try {
+    await window._auth.signInWithPopup(provider);
+    // onAuthStateChanged fires → password step (_onNeedPassword)
+  } catch (e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') {
+      try { await window._auth.signInWithRedirect(provider); return; } catch (re) { errEl.textContent = friendlyAuthError(re.code); }
+    } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      errEl.textContent = friendlyAuthError(e.code);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = window._googleBtnHtml;
+  }
+}
+
+// Step 2 — called by the auth listener once a Google account is chosen
+window._onNeedPassword = (fbUser) => {
+  const hasPassword = fbUser.providerData.some(p => p.providerId === 'password');
+  window._pwMode = hasPassword ? 'enter' : 'create';
+
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').style.display = 'flex';
+  showLoginStep('password');
+
+  document.getElementById('login-account-name').textContent  = fbUser.displayName || fbUser.email.split('@')[0];
+  document.getElementById('login-account-email').textContent = fbUser.email;
+  const photo = document.getElementById('login-account-photo');
+  if (fbUser.photoURL) photo.src = fbUser.photoURL; else photo.removeAttribute('src');
+
+  const creating = window._pwMode === 'create';
+  document.getElementById('login-pw-sub').textContent = creating
+    ? 'Create a LearnOS password — you will enter it every time you sign in'
+    : 'Enter your LearnOS password to continue';
+  document.getElementById('login-pw-field-label').textContent = creating ? 'New password' : 'Password';
+  document.getElementById('login-app-password').autocomplete = creating ? 'new-password' : 'current-password';
+  document.getElementById('login-pw-confirm-group').style.display = creating ? '' : 'none';
+  document.getElementById('login-forgot-link').style.visibility = creating ? 'hidden' : 'visible';
+  document.getElementById('login-pw-btn').textContent = creating ? 'Create password & continue' : 'Continue';
+
+  hideAppLoader();
+  setTimeout(() => document.getElementById('login-app-password').focus(), 50);
+};
+
+async function submitLoginPassword() {
+  const user  = window._auth.currentUser;
+  const pass  = document.getElementById('login-app-password').value;
+  const pass2 = document.getElementById('login-app-password2').value;
+  const errEl = document.getElementById('login-error');
+  const btn   = document.getElementById('login-pw-btn');
+  errEl.textContent = '';
+  errEl.classList.remove('info');
+  if (!user) { showLoginStep('google'); return; }
+
+  const creating = window._pwMode === 'create';
+  if (!pass) { errEl.textContent = 'Please enter a password.'; return; }
+  if (creating && pass.length < 6) { errEl.textContent = friendlyAuthError('auth/weak-password'); return; }
+  if (creating && pass !== pass2) { errEl.textContent = 'Passwords do not match.'; return; }
+
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = creating ? 'Creating…' : 'Checking…';
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+    if (creating) await user.linkWithCredential(cred);
+    else          await user.reauthenticateWithCredential(cred);
+  } catch (e) {
+    if (e.code === 'auth/provider-already-linked') {
+      window._onNeedPassword(user); // password exists already — switch to "enter" mode
+    }
+    errEl.textContent = friendlyAuthError(e.code);
+    btn.disabled = false;
+    btn.textContent = label;
+    return;
+  }
+
+  try { localStorage.setItem('los_pw_ok', user.uid); } catch (e) {}
+
+  // Keep email/name in the user doc (friend search + owner panel rely on them)
+  const meta = { email: user.email };
+  try {
+    const snap = await window._db.collection('users').doc(user.uid).get();
+    if (!snap.exists) Object.assign(meta, { displayName: user.displayName || user.email.split('@')[0], role: 'student', createdAt: new Date().toISOString() });
+  } catch (e) {}
+  fbSaveUserMeta(meta).catch(() => {});
+
+  btn.disabled = false;
+  btn.textContent = label;
+  window._realLogin = true;
+  setLoaderStatus('Loading your data…');
+  window._onFirebaseLogin(user);
+}
+
+async function sendLoginPasswordReset() {
+  const user  = window._auth.currentUser;
+  const errEl = document.getElementById('login-error');
+  if (!user) return;
+  try {
+    await window._auth.sendPasswordResetEmail(user.email);
+    errEl.classList.add('info');
+    errEl.textContent = `Password reset link sent to ${user.email}. Set a new password, then come back here.`;
+  } catch (e) {
+    errEl.classList.remove('info');
+    errEl.textContent = friendlyAuthError(e.code);
+  }
+}
+
+async function useDifferentGoogleAccount() {
+  try { await window._auth.signOut(); } catch (e) {}
+  showLoginStep('google');
+}
+
+// Owner sign-in (email + password, owner account only)
+async function doLogin() {
+  const email = document.getElementById('login-username').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn   = document.getElementById('owner-login-btn');
 
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email.'; return; }
   if (!pass)  { errEl.textContent = 'Please enter a password.'; return; }
   if (!window._fbApi) { errEl.textContent = 'Firebase not loaded yet — please wait a moment and try again.'; return; }
 
-  btn.textContent = 'Signing in…';
-  btn.disabled = true;
-
   // ── Static owner credentials check ──
   const OWNER_EMAIL = 'owner@gmail.com';
   const OWNER_PASS  = '101010';
-  if (email === OWNER_EMAIL && pass !== OWNER_PASS) {
-    errEl.textContent = 'Incorrect owner password.';
-    btn.textContent = 'Sign In / Create Account';
-    btn.disabled = false;
+  if (email !== OWNER_EMAIL) {
+    errEl.textContent = friendlyAuthError('app/google-required');
     return;
   }
+  if (pass !== OWNER_PASS) {
+    errEl.textContent = 'Incorrect owner password.';
+    return;
+  }
+
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
 
   try {
     // Mark this as a REAL login (user typed credentials)
@@ -7519,36 +7750,33 @@ async function doLogin() {
           window._realLogin = false;
           errEl.textContent = friendlyAuthError(ce.code);
         }
-      } else {
-        // Regular student — create new account
-        try {
-          window._realLogin = true;
-          await window._auth.createUserWithEmailAndPassword(email, pass);
-          const name = displayName || email.split('@')[0];
-          window._fbDisplayName = name;
-          fbSaveUserMeta({ displayName: name, email, role: 'student', createdAt: new Date().toISOString() }).catch(()=>{});
-        } catch (ce) {
-          window._realLogin = false;
-          errEl.textContent = friendlyAuthError(ce.code);
-        }
       }
     } else {
       errEl.textContent = friendlyAuthError(e.code);
     }
   } finally {
-    btn.textContent = 'Sign In / Create Account';
+    btn.textContent = 'Sign in as Owner';
     btn.disabled = false;
   }
 }
 
 function friendlyAuthError(code) {
   const map = {
+    'app/google-required': 'Please sign in with “Continue with Google”.',
     'auth/invalid-email': 'Invalid email address.',
     'auth/wrong-password': 'Incorrect password.',
     'auth/user-not-found': 'No account found — check email or create one.',
-    'auth/invalid-credential': 'Incorrect email or password.',
+    'auth/invalid-credential': 'Incorrect password.',
+    'auth/invalid-login-credentials': 'Incorrect password.',
     'auth/weak-password': 'Password must be at least 6 characters.',
     'auth/email-already-in-use': 'Email already registered — try signing in.',
+    'auth/credential-already-in-use': 'This email already has a separate password account. Contact the owner.',
+    'auth/provider-already-linked': 'You already have a password — enter it below.',
+    'auth/account-exists-with-different-credential': 'An older password account exists for this email. Contact the owner.',
+    'auth/unauthorized-domain': 'This site is not authorised for Google sign-in (add it in Firebase → Authentication → Settings → Authorized domains).',
+    'auth/operation-not-allowed': 'This sign-in method is disabled in Firebase. Enable Google and Email/Password providers.',
+    'auth/popup-blocked': 'Popup blocked — allow popups for this site and try again.',
+    'auth/operation-not-supported-in-this-environment': 'Google sign-in needs the app served over http(s), not opened as a file. Run a local server (e.g. "python -m http.server 5500") and open http://localhost:5500.',
     'auth/too-many-requests': 'Too many attempts. Please wait and try again.',
     'auth/network-request-failed': 'Network error. Check your internet connection.'
   };
@@ -10046,7 +10274,7 @@ setTimeout(() => {
   const loginScreen = document.getElementById('login-screen');
   if (loginScreen) loginScreen.style.display = 'flex';
   const btn = document.getElementById('login-btn');
-  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Sign In / Create Account'; }
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = ''; btn.innerHTML = window._googleBtnHtml; }
   setLoaderStatus('Ready to sign in');
 }, 6000); // 6s hard timeout — show login if Firebase doesn't respond
 
