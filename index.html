@@ -123,6 +123,10 @@
   const OWNER_EMAIL = 'owner@gmail.com';
   window._googleBtnHtml = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="vertical-align:-3px;margin-right:10px;"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google';
   const pwVerified = uid => { try { return localStorage.getItem('los_pw_ok') === uid; } catch (e) { return false; } };
+  // Local calendar day of the last password login ('los_pw_day'). A different day means
+  // midnight has passed — mobile browsers suspend the midnight timer, so check on open/resume.
+  window._todayKey = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD, local time
+  window._loginDayExpired = () => { try { return localStorage.getItem('los_pw_day') !== window._todayKey(); } catch (e) { return false; } };
   const whenReady = (fnName, arg) => {
     if (window[fnName]) { window[fnName](arg); return; }
     const t = setInterval(() => { if (window[fnName]) { clearInterval(t); window[fnName](arg); } }, 50);
@@ -148,6 +152,12 @@
       if (!isOwner && !isGoogle) {
         // Old email/password-only account — students must now use Google
         window._pendingAuthError = 'app/google-required';
+        auth.signOut();
+        return;
+      }
+      if (isGoogle && pwVerified(user.uid) && window._loginDayExpired()) {
+        // Logged in on an earlier day and the midnight logout never ran (app closed/suspended)
+        window._pendingAuthError = 'app/session-expired';
         auth.signOut();
         return;
       }
@@ -185,7 +195,7 @@
     } else {
       window._fbUser = null;
       window._fbUid  = null;
-      try { localStorage.removeItem('los_pw_ok'); } catch (e) {}
+      try { localStorage.removeItem('los_pw_ok'); localStorage.removeItem('los_pw_day'); } catch (e) {}
       setLoaderStatus('Ready to sign in');
       if (window._onFirebaseLogout) {
         window._onFirebaseLogout();
@@ -7540,6 +7550,19 @@ function scheduleMidnightLogout() {
   setTimeout(() => {
     if (state.user) doMidnightLogout();
   }, msToMidnight);
+
+  // Mobile: timers are frozen while the app is in the background / screen is off,
+  // so also check the login day whenever the app comes back and every 30s while open.
+  if (!window._midnightWatchInstalled) {
+    window._midnightWatchInstalled = true;
+    const checkDayChanged = () => {
+      if (state.user && window._fbUser && window._loginDayExpired()) doMidnightLogout();
+    };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkDayChanged(); });
+    window.addEventListener('focus', checkDayChanged);
+    window.addEventListener('pageshow', checkDayChanged);
+    setInterval(checkDayChanged, 30000);
+  }
 }
 
 async function doMidnightLogout() {
@@ -7668,7 +7691,7 @@ async function submitLoginPassword() {
     return;
   }
 
-  try { localStorage.setItem('los_pw_ok', user.uid); } catch (e) {}
+  try { localStorage.setItem('los_pw_ok', user.uid); localStorage.setItem('los_pw_day', window._todayKey()); } catch (e) {}
 
   // Keep email/name in the user doc (friend search + owner panel rely on them)
   const meta = { email: user.email };
@@ -7763,6 +7786,7 @@ async function doLogin() {
 function friendlyAuthError(code) {
   const map = {
     'app/google-required': 'Please sign in with “Continue with Google”.',
+    'app/session-expired': 'Your session ended at 12:00 AM. Please sign in again.',
     'auth/invalid-email': 'Invalid email address.',
     'auth/wrong-password': 'Incorrect password.',
     'auth/user-not-found': 'No account found — check email or create one.',
