@@ -2,6 +2,8 @@
 
 ![LearnOS Logo](https://raw.githubusercontent.com/Harshit10880/learning_os/main/assets/logo.png) <!-- Placeholder for a logo, assuming one might be added later or generated -->
 
+**🔗 Live app: https://learning-os-c8be8.web.app**
+
 ## Project Overview
 
 LearnOS is an innovative web-based personal learning system designed to empower students and lifelong learners with a centralized command center for managing their educational journey. This application transforms passive learning into an active, organized, and data-driven experience, helping users track progress, manage tasks, and optimize their study habits.
