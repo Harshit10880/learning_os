@@ -4348,6 +4348,18 @@ kbd.k {
             </div>
             <div class="set-row">
               <div class="set-row-main">
+                <div class="set-row-title">Copy Data from har@gmail.com</div>
+                <div class="set-row-desc">Permanently sync and copy all master data (subjects, tasks, sessions, notes, attendance) from har@gmail.com into your account.</div>
+              </div>
+              <div class="set-row-action">
+                <button class="btn-primary" id="btn-copy-har" onclick="triggerCopyFromHar()">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  Sync from har@gmail.com
+                </button>
+              </div>
+            </div>
+            <div class="set-row">
+              <div class="set-row-main">
                 <div class="set-row-title">Records held</div>
                 <div class="set-row-desc">What is in your account right now, across all devices.</div>
               </div>
@@ -5171,7 +5183,7 @@ async function fbGetAllUsers() {
 
 async function fbLoadUserData(uid) {
   if (!window._db) return {};
-  const keys = ['subjects','tasks','sessions','attendance','leaves','notes','activeTimers'];
+  const keys = ['subjects','tasks','sessions','attendance','leaves','notes','activeTimers','gamification'];
   const result = {};
   await Promise.all(keys.map(async k => {
     try {
@@ -5180,6 +5192,72 @@ async function fbLoadUserData(uid) {
     } catch(e) { result[k] = []; }
   }));
   return result;
+}
+
+// ===================== DATA COPY & PERMANENT SYNC HELPERS =====================
+async function copyUserDataFromSource(sourceEmail = 'har@gmail.com', targetUid = window._fbUid) {
+  if (!window._db || !targetUid) return false;
+  try {
+    const usersSnap = await window._db.collection('users').get();
+    let sourceUid = null;
+    let foundEmail = null;
+
+    usersSnap.forEach(doc => {
+      const uData = doc.data();
+      if (uData && uData.email) {
+        const em = uData.email.toLowerCase();
+        if (em === sourceEmail.toLowerCase() || em.includes('harshit.cha10') || em.startsWith('har@')) {
+          sourceUid = doc.id;
+          foundEmail = uData.email;
+        }
+      }
+    });
+
+    if (!sourceUid) {
+      console.warn('[CopyData] Source email not found in Firestore:', sourceEmail);
+      return false;
+    }
+
+    const keys = ['subjects','tasks','sessions','attendance','leaves','notes','activeTimers','gamification'];
+    let copiedCount = 0;
+
+    for (const k of keys) {
+      const snap = await window._db.collection('users').doc(sourceUid).collection('data').doc(k).get();
+      if (snap.exists && snap.data() && snap.data().payload) {
+        await window._db.collection('users').doc(targetUid).collection('data').doc(k).set({
+          payload: snap.data().payload,
+          updatedAt: new Date().toISOString()
+        });
+        copiedCount++;
+      }
+    }
+
+    console.log(`[CopyData] Successfully copied ${copiedCount} collections from ${foundEmail} (${sourceUid}) to ${targetUid}`);
+    return true;
+  } catch (e) {
+    console.error('[CopyData] Error copying data:', e);
+    return false;
+  }
+}
+
+async function triggerCopyFromHar() {
+  const btn = document.getElementById('btn-copy-har');
+  if (btn) { btn.disabled = true; btn.textContent = 'Syncing…'; }
+  const ok = await copyUserDataFromSource('har@gmail.com', window._fbUid);
+  if (ok) {
+    await loadAllData();
+    renderDailyStudyMatrix();
+    renderDashboard();
+    renderTasks();
+    renderActiveTimers();
+    renderSessions();
+    renderAttendance();
+    renderPosts();
+    showToast('Data copied permanently from har@gmail.com! 🎉', 'success');
+  } else {
+    showToast('Could not find har@gmail.com source data in Firebase', 'error');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Sync from har@gmail.com'; }
 }
 
 // ===================== STATE =====================
@@ -7313,6 +7391,16 @@ function init() {
     const displayName = meta.displayName || window._fbDisplayName || fbUser.displayName || fbUser.email.split('@')[0];
     window._fbDisplayName = displayName;
     state.user = { name: displayName };
+
+    // ── Auto sync har@gmail.com master data to target accounts ──
+    if (fbUser.email && (fbUser.email.toLowerCase().includes('gemini') || fbUser.email.toLowerCase().includes('gemininewuser10'))) {
+      try {
+        console.log('[AutoSync] Permanently copying master data from har@gmail.com to ' + fbUser.email);
+        await copyUserDataFromSource('har@gmail.com', fbUser.uid);
+      } catch(e) {
+        console.warn('[AutoSync] Auto-copy failed:', e);
+      }
+    }
 
     try {
       await loadAllData();
@@ -9960,6 +10048,8 @@ function renderOwnerStudentDetail() {
     <div class="meta-item"><div class="meta-val">${d.subjects.length}</div><div class="meta-lbl">Subjects</div></div>
     <div class="meta-divider"></div>
     <div class="meta-item"><div class="meta-val">${d.sessions.filter(s=>s.status==='done').length}</div><div class="meta-lbl">Sessions Logged</div></div>
+    <div class="meta-divider"></div>
+    <button class="btn-secondary" style="font-size:0.75rem;margin-left:auto;" onclick="ownerCopyHarDataToStudent('${d.uid}')">📋 Copy har@gmail.com Data</button>
   `;
 
   // Overall progress ring
@@ -10007,6 +10097,18 @@ function renderOwnerStudentDetail() {
   renderOwnerLeaves(d);
   renderOwnerNotes(d);
   renderOwnerSessionHistory(d);
+}
+
+async function ownerCopyHarDataToStudent(targetUid) {
+  if (!confirm('Copy all har@gmail.com data into this student account permanently?')) return;
+  const ok = await copyUserDataFromSource('har@gmail.com', targetUid);
+  if (ok) {
+    showToast('Data copied successfully to student!', 'success');
+    ownerState.studentData = await loadStudentData(targetUid);
+    renderOwnerStudentDetail();
+  } else {
+    showToast('Failed to copy data from har@gmail.com', 'error');
+  }
 }
 
 function ownerSetRoundProgress(circleId, pctId, pct) {
