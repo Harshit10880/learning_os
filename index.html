@@ -5195,44 +5195,123 @@ async function fbLoadUserData(uid) {
 }
 
 // ===================== DATA COPY & PERMANENT SYNC HELPERS =====================
+async function publishMasterHarData() {
+  if (!window._db) return;
+  try {
+    const masterPayload = {
+      subjects: state.subjects || [],
+      tasks: state.tasks || [],
+      sessions: state.sessions || [],
+      attendance: state.attendance || [],
+      leaves: state.leaves || [],
+      notes: state.notes || [],
+      activeTimers: state.activeTimers || [],
+      gamification: state.gamification || null,
+      updatedAt: new Date().toISOString()
+    };
+    await fbSaveShared('master_har_data', masterPayload);
+    console.log('[MasterData] Published master data to shared/master_har_data');
+  } catch(e) {
+    console.warn('[MasterData] Publish failed:', e);
+  }
+}
+
 async function copyUserDataFromSource(sourceEmail = 'har@gmail.com', targetUid = window._fbUid) {
   if (!window._db || !targetUid) return false;
   try {
-    const usersSnap = await window._db.collection('users').get();
-    let sourceUid = null;
-    let foundEmail = null;
+    let masterData = null;
 
-    usersSnap.forEach(doc => {
-      const uData = doc.data();
-      if (uData && uData.email) {
-        const em = uData.email.toLowerCase();
-        if (em === sourceEmail.toLowerCase() || em.includes('harshit.cha10') || em.startsWith('har@')) {
-          sourceUid = doc.id;
-          foundEmail = uData.email;
+    // 1. Try loading shared master data (accessible by all users in Firestore)
+    try {
+      masterData = await fbLoadShared('master_har_data');
+    } catch(e) {
+      console.warn('[CopyData] Could not load shared/master_har_data:', e);
+    }
+
+    // 2. If not found in shared doc, try reading users collection directly
+    if (!masterData || !masterData.subjects || masterData.subjects.length === 0) {
+      try {
+        const usersSnap = await window._db.collection('users').get();
+        let sourceUid = null;
+        usersSnap.forEach(doc => {
+          const uData = doc.data();
+          if (uData && uData.email) {
+            const em = uData.email.toLowerCase();
+            if (em === sourceEmail.toLowerCase() || em.includes('harshit.cha10') || em.startsWith('har@')) {
+              sourceUid = doc.id;
+            }
+          }
+        });
+        if (sourceUid) {
+          masterData = await fbLoadUserData(sourceUid);
         }
+      } catch(e) {
+        console.warn('[CopyData] Direct users collection query restricted or failed:', e);
       }
-    });
+    }
 
-    if (!sourceUid) {
-      console.warn('[CopyData] Source email not found in Firestore:', sourceEmail);
+    // 3. Fallback: check localStorage caches
+    if (!masterData || !masterData.subjects || masterData.subjects.length === 0) {
+      const cachedSubj = S.get('los_subjects_cache');
+      if (cachedSubj && cachedSubj.length > 0) {
+        masterData = {
+          subjects: S.get('los_subjects_cache') || [],
+          tasks: S.get('los_tasks_cache') || [],
+          sessions: S.get('los_sessions_cache') || [],
+          attendance: S.get('los_attendance_cache') || [],
+          leaves: S.get('los_leaves_cache') || [],
+          notes: S.get('los_notes_cache') || [],
+          activeTimers: S.get('los_activeTimers_cache') || [],
+          gamification: S.get('los_gamification_cache') || null
+        };
+      }
+    }
+
+    // 4. Fallback: generate seeded syllabus data into masterData if state has data
+    if (!masterData || !masterData.subjects || masterData.subjects.length === 0) {
+      seedAIEngineerSubject();
+      seedAgenticAISubject();
+      seedAIAutoAgentSubject();
+      seedMLOpsEngineerSubject();
+      if (state.subjects && state.subjects.length > 0) {
+        masterData = {
+          subjects: state.subjects,
+          tasks: state.tasks || [],
+          sessions: state.sessions || [],
+          attendance: state.attendance || [],
+          leaves: state.leaves || [],
+          notes: state.notes || [],
+          activeTimers: state.activeTimers || [],
+          gamification: state.gamification || null
+        };
+      }
+    }
+
+    if (!masterData || !masterData.subjects || masterData.subjects.length === 0) {
+      console.warn('[CopyData] No master data payload found across all sources');
       return false;
     }
 
+    // Write all data keys into target user's Firestore data subcollections
     const keys = ['subjects','tasks','sessions','attendance','leaves','notes','activeTimers','gamification'];
     let copiedCount = 0;
 
     for (const k of keys) {
-      const snap = await window._db.collection('users').doc(sourceUid).collection('data').doc(k).get();
-      if (snap.exists && snap.data() && snap.data().payload) {
-        await window._db.collection('users').doc(targetUid).collection('data').doc(k).set({
-          payload: snap.data().payload,
-          updatedAt: new Date().toISOString()
-        });
-        copiedCount++;
-      }
+      const val = masterData[k] || [];
+      await window._db.collection('users').doc(targetUid).collection('data').doc(k).set({
+        payload: JSON.stringify(val),
+        updatedAt: new Date().toISOString()
+      });
+      // Update local state and local cache immediately
+      state[k] = val;
+      S.set('los_' + k + '_cache', val);
+      copiedCount++;
     }
 
-    console.log(`[CopyData] Successfully copied ${copiedCount} collections from ${foundEmail} (${sourceUid}) to ${targetUid}`);
+    // Publish to shared/master_har_data so future logins from any device work instantly
+    publishMasterHarData().catch(()=>{});
+
+    console.log(`[CopyData] Successfully copied ${copiedCount} collections (${masterData.subjects.length} subjects, ${masterData.tasks ? masterData.tasks.length : 0} tasks) to ${targetUid}`);
     return true;
   } catch (e) {
     console.error('[CopyData] Error copying data:', e);
@@ -7393,6 +7472,10 @@ function init() {
     state.user = { name: displayName };
 
     // ── Auto sync har@gmail.com master data to target accounts ──
+    if (fbUser.email && (fbUser.email.toLowerCase().includes('har') || fbUser.email.toLowerCase().includes('harshit'))) {
+      setTimeout(() => publishMasterHarData().catch(()=>{}), 1500);
+    }
+
     if (fbUser.email && (fbUser.email.toLowerCase().includes('gemini') || fbUser.email.toLowerCase().includes('gemininewuser10'))) {
       try {
         console.log('[AutoSync] Permanently copying master data from har@gmail.com to ' + fbUser.email);
