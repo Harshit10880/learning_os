@@ -2912,6 +2912,10 @@ html[data-theme="light"] { color-scheme: light; }
 .seg-btn:hover { color: var(--text-bright); }
 .seg-btn[aria-pressed="true"] { background: var(--surface); border-color: var(--line); color: var(--text-bright); }
 .seg-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.manual-date-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 3px; }
+.manual-date-quick .seg-btn { flex: 0 0 auto; }
+.manual-date-hint { margin-top: 7px; font-size: 0.75rem; color: var(--muted2); min-height: 1em; }
+@media (max-width: 620px) { .manual-date-quick .seg-btn { flex: 1 1 44%; justify-content: center; } }
 .set-kbd { display: grid; grid-template-columns: 1fr auto; gap: 11px 20px; align-items: center; }
 .set-kbd dt { font-size: 0.83rem; color: var(--muted); margin: 0; }
 .set-kbd dd { margin: 0; text-align: right; }
@@ -4940,6 +4944,17 @@ kbd.k {
       <div class="field">
         <label>Description (Optional)</label>
         <textarea id="manual-session-desc" placeholder="Any notes about this session…"></textarea>
+      </div>
+      <div class="field">
+        <label>Session Date</label>
+        <input type="date" id="manual-session-date" onchange="onManualDateChange()" aria-label="Session date">
+        <div class="seg manual-date-quick" role="group" aria-label="Quick date">
+          <button type="button" class="seg-btn" data-offset="0" onclick="setManualDateOffset(0)" aria-pressed="true">Today</button>
+          <button type="button" class="seg-btn" data-offset="1" onclick="setManualDateOffset(1)" aria-pressed="false">Yesterday</button>
+          <button type="button" class="seg-btn" data-offset="2" onclick="setManualDateOffset(2)" aria-pressed="false">2 days ago</button>
+          <button type="button" class="seg-btn" data-offset="3" onclick="setManualDateOffset(3)" aria-pressed="false">3 days ago</button>
+        </div>
+        <div class="manual-date-hint" id="manual-date-hint"></div>
       </div>
       <div class="field-row">
         <div class="field">
@@ -8603,18 +8618,60 @@ function openManualSessionModal() {
   document.getElementById('manual-end-time').value = '';
   document.getElementById('manual-duration').value = '';
 
-  // Add event listeners for auto-calculation
+  const dateInput = document.getElementById('manual-session-date');
+  if (dateInput) dateInput.max = toDateKey(new Date());
+  setManualDateOffset(0);
+
+  // Add event listeners for auto-calculation (bound only once)
   const startTimeInput = document.getElementById('manual-start-time');
   const endTimeInput = document.getElementById('manual-end-time');
 
-  if (startTimeInput) {
+  if (startTimeInput && !startTimeInput.dataset.bound) {
+    startTimeInput.dataset.bound = '1';
     startTimeInput.addEventListener('input', calculateDuration);
   }
-  if (endTimeInput) {
+  if (endTimeInput && !endTimeInput.dataset.bound) {
+    endTimeInput.dataset.bound = '1';
     endTimeInput.addEventListener('input', calculateDuration);
   }
 
   openModal('modal-manual-session');
+}
+
+function manualDateKeyForOffset(days) {
+  return toDateKey(new Date(Date.now() - days * 86400000));
+}
+
+function setManualDateOffset(days) {
+  const dateInput = document.getElementById('manual-session-date');
+  if (dateInput) dateInput.value = manualDateKeyForOffset(days);
+  syncManualDateChips(days);
+}
+
+function onManualDateChange() {
+  const dateInput = document.getElementById('manual-session-date');
+  if (!dateInput) return;
+  const todayKey = toDateKey(new Date());
+  if (!dateInput.value) { syncManualDateChips(null); return; }
+  if (dateInput.value > todayKey) dateInput.value = todayKey;
+  let offset = null;
+  for (let i = 0; i <= 3; i++) {
+    if (manualDateKeyForOffset(i) === dateInput.value) { offset = i; break; }
+  }
+  syncManualDateChips(offset);
+}
+
+function syncManualDateChips(activeOffset) {
+  const seg = document.querySelector('.manual-date-quick');
+  if (seg) {
+    seg.querySelectorAll('.seg-btn').forEach(b => {
+      const on = activeOffset !== null && parseInt(b.dataset.offset, 10) === activeOffset;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  const hint = document.getElementById('manual-date-hint');
+  const dateInput = document.getElementById('manual-session-date');
+  if (hint) hint.textContent = (dateInput && dateInput.value) ? formatTimerSessionDateHeader(dateInput.value) : '';
 }
 
 function calculateDuration() {
@@ -8649,6 +8706,9 @@ function saveManualSession() {
   const description = document.getElementById('manual-session-desc').value.trim();
   const startTime = document.getElementById('manual-start-time').value;
   const endTime = document.getElementById('manual-end-time').value;
+  const dateInput = document.getElementById('manual-session-date');
+  const todayKey = toDateKey(new Date());
+  const dateKey = (dateInput && dateInput.value && dateInput.value <= todayKey) ? dateInput.value : todayKey;
 
   if (!sessionName) { showToast('Enter a session name', 'error'); return; }
   if (!startTime || !endTime) { showToast('Please set start and end times', 'error'); return; }
@@ -8665,24 +8725,26 @@ function saveManualSession() {
 
   const durationMs = (end - start) * 60 * 1000;
 
-  const now = new Date();
+  const startDate = new Date(`${dateKey}T${startTime}:00`);
+  const endDate = new Date(startDate.getTime() + durationMs);
+
   const session = {
     id: 'sess_' + Date.now(),
-    date: toDateKey(now),
+    date: dateKey,
     subjectId,
     taskName: sessionName,
     duration: durationMs,
     status: 'done',
-    startDateTime: now.toLocaleString(),
-    endDateTime: now.toLocaleString()
+    startDateTime: startDate.toLocaleString(),
+    endDateTime: endDate.toLocaleString()
   };
 
   state.sessions.push(session);
   saveData('sessions');
   closeModal('modal-manual-session');
-  renderSessions();
+  selectTimerMonth(dateKey.slice(0, 7));
   renderDashboard();
-  showToast(`Session saved: ${formatHM(durationMs)}`, 'success');
+  showToast(`Session saved for ${formatTimerSessionDateHeader(dateKey)}: ${formatHM(durationMs)}`, 'success');
 }
 
 function startSession() {
