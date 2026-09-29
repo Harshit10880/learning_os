@@ -2459,7 +2459,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 /* ---------- 9. DASHBOARD ---------- */
 #dash-meta {
   display: flex; align-items: stretch; gap: 0; flex-wrap: nowrap;
-  padding: 18px 8px; margin-bottom: 16px;
+  padding: 18px 8px; margin-bottom: 18px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none;
 }
 .meta-item { flex: 1 1 0; min-width: 0; flex-direction: column-reverse; justify-content: flex-end; gap: 4px; padding: 0 20px; }
@@ -2468,7 +2468,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 .meta-divider { width: 1px; height: auto; align-self: stretch; background: var(--line); }
 #dash-streak { color: var(--warn) !important; }
 
-#daily-goal-card { margin-bottom: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
+#daily-goal-card { margin-bottom: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
 #daily-goal-card::before, #page-dashboard #daily-goal-card::before { display: none; }
 .goal-title { font-size: 0.9rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-bright); }
 .goal-progress-wrap { border-radius: 99px; background: var(--bg3); }
@@ -3026,6 +3026,7 @@ kbd.k {
 .heat-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
 .heat {
   display: grid; grid-template-columns: auto auto; gap: 5px 7px; width: max-content;
+  --cell: 11px;
   --h0: var(--bg3);
   --h1: rgba(94, 156, 208, 0.24);
   --h2: rgba(94, 156, 208, 0.45);
@@ -3038,13 +3039,13 @@ kbd.k {
   --h3: rgba(47, 109, 158, 0.64);
   --h4: rgba(47, 109, 158, 0.95);
 }
-.heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: 14px; font-size: 0.66rem; color: var(--muted2); }
+.heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: calc(var(--cell) + 3px); font-size: 0.66rem; color: var(--muted2); }
 .heat-months span { white-space: nowrap; }
-.heat-days { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; font-size: 0.62rem; color: var(--muted2); }
-.heat-days span { line-height: 11px; text-align: right; }
+.heat-days { display: grid; grid-template-rows: repeat(7, var(--cell)); gap: 3px; font-size: 0.62rem; color: var(--muted2); }
+.heat-days span { line-height: var(--cell); text-align: right; }
 .heat-weeks { display: flex; gap: 3px; }
-.heat-col { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; }
-.heat-cell { width: 11px; height: 11px; border-radius: 2px; background: var(--h0); box-shadow: inset 0 0 0 1px var(--line-soft); }
+.heat-col { display: grid; grid-template-rows: repeat(7, var(--cell)); gap: 3px; }
+.heat-cell { width: var(--cell, 11px); height: var(--cell, 11px); border-radius: 2px; background: var(--h0); box-shadow: inset 0 0 0 1px var(--line-soft); }
 .heat-cell.l1 { background: var(--h1); box-shadow: none; }
 .heat-cell.l2 { background: var(--h2); box-shadow: none; }
 .heat-cell.l3 { background: var(--h3); box-shadow: none; }
@@ -3137,8 +3138,11 @@ kbd.k {
 .pomo-hint { margin-top: 10px; font-size: 0.78rem; line-height: 1.5; color: var(--muted2); }
 
 /* ---------- J. TODAY / UP NEXT ---------- */
-.dash-topline { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-bottom: 18px; align-items: start; }
+.dash-topline { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-bottom: 18px; align-items: stretch; }
 .dash-topline > .grid-2 { margin-bottom: 0 !important; }
+#page-dashboard .dash-topline .card { display: flex; flex-direction: column; }
+#page-dashboard .dash-topline .round-progress-wrap { flex: 1 1 auto; justify-content: center; }
+#page-dashboard .dash-topline .grid-2 .card-title { min-height: 1.2em; }
 .upnext-card { display: flex; flex-direction: column; height: 100%; }
 .upnext-list { display: flex; flex-direction: column; gap: 7px; }
 .upnext-item {
@@ -7926,6 +7930,8 @@ function navTo(page) {
   closeSidebarMobile();
   closeMoreMenu();
   try { renderSidebarFoot(); } catch (e) {}
+  // Heatmaps measure their card only once it is visible — refit on every navigation.
+  try { document.querySelectorAll('.page.active .heat').forEach(fitHeatmap); } catch (e) {}
 }
 
 function toggleSidebar() {
@@ -11187,6 +11193,23 @@ function studyMsByDate() {
   return map;
 }
 
+// Sizes heatmap cells so the grid fills the card instead of leaving dead space
+// on the right. Cells stay between 11px (scroll kicks in) and 18px.
+function fitHeatmap(heatEl) {
+  if (!heatEl) return;
+  const weeks = parseInt(heatEl.dataset.weeks, 10) || 53;
+  const scroller = heatEl.parentElement;
+  const avail = ((scroller && scroller.clientWidth) || heatEl.clientWidth) - 36 - weeks * 3;
+  const cell = Math.max(11, Math.min(18, Math.floor(avail / weeks)));
+  heatEl.style.setProperty('--cell', cell + 'px');
+}
+
+let _heatFitTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_heatFitTimer);
+  _heatFitTimer = setTimeout(() => document.querySelectorAll('.heat').forEach(fitHeatmap), 180);
+});
+
 function renderHeatmap(mountId, statsId) {
   const mount = document.getElementById(mountId);
   if (!mount) return;
@@ -11259,6 +11282,14 @@ function renderHeatmap(mountId, statsId) {
   // Narrow screens scroll the grid: start at this week rather than last October.
   const scroller = mount.querySelector('.heat-scroll');
   if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+
+  // Fill the card width: grow the cells to the available room.
+  const heatEl = mount.querySelector('.heat');
+  if (heatEl) {
+    heatEl.dataset.weeks = String(cols.length);
+    fitHeatmap(heatEl);
+    if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+  }
 
   const stats = statsId && document.getElementById(statsId);
   if (stats) {
