@@ -896,6 +896,15 @@ input, textarea, select { font-family: inherit; outline: none; }
 
 /* ===================== SUBJECTS PAGE ===================== */
 .subjects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+#subjects-summary { margin-bottom: 16px; }
+.subj-sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.subj-sum { padding: 12px 14px; background: var(--bg3); border: 1px solid var(--line); border-radius: var(--r-md); }
+.subj-sum-val { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.subj-sum:nth-child(1) .subj-sum-val { color: var(--accent); }
+.subj-sum:nth-child(2) .subj-sum-val { color: #9cc4e4; }
+.subj-sum:nth-child(3) .subj-sum-val { color: var(--accent3, #6bbd8a); }
+.subj-sum:nth-child(4) .subj-sum-val { color: #d4a45a; }
+.subj-sum-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
 .subject-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 22px;
@@ -3662,13 +3671,6 @@ kbd.k {
             <div id="upnext-body"></div>
           </div>
         </div>
-        <!-- Subject progress -->
-        <div class="card" style="margin-bottom:18px;">
-          <div class="card-title">Subject Progress</div>
-          <div id="dash-subjects">
-            <div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
-          </div>
-        </div>
         <!-- Task summary -->
         <div class="card" style="margin-bottom:18px;">
           <div class="card-title">Tasks Summary</div>
@@ -3789,6 +3791,15 @@ kbd.k {
         <div class="inline-form">
           <input type="text" id="new-subject-input" placeholder="New subject name…" onkeydown="if(event.key==='Enter')addSubject()">
           <button class="btn-add-subject" onclick="addSubject()">+ Add Subject</button>
+        </div>
+        <div class="card" id="subjects-summary">
+          <div class="card-title">All Subjects</div>
+          <div class="subj-sum-grid">
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-subjects">0</div><div class="subj-sum-lbl">Subjects</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-topics">0 / 0</div><div class="subj-sum-lbl">Topics done</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-progress">0%</div><div class="subj-sum-lbl">Avg progress</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-hours">0h</div><div class="subj-sum-lbl">Study time</div></div>
+          </div>
         </div>
         <div class="subjects-grid" id="subjects-grid">
           <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
@@ -7992,22 +8003,6 @@ function renderDashboard() {
   const attRate = daysElapsed > 0 ? Math.round(((presentDays + leaveDays) / daysElapsed) * 100) : 0;
   setRoundProgress('att-circle', 'att-pct', Math.min(100, attRate));
 
-  // subject bars
-  const dashSubj = document.getElementById('dash-subjects');
-  if (subjs.length === 0) {
-    dashSubj.innerHTML = '<div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
-  } else {
-    dashSubj.innerHTML = subjs.map(s => {
-      const pct = calcSubjectProgress(s);
-      const c = colorForSubject(s);
-      return `<div class="subject-bar-row" onclick="openRoadmap('${s.id}')">
-        <span class="subject-bar-name" style="color:${c};">●&nbsp; ${escHtml(s.name)}</span>
-        <div class="subject-bar-track"><div class="subject-bar-fill" style="width:${pct}%;background:linear-gradient(90deg, ${c}, ${c}cc);"></div></div>
-        <span class="subject-bar-pct">${pct}%</span>
-      </div>`;
-    }).join('');
-  }
-
   // tasks
   const tasks = state.tasks;
   document.getElementById('dash-total-tasks').textContent = tasks.length;
@@ -8179,8 +8174,23 @@ function calcSubjectProgress(s) {
   return Math.round((done / s.topics.length) * 100);
 }
 
+function renderSubjectsSummary() {
+  const subs = state.subjects;
+  const totalTopics = subs.reduce((a, s) => a + (s.topics ? s.topics.length : 0), 0);
+  const doneTopics = subs.reduce((a, s) => a + (s.topics ? s.topics.filter(t => t.done).length : 0), 0);
+  const avg = subs.length ? Math.round(subs.reduce((a, s) => a + calcSubjectProgress(s), 0) / subs.length) : 0;
+  const ms = state.sessions.filter(s => s.status === 'done').reduce((a, s) => a + (s.duration || 0), 0);
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('ss-subjects', String(subs.length));
+  set('ss-topics', `${doneTopics} / ${totalTopics}`);
+  set('ss-progress', avg + '%');
+  set('ss-hours', subs.length ? formatHM(ms) : '0h');
+}
+
 function renderSubjects() {
   const grid = document.getElementById('subjects-grid');
+  renderSubjectsSummary();
   if (state.subjects.length === 0) {
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
     return;
