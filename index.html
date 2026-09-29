@@ -896,6 +896,15 @@ input, textarea, select { font-family: inherit; outline: none; }
 
 /* ===================== SUBJECTS PAGE ===================== */
 .subjects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+#subjects-summary { margin-bottom: 16px; }
+.subj-sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.subj-sum { padding: 12px 14px; background: var(--bg3); border: 1px solid var(--line); border-radius: var(--r-md); }
+.subj-sum-val { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+.subj-sum:nth-child(1) .subj-sum-val { color: var(--accent); }
+.subj-sum:nth-child(2) .subj-sum-val { color: #9cc4e4; }
+.subj-sum:nth-child(3) .subj-sum-val { color: var(--accent3, #6bbd8a); }
+.subj-sum:nth-child(4) .subj-sum-val { color: #d4a45a; }
+.subj-sum-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
 .subject-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 22px;
@@ -1275,13 +1284,30 @@ input, textarea, select { font-family: inherit; outline: none; }
 .an-day-dur { font-family: var(--font-mono); font-weight: 500; font-size: 0.8rem; color: var(--text); }
 .an-day-empty { font-size: 0.85rem; color: var(--muted2); padding: 8px 0 2px; }
 
-.an-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.an-charts { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; align-items: stretch; }
 #page-analytics .chart-card { padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
 #page-analytics .chart-card::before { display: none; }
 #page-analytics .chart-card:hover { transform: none; box-shadow: none; }
-#page-analytics .chart-card .card-title, #page-analytics .an-chart-title { font-size: 0.9rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-bright); margin-bottom: 14px; }
-#page-analytics .chart-wrap { height: 220px; }
+#page-analytics .chart-card .card-title, #page-analytics .an-chart-title { font-size: 0.92rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-bright); margin-bottom: 4px; }
+#page-analytics .an-chart-sub { font-size: 0.74rem; color: var(--muted2); margin-bottom: 14px; }
+#page-analytics .an-charts .chart-card { display: flex; flex-direction: column; min-width: 0; padding: 22px; }
+#page-analytics .an-charts .an-c-4 { grid-column: span 4; }
+#page-analytics .an-charts .an-c-6 { grid-column: span 6; }
+#page-analytics .an-charts .an-c-8 { grid-column: span 8; }
+#page-analytics .an-charts .an-c-12 { grid-column: span 12; }
+.an-h-hero { --an-h: 336px; }
+.an-h-lg { --an-h: 300px; }
+.an-h-md { --an-h: 272px; }
+#page-analytics .an-charts .chart-wrap { position: relative; height: auto; flex: 1 1 auto; min-height: var(--an-h, 272px); }
 
+@media (max-width: 1200px) {
+  #page-analytics .an-charts .an-c-8 { grid-column: span 12; }
+  #page-analytics .an-charts .an-c-6 { grid-column: span 4; }
+}
+@media (max-width: 1040px) {
+  #page-analytics .an-charts .an-c-4 { grid-column: span 6; }
+  #page-analytics .an-charts .an-c-6 { grid-column: span 6; }
+}
 @media (max-width: 900px) {
   .an-hero { grid-template-columns: 1fr; }
   .an-kpi-row { grid-template-columns: repeat(2, 1fr); }
@@ -1289,8 +1315,8 @@ input, textarea, select { font-family: inherit; outline: none; }
 @media (max-width: 700px) {
   .an-hero-main, .an-control-panel { padding: 16px; }
   .an-charts { grid-template-columns: 1fr; }
-  #page-analytics .chart-card { padding: 14px; }
-  #page-analytics .chart-wrap { height: 190px; }
+  #page-analytics .an-charts .chart-card { grid-column: 1 / -1; padding: 14px; }
+  #page-analytics .an-charts .chart-wrap { height: 210px; min-height: 210px; }
   .an-kpi-val { font-size: 1.1rem; }
   .an-day-session { grid-template-columns: 1fr auto; }
   .an-day-task { grid-column: 1 / -1; }
@@ -2433,7 +2459,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 /* ---------- 9. DASHBOARD ---------- */
 #dash-meta {
   display: flex; align-items: stretch; gap: 0; flex-wrap: nowrap;
-  padding: 18px 8px; margin-bottom: 16px;
+  padding: 18px 8px; margin-bottom: 18px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none;
 }
 .meta-item { flex: 1 1 0; min-width: 0; flex-direction: column-reverse; justify-content: flex-end; gap: 4px; padding: 0 20px; }
@@ -2442,7 +2468,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 .meta-divider { width: 1px; height: auto; align-self: stretch; background: var(--line); }
 #dash-streak { color: var(--warn) !important; }
 
-#daily-goal-card { margin-bottom: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
+#daily-goal-card { margin-bottom: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: none; }
 #daily-goal-card::before, #page-dashboard #daily-goal-card::before { display: none; }
 .goal-title { font-size: 0.9rem; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-bright); }
 .goal-progress-wrap { border-radius: 99px; background: var(--bg3); }
@@ -3004,6 +3030,7 @@ kbd.k {
 .heat-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
 .heat {
   display: grid; grid-template-columns: auto auto; gap: 5px 7px; width: max-content;
+  --cell: 11px;
   --h0: var(--bg3);
   --h1: rgba(94, 156, 208, 0.24);
   --h2: rgba(94, 156, 208, 0.45);
@@ -3016,13 +3043,13 @@ kbd.k {
   --h3: rgba(47, 109, 158, 0.64);
   --h4: rgba(47, 109, 158, 0.95);
 }
-.heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: 14px; font-size: 0.66rem; color: var(--muted2); }
+.heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: calc(var(--cell) + 3px); font-size: 0.66rem; color: var(--muted2); }
 .heat-months span { white-space: nowrap; }
-.heat-days { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; font-size: 0.62rem; color: var(--muted2); }
-.heat-days span { line-height: 11px; text-align: right; }
+.heat-days { display: grid; grid-template-rows: repeat(7, var(--cell)); gap: 3px; font-size: 0.62rem; color: var(--muted2); }
+.heat-days span { line-height: var(--cell); text-align: right; }
 .heat-weeks { display: flex; gap: 3px; }
-.heat-col { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; }
-.heat-cell { width: 11px; height: 11px; border-radius: 2px; background: var(--h0); box-shadow: inset 0 0 0 1px var(--line-soft); }
+.heat-col { display: grid; grid-template-rows: repeat(7, var(--cell)); gap: 3px; }
+.heat-cell { width: var(--cell, 11px); height: var(--cell, 11px); border-radius: 2px; background: var(--h0); box-shadow: inset 0 0 0 1px var(--line-soft); }
 .heat-cell.l1 { background: var(--h1); box-shadow: none; }
 .heat-cell.l2 { background: var(--h2); box-shadow: none; }
 .heat-cell.l3 { background: var(--h3); box-shadow: none; }
@@ -3115,8 +3142,11 @@ kbd.k {
 .pomo-hint { margin-top: 10px; font-size: 0.78rem; line-height: 1.5; color: var(--muted2); }
 
 /* ---------- J. TODAY / UP NEXT ---------- */
-.dash-topline { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-bottom: 18px; align-items: start; }
+.dash-topline { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; margin-bottom: 18px; align-items: stretch; }
 .dash-topline > .grid-2 { margin-bottom: 0 !important; }
+#page-dashboard .dash-topline .card { display: flex; flex-direction: column; }
+#page-dashboard .dash-topline .round-progress-wrap { flex: 1 1 auto; justify-content: center; }
+#page-dashboard .dash-topline .grid-2 .card-title { min-height: 1.2em; }
 .upnext-card { display: flex; flex-direction: column; height: 100%; }
 .upnext-list { display: flex; flex-direction: column; gap: 7px; }
 .upnext-item {
@@ -3649,13 +3679,6 @@ kbd.k {
             <div id="upnext-body"></div>
           </div>
         </div>
-        <!-- Subject progress -->
-        <div class="card" style="margin-bottom:18px;">
-          <div class="card-title">Subject Progress</div>
-          <div id="dash-subjects">
-            <div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
-          </div>
-        </div>
         <!-- Task summary -->
         <div class="card" style="margin-bottom:18px;">
           <div class="card-title">Tasks Summary</div>
@@ -3776,6 +3799,15 @@ kbd.k {
         <div class="inline-form">
           <input type="text" id="new-subject-input" placeholder="New subject name…" onkeydown="if(event.key==='Enter')addSubject()">
           <button class="btn-add-subject" onclick="addSubject()">+ Add Subject</button>
+        </div>
+        <div class="card" id="subjects-summary">
+          <div class="card-title">All Subjects</div>
+          <div class="subj-sum-grid">
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-subjects">0</div><div class="subj-sum-lbl">Subjects</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-topics">0 / 0</div><div class="subj-sum-lbl">Topics done</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-progress">0%</div><div class="subj-sum-lbl">Avg progress</div></div>
+            <div class="subj-sum"><div class="subj-sum-val" id="ss-hours">0h</div><div class="subj-sum-lbl">Study time</div></div>
+          </div>
         </div>
         <div class="subjects-grid" id="subjects-grid">
           <div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>
@@ -4159,21 +4191,42 @@ kbd.k {
         <div id="day-lookup-result" style="display:none;"></div>
 
         <div class="an-charts">
-          <div class="chart-card accent-amber">
-            <div class="an-chart-title">Subject Performance</div>
-            <div class="chart-wrap"><canvas id="analytics-subjects-chart"></canvas></div>
-          </div>
-          <div class="chart-card accent-sky">
+          <div class="chart-card accent-sky an-c-8 an-h-hero">
             <div class="an-chart-title" id="weekly-chart-title">Study Hours Trend</div>
+            <div class="an-chart-sub" id="weekly-chart-sub">Hours logged across the selected range</div>
             <div class="chart-wrap"><canvas id="analytics-weekly-chart"></canvas></div>
           </div>
-          <div class="chart-card accent-rose">
+          <div class="chart-card accent-amber an-c-4 an-h-hero">
+            <div class="an-chart-title">Subject Performance</div>
+            <div class="an-chart-sub" id="subjects-chart-sub">Progress across every subject</div>
+            <div class="chart-wrap"><canvas id="analytics-subjects-chart"></canvas></div>
+          </div>
+
+          <div class="chart-card accent-violet an-c-4 an-h-md">
+            <div class="an-chart-title">Monthly Study Hours</div>
+            <div class="an-chart-sub">Hours logged per calendar month</div>
+            <div class="chart-wrap"><canvas id="analytics-monthly-chart"></canvas></div>
+          </div>
+          <div class="chart-card accent-teal an-c-4 an-h-md">
+            <div class="an-chart-title">Weekday Rhythm</div>
+            <div class="an-chart-sub">Total hours vs average per active day</div>
+            <div class="chart-wrap"><canvas id="analytics-weekday-chart"></canvas></div>
+          </div>
+          <div class="chart-card accent-green an-c-4 an-h-md">
+            <div class="an-chart-title">Cumulative Study Time</div>
+            <div class="an-chart-sub">Running total over the selected range</div>
+            <div class="chart-wrap"><canvas id="analytics-cumulative-chart"></canvas></div>
+          </div>
+
+          <div class="chart-card accent-rose an-c-6 an-h-lg">
             <div class="an-chart-title">Task Status Breakdown</div>
+            <div class="an-chart-sub">Every task by its current status</div>
             <div class="chart-wrap"><canvas id="analytics-tasks-chart"></canvas></div>
           </div>
-          <div class="chart-card accent-violet">
-            <div class="an-chart-title">Monthly Study Hours</div>
-            <div class="chart-wrap"><canvas id="analytics-monthly-chart"></canvas></div>
+          <div class="chart-card accent-sky an-c-6 an-h-lg">
+            <div class="an-chart-title">Session Length Distribution</div>
+            <div class="an-chart-sub">How long your sessions usually run</div>
+            <div class="chart-wrap"><canvas id="analytics-sessionlen-chart"></canvas></div>
           </div>
         </div>
 
@@ -8063,6 +8116,8 @@ function navTo(page) {
   closeSidebarMobile();
   closeMoreMenu();
   try { renderSidebarFoot(); } catch (e) {}
+  // Heatmaps measure their card only once it is visible — refit on every navigation.
+  try { document.querySelectorAll('.page.active .heat').forEach(fitHeatmap); } catch (e) {}
 }
 
 function toggleSidebar() {
@@ -8139,22 +8194,6 @@ function renderDashboard() {
   }).length;
   const attRate = daysElapsed > 0 ? Math.round(((presentDays + leaveDays) / daysElapsed) * 100) : 0;
   setRoundProgress('att-circle', 'att-pct', Math.min(100, attRate));
-
-  // subject bars
-  const dashSubj = document.getElementById('dash-subjects');
-  if (subjs.length === 0) {
-    dashSubj.innerHTML = '<div class="empty-state"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
-  } else {
-    dashSubj.innerHTML = subjs.map(s => {
-      const pct = calcSubjectProgress(s);
-      const c = colorForSubject(s);
-      return `<div class="subject-bar-row" onclick="openRoadmap('${s.id}')">
-        <span class="subject-bar-name" style="color:${c};">●&nbsp; ${escHtml(s.name)}</span>
-        <div class="subject-bar-track"><div class="subject-bar-fill" style="width:${pct}%;background:linear-gradient(90deg, ${c}, ${c}cc);"></div></div>
-        <span class="subject-bar-pct">${pct}%</span>
-      </div>`;
-    }).join('');
-  }
 
   // tasks
   const tasks = state.tasks;
@@ -8327,8 +8366,23 @@ function calcSubjectProgress(s) {
   return Math.round((done / s.topics.length) * 100);
 }
 
+function renderSubjectsSummary() {
+  const subs = state.subjects;
+  const totalTopics = subs.reduce((a, s) => a + (s.topics ? s.topics.length : 0), 0);
+  const doneTopics = subs.reduce((a, s) => a + (s.topics ? s.topics.filter(t => t.done).length : 0), 0);
+  const avg = subs.length ? Math.round(subs.reduce((a, s) => a + calcSubjectProgress(s), 0) / subs.length) : 0;
+  const ms = state.sessions.filter(s => s.status === 'done').reduce((a, s) => a + (s.duration || 0), 0);
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('ss-subjects', String(subs.length));
+  set('ss-topics', `${doneTopics} / ${totalTopics}`);
+  set('ss-progress', avg + '%');
+  set('ss-hours', subs.length ? formatHM(ms) : '0h');
+}
+
 function renderSubjects() {
   const grid = document.getElementById('subjects-grid');
+  renderSubjectsSummary();
   if (state.subjects.length === 0) {
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon" aria-hidden="true">📚</div><div class="empty-text">No subjects yet</div><button type="button" class="empty-cta" onclick="focusNewSubject()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add your first subject</button></div>';
     return;
@@ -9766,6 +9820,8 @@ function renderAnalytics() {
 
   const rangeLabelEl = document.getElementById('an-range-label');
   if (rangeLabelEl) rangeLabelEl.textContent = rangeLabelText;
+  const weekSubEl = document.getElementById('weekly-chart-sub');
+  if (weekSubEl) weekSubEl.textContent = rangeLabelText;
 
   const kpiHours = document.getElementById('an-kpi-hours');
   const kpiSessions = document.getElementById('an-kpi-sessions');
@@ -9818,6 +9874,9 @@ function renderAnalytics() {
     } else {
       subjData = state.subjects.map(s => calcSubjectProgress(s));
     }
+
+    const subjSubEl = document.getElementById('subjects-chart-sub');
+    if (subjSubEl) subjSubEl.textContent = isSpecificMonth ? `Hours studied in ${rangeLabelText}` : 'Progress % across every subject';
 
     const barGradients = colors.map(c => c + 'cc');
 
@@ -9930,7 +9989,14 @@ function renderAnalytics() {
           pointHoverBorderWidth: 3
         }]
       },
-      options: cOpts
+      options: {
+        ...cOpts,
+        scales: {
+          ...cOpts.scales,
+          x: { ...cOpts.scales.x, ticks: { ...cOpts.scales.x.ticks, autoSkip: true, maxTicksLimit: 10, maxRotation: 0, minRotation: 0 } },
+          y: { ...cOpts.scales.y, ticks: { ...cOpts.scales.y.ticks, callback: v => v + 'h' } }
+        }
+      }
     });
   }
 
@@ -10006,6 +10072,163 @@ function renderAnalytics() {
         }]
       },
       options: cOpts
+    });
+  }
+
+  // 5. Weekday Rhythm Chart (total hours bars + avg-per-active-day line)
+  const wdCtx = document.getElementById('analytics-weekday-chart');
+  if (wdCtx) {
+    const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dayMs = new Array(7).fill(0);
+    const daySeen = Array.from({ length: 7 }, () => new Set());
+    rangeSessions.forEach(s => {
+      if (!s.date) return;
+      const d = new Date(s.date + 'T00:00:00');
+      if (isNaN(d.getTime())) return;
+      const i = (d.getDay() + 6) % 7;
+      dayMs[i] += (s.duration || 0);
+      daySeen[i].add(s.date);
+    });
+    const dayTotals = dayMs.map(ms => Math.round(ms / 3600000 * 10) / 10);
+    const dayAvgs = dayMs.map((ms, i) => daySeen[i].size
+      ? Math.round((ms / daySeen[i].size / 3600000) * 10) / 10
+      : 0);
+
+    state.analyticsCharts.weekday = new Chart(wdCtx, {
+      type: 'bar',
+      data: {
+        labels: dayLabels,
+        datasets: [
+          {
+            label: 'Total hours', data: dayTotals,
+            backgroundColor: 'rgba(94, 156, 208, 0.72)',
+            borderColor: '#5e9cd0',
+            borderWidth: 0,
+            borderRadius: 5,
+            maxBarThickness: 34,
+            order: 2
+          },
+          {
+            label: 'Avg per active day', type: 'line', data: dayAvgs,
+            yAxisID: 'y1',
+            borderColor: '#d4a45a',
+            borderWidth: 2.5,
+            backgroundColor: '#d4a45a',
+            tension: 0.35,
+            pointRadius: 3.5,
+            pointBackgroundColor: '#d4a45a',
+            pointBorderColor: '#1a1b1d',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6,
+            order: 1
+          }
+        ]
+      },
+      options: {
+        ...cOpts,
+        scales: {
+          x: { ...cOpts.scales.x, ticks: { ...cOpts.scales.x.ticks, font: { size: 11, family: 'IBM Plex Sans', weight: '600' } } },
+          y: { ...cOpts.scales.y, ticks: { ...cOpts.scales.y.ticks, callback: v => v + 'h' } },
+          y1: {
+            position: 'right', beginAtZero: true,
+            grid: { display: false, drawOnChartArea: false },
+            ticks: { color: '#d4a45a', font: { size: 10, family: 'IBM Plex Sans' }, callback: v => v + 'h' }
+          }
+        }
+      }
+    });
+  }
+
+  // 6. Cumulative Study Time Chart (running total area)
+  const cumCtx = document.getElementById('analytics-cumulative-chart');
+  if (cumCtx) {
+    const byDay = {};
+    rangeSessions.forEach(s => {
+      if (!s.date) return;
+      byDay[s.date] = (byDay[s.date] || 0) + (s.duration || 0);
+    });
+    const keys = Object.keys(byDay).sort();
+    let running = 0;
+    const cumLabels = [];
+    const cumData = [];
+    keys.forEach(k => {
+      running += byDay[k];
+      cumLabels.push(new Date(k + 'T00:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
+      cumData.push(Math.round(running / 3600000 * 10) / 10);
+    });
+
+    const cumGradient = cumCtx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+    cumGradient.addColorStop(0, 'rgba(74, 158, 107, 0.42)');
+    cumGradient.addColorStop(0.6, 'rgba(74, 158, 107, 0.10)');
+    cumGradient.addColorStop(1, 'rgba(74, 158, 107, 0.0)');
+
+    state.analyticsCharts.cumulative = new Chart(cumCtx, {
+      type: 'line',
+      data: {
+        labels: cumLabels,
+        datasets: [{
+          label: 'Cumulative hours', data: cumData,
+          borderColor: '#6bbd8a',
+          borderWidth: 3,
+          backgroundColor: cumGradient,
+          fill: true,
+          tension: 0.32,
+          pointBackgroundColor: '#6bbd8a',
+          pointBorderColor: '#0f0f0f',
+          pointBorderWidth: 2,
+          pointRadius: keys.length > 40 ? 0 : 3,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        ...cOpts,
+        scales: {
+          ...cOpts.scales,
+          x: { ...cOpts.scales.x, ticks: { ...cOpts.scales.x.ticks, autoSkip: true, maxTicksLimit: 8, maxRotation: 0, minRotation: 0 } },
+          y: { ...cOpts.scales.y, ticks: { ...cOpts.scales.y.ticks, callback: v => v + 'h' } }
+        }
+      }
+    });
+  }
+
+  // 7. Session Length Distribution Chart (horizontal bars)
+  const slCtx = document.getElementById('analytics-sessionlen-chart');
+  if (slCtx) {
+    const buckets = [
+      { label: '< 30 min',  min: 0,   max: 30,       color: 'rgba(94, 156, 208, 0.45)' },
+      { label: '30–60 min', min: 30,  max: 60,       color: 'rgba(94, 156, 208, 0.72)' },
+      { label: '1–2 h',     min: 60,  max: 120,      color: 'rgba(107, 189, 138, 0.75)' },
+      { label: '2–3 h',     min: 120, max: 180,      color: 'rgba(212, 164, 90, 0.82)' },
+      { label: '3 h +',     min: 180, max: Infinity, color: 'rgba(199, 95, 95, 0.82)' }
+    ];
+    const slCounts = buckets.map(() => 0);
+    rangeSessions.forEach(s => {
+      const mins = (s.duration || 0) / 60000;
+      const idx = buckets.findIndex(b => mins >= b.min && mins < b.max);
+      if (idx >= 0) slCounts[idx]++;
+    });
+
+    state.analyticsCharts.sessionLen = new Chart(slCtx, {
+      type: 'bar',
+      data: {
+        labels: buckets.map(b => b.label),
+        datasets: [{
+          label: 'Sessions',
+          data: slCounts,
+          backgroundColor: buckets.map(b => b.color),
+          borderRadius: 5,
+          maxBarThickness: 26
+        }]
+      },
+      options: {
+        ...cOpts,
+        indexAxis: 'y',
+        plugins: { ...cOpts.plugins, legend: { display: false } },
+        scales: {
+          x: { ...cOpts.scales.y, ticks: { ...cOpts.scales.y.ticks, precision: 0 } },
+          y: { ...cOpts.scales.x, ticks: { ...cOpts.scales.x.ticks, font: { size: 11, family: 'IBM Plex Sans', weight: '600' } } }
+        }
+      }
     });
   }
 }
@@ -11217,6 +11440,23 @@ function studyMsByDate() {
   return map;
 }
 
+// Sizes heatmap cells so the grid fills the card instead of leaving dead space
+// on the right. Cells stay between 11px (scroll kicks in) and 18px.
+function fitHeatmap(heatEl) {
+  if (!heatEl) return;
+  const weeks = parseInt(heatEl.dataset.weeks, 10) || 53;
+  const scroller = heatEl.parentElement;
+  const avail = ((scroller && scroller.clientWidth) || heatEl.clientWidth) - 36 - weeks * 3;
+  const cell = Math.max(11, Math.min(18, Math.floor(avail / weeks)));
+  heatEl.style.setProperty('--cell', cell + 'px');
+}
+
+let _heatFitTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_heatFitTimer);
+  _heatFitTimer = setTimeout(() => document.querySelectorAll('.heat').forEach(fitHeatmap), 180);
+});
+
 function renderHeatmap(mountId, statsId) {
   const mount = document.getElementById(mountId);
   if (!mount) return;
@@ -11289,6 +11529,14 @@ function renderHeatmap(mountId, statsId) {
   // Narrow screens scroll the grid: start at this week rather than last October.
   const scroller = mount.querySelector('.heat-scroll');
   if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+
+  // Fill the card width: grow the cells to the available room.
+  const heatEl = mount.querySelector('.heat');
+  if (heatEl) {
+    heatEl.dataset.weeks = String(cols.length);
+    fitHeatmap(heatEl);
+    if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+  }
 
   const stats = statsId && document.getElementById(statsId);
   if (stats) {
