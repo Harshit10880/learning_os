@@ -1097,6 +1097,15 @@ input, textarea, select { font-family: inherit; outline: none; }
 }
 .att-leave-btn:hover, .an-export-btn:hover { background: var(--brand-hover); border-color: var(--brand-hover); transform: none; filter: none; box-shadow: none; }
 .att-next-leave { font-size: 0.75rem; color: var(--muted2); text-align: center; line-height: 1.35; padding: 0 4px; }
+.att-manual-btn {
+  background: transparent; color: var(--text); border: 1px dashed var(--line-strong);
+}
+.att-manual-btn:hover { background: var(--surface2); color: var(--text-bright); border-color: var(--brand); }
+.att-manual-hint { font-size: 0.78rem; line-height: 1.5; color: var(--muted); padding: 10px 12px; border-radius: var(--r-sm); background: var(--bg3); border: 1px solid var(--line); }
+.att-manual-hint.ok { color: #6bbd8a; border-color: rgba(74, 158, 107, 0.3); background: rgba(74, 158, 107, 0.1); }
+.att-manual-hint.warn { color: #d98585; border-color: rgba(199, 95, 95, 0.3); background: rgba(199, 95, 95, 0.08); }
+#modal-manual-att .att-manual-remove { color: #d98585; border-color: rgba(199, 95, 95, 0.35); }
+#modal-manual-att .att-manual-remove:hover { background: rgba(199, 95, 95, 0.12); color: #d98585; border-color: rgba(199, 95, 95, 0.5); }
 
 .att-cal-shell { margin-bottom: 16px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); }
 .att-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
@@ -3963,6 +3972,7 @@ kbd.k {
 
           <div class="att-hero-actions">
             <button class="att-leave-btn" onclick="openLeaveModal()" type="button">Apply for Leave</button>
+            <button class="att-leave-btn att-manual-btn" onclick="openManualAttModal()" type="button">Mark a Day Present</button>
             <div class="att-next-leave" id="next-leave-info">No upcoming leaves</div>
           </div>
         </section>
@@ -4974,6 +4984,32 @@ kbd.k {
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-leave')">Cancel</button>
       <button class="btn-accent" onclick="applyLeave()">Apply Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Attendance Modal -->
+<div class="modal-overlay" id="modal-manual-att">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Mark a Day Present</div>
+      <button class="modal-close" onclick="closeModal('modal-manual-att')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="manual-att-date" onchange="syncManualAttModal()">
+      </div>
+      <div class="field">
+        <label>Login time (optional)</label>
+        <input type="time" id="manual-att-time" value="09:00">
+      </div>
+      <div class="att-manual-hint" id="manual-att-hint">Pick the day you forgot to check in.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary att-manual-remove" id="manual-att-remove" style="display:none" onclick="removeManualAttendance()">Remove mark</button>
+      <button class="btn-secondary" onclick="closeModal('modal-manual-att')">Cancel</button>
+      <button class="btn-accent" id="manual-att-save" onclick="saveManualAttendance()">Mark Present</button>
     </div>
   </div>
 </div>
@@ -9263,6 +9299,127 @@ function deleteLeave(idx) {
   saveData('leaves');
   renderAttendance();
   showToast('Leave removed');
+}
+
+// ===================== MANUAL ATTENDANCE (back-fill a forgotten day) =====================
+function manualAttStatus(dateKey) {
+  if (!dateKey) return null;
+  if (state.leaves.some(l => dateKey >= l.startDate && dateKey <= l.endDate)) return 'leave';
+  const entry = state.attendance.find(a => a.date === dateKey && a.status === 'present');
+  if (!entry) return 'absent';
+  return (entry.history && entry.history.length && entry.history.every(h => h.manual)) ? 'manual-present' : 'present';
+}
+
+function manualTimeLabel(v) {
+  if (!v) return '09:00 AM';
+  const parts = v.split(':');
+  const d = new Date();
+  d.setHours(parseInt(parts[0], 10) || 0, parseInt(parts[1], 10) || 0, 0, 0);
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+function openManualAttModal() {
+  const today = toDateKey(new Date());
+  const min = new Date();
+  min.setFullYear(min.getFullYear() - 2);
+  const dateInput = document.getElementById('manual-att-date');
+  dateInput.min = toDateKey(min);
+  dateInput.max = today;
+  dateInput.value = '';
+  document.getElementById('manual-att-time').value = '09:00';
+  syncManualAttModal();
+  openModal('modal-manual-att');
+}
+
+function syncManualAttModal() {
+  const date = document.getElementById('manual-att-date').value;
+  const hint = document.getElementById('manual-att-hint');
+  const saveBtn = document.getElementById('manual-att-save');
+  const removeBtn = document.getElementById('manual-att-remove');
+  const today = toDateKey(new Date());
+  hint.className = 'att-manual-hint';
+  saveBtn.style.display = '';
+  removeBtn.style.display = 'none';
+  if (!date) {
+    hint.textContent = 'Pick the day you forgot to check in.';
+    saveBtn.disabled = false;
+    return;
+  }
+  if (date > today) {
+    hint.className = 'att-manual-hint warn';
+    hint.textContent = 'Future dates cannot be marked present.';
+    saveBtn.disabled = true;
+    return;
+  }
+  const st = manualAttStatus(date);
+  if (st === 'leave') {
+    hint.className = 'att-manual-hint warn';
+    hint.textContent = date + ' already has approved leave.';
+    saveBtn.disabled = true;
+    return;
+  }
+  if (st === 'manual-present') {
+    hint.className = 'att-manual-hint ok';
+    hint.textContent = date + ' is already marked present (added manually).';
+    saveBtn.style.display = 'none';
+    saveBtn.disabled = false;
+    removeBtn.style.display = '';
+    return;
+  }
+  if (st === 'present') {
+    hint.className = 'att-manual-hint ok';
+    hint.textContent = date + ' is already marked present from your login.';
+    saveBtn.disabled = true;
+    return;
+  }
+  hint.className = 'att-manual-hint';
+  hint.textContent = 'Will mark ' + date + ' as present.';
+  saveBtn.disabled = false;
+}
+
+function saveManualAttendance() {
+  const date = document.getElementById('manual-att-date').value;
+  const today = toDateKey(new Date());
+  if (!date) { showToast('Pick a date', 'error'); return; }
+  if (date > today) { showToast('Cannot mark a future day', 'error'); return; }
+  const st = manualAttStatus(date);
+  if (st === 'leave') { showToast('That day already has leave', 'warn'); return; }
+  if (st === 'present' || st === 'manual-present') { showToast('That day is already present', 'warn'); return; }
+
+  const timeStr = manualTimeLabel(document.getElementById('manual-att-time').value);
+  let entry = state.attendance.find(a => a.date === date);
+  if (!entry) {
+    state.attendance.push({
+      date: date,
+      loginTime: timeStr,
+      logoutTime: null,
+      status: 'present',
+      history: [{ type: 'login', time: timeStr, ts: new Date().toISOString(), manual: true }]
+    });
+  } else {
+    entry.status = 'present';
+    entry.loginTime = timeStr;
+    if (!entry.history) entry.history = [];
+    entry.history.push({ type: 'login', time: timeStr, ts: new Date().toISOString(), manual: true });
+  }
+  saveData('attendance');
+  closeModal('modal-manual-att');
+  renderAttendance();
+  showToast('Marked ' + date + ' as present', 'success');
+}
+
+function removeManualAttendance() {
+  const date = document.getElementById('manual-att-date').value;
+  if (!date) return;
+  const idx = state.attendance.findIndex(a => a.date === date && a.status === 'present');
+  if (idx < 0) { closeModal('modal-manual-att'); return; }
+  if (manualAttStatus(date) !== 'manual-present') { closeModal('modal-manual-att'); return; }
+  if (!confirm('Remove the present mark for ' + date + '?')) return;
+  state.attendance.splice(idx, 1);
+  saveData('attendance');
+  closeModal('modal-manual-att');
+  renderAttendance();
+  showToast('Mark removed for ' + date);
 }
 
 // ===================== NOTES =====================
